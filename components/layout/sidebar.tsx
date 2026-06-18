@@ -33,6 +33,12 @@ export function Sidebar() {
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
+          title: "Debt Management",
+          href: "/dashboard/debts",
+          icon: <Wallet className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
           title: "Import Cashflow",
           href: "/dashboard/imports/cashflow",
           icon: <UploadCloud className="h-5 w-5" />,
