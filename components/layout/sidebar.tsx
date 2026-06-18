@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "../../store/auth-store";
-import { LayoutDashboard, Users, Building, Settings, Sparkles, Building2, Wallet, FolderTree, Package, Briefcase } from "lucide-react";
+import { LayoutDashboard, Users, Building, Settings, Sparkles, Building2, Wallet, FolderTree, Package, Briefcase, ArrowRightLeft, UploadCloud, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "../../lib/utils";
 
 export function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   if (!user) return null;
 
@@ -23,6 +25,35 @@ export function Sidebar() {
           href: "/dashboard",
           icon: <LayoutDashboard className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Transactions",
+          href: "/dashboard/transactions",
+          icon: <ArrowRightLeft className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Import Cashflow",
+          href: "/dashboard/imports/cashflow",
+          icon: <UploadCloud className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+      ],
+    },
+    {
+      groupLabel: "Reports & Analytics",
+      items: [
+        {
+          title: "Cashflow Reports",
+          href: "/dashboard/reports/cashflow",
+          icon: <LayoutDashboard className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+        {
+          title: "Account Balances",
+          href: "/dashboard/reports/balances",
+          icon: <Wallet className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
       ],
     },
@@ -87,17 +118,24 @@ export function Sidebar() {
   ];
 
   return (
-    <div className="flex h-full w-72 flex-col bg-slate-900 text-slate-300 shadow-2xl">
-      <div className="flex h-20 items-center px-6 border-b border-slate-800">
+    <div className={cn("flex h-full flex-col bg-slate-900 text-slate-300 shadow-2xl transition-all duration-300 relative", isMinimized ? "w-20" : "w-72")}>
+      <button 
+        onClick={() => setIsMinimized(!isMinimized)}
+        className="absolute -right-3 top-6 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-700 transition-colors"
+      >
+        {isMinimized ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+      </button>
+
+      <div className={cn("flex h-20 items-center border-b border-slate-800", isMinimized ? "justify-center px-0" : "px-6")}>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/30 shrink-0">
             <Sparkles className="h-5 w-5" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white">BCP</h1>
+          {!isMinimized && <h1 className="text-2xl font-bold tracking-tight text-white whitespace-nowrap overflow-hidden">BCP</h1>}
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto py-6">
-        <nav className="space-y-6 px-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-6">
+        <nav className={cn("space-y-6", isMinimized ? "px-2" : "px-4")}>
           {navGroups.map((group, index) => {
             const visibleItems = group.items.filter((item) =>
               item.allowedRoles.includes(role)
@@ -107,24 +145,28 @@ export function Sidebar() {
 
             return (
               <div key={index} className="space-y-2">
-                <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                  {group.groupLabel}
-                </div>
+                {!isMinimized && (
+                  <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap overflow-hidden">
+                    {group.groupLabel}
+                  </div>
+                )}
                 {visibleItems.map((item) => {
                   const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(`${item.href}/`));
                   return (
                     <Link
                       key={item.href}
                       href={item.href}
+                      title={isMinimized ? item.title : undefined}
                       className={cn(
-                        "flex items-center space-x-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200",
+                        "flex items-center space-x-3 rounded-xl py-3 text-sm font-medium transition-all duration-200",
+                        isMinimized ? "px-0 justify-center" : "px-4",
                         isActive
                           ? "bg-primary-600 text-white shadow-md shadow-primary-500/20"
                           : "hover:bg-slate-800 hover:text-white"
                       )}
                     >
-                      {item.icon}
-                      <span>{item.title}</span>
+                      <div className="shrink-0">{item.icon}</div>
+                      {!isMinimized && <span className="whitespace-nowrap overflow-hidden">{item.title}</span>}
                     </Link>
                   );
                 })}

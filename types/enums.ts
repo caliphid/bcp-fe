@@ -23,3 +23,13 @@ export enum ProductType {
   RAW_MATERIAL = 'RAW_MATERIAL',
   OTHER = 'OTHER',
 }
+
+export enum TransactionType {
+  IN = 'IN',
+  OUT = 'OUT',
+}
+
+export enum TransactionStatus {
+  POSTED = 'POSTED',
+  VOID = 'VOID',
+}

@@ -148,7 +148,7 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New User">
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New User" className="max-w-2xl">
         <CreateUserForm 
           onSuccess={() => {
             setIsCreateModalOpen(false);
@@ -158,7 +158,7 @@ export default function UsersPage() {
         />
       </Modal>
 
-      <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit User">
+      <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit User" className="max-w-2xl">
         {editingUser && (
           <UpdateUserForm 
             user={editingUser}

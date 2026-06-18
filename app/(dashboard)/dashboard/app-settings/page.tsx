@@ -90,7 +90,7 @@ export default function AppSettingsPage() {
       )}
 
       {settings && (
-        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Modify App Settings">
+        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} title="Modify App Settings" className="max-w-2xl">
           <UpdateAppSettingsForm 
             initialData={settings}
             onSuccess={() => {

@@ -1,86 +1,76 @@
 "use client";
 
 import { useAuthStore } from "../../../store/auth-store";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Users, Building, Settings, ShieldAlert, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { DashboardFilterBar } from "../../../features/dashboard/components/dashboard-filter-bar";
+import { DashboardOverviewCards } from "../../../features/dashboard/components/dashboard-overview-cards";
+import { DashboardMonthComparison } from "../../../features/dashboard/components/dashboard-month-comparison";
+import { DashboardFinanceHealthCard } from "../../../features/dashboard/components/dashboard-finance-health-card";
+import { DashboardMonthlyTrend } from "../../../features/dashboard/components/dashboard-monthly-trend";
+import { DashboardDailyTrend } from "../../../features/dashboard/components/dashboard-daily-trend";
+import { DashboardCategoryBreakdown } from "../../../features/dashboard/components/dashboard-category-breakdown";
+import { DashboardTopTransactions } from "../../../features/dashboard/components/dashboard-top-transactions";
+import { DashboardAccountBalances } from "../../../features/dashboard/components/dashboard-account-balances";
+import { DashboardBusinessUnitPerformance } from "../../../features/dashboard/components/dashboard-business-unit-performance";
+import { DashboardYearlySummary } from "../../../features/dashboard/components/dashboard-yearly-summary";
+import { DashboardRecentTransactions } from "../../../features/dashboard/components/dashboard-recent-transactions";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
 
   if (!user) return null;
 
+  const isAdvancedRole = ["OWNER", "ADMIN_FINANCE"].includes(user.role);
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 pb-12">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h2>
-        <p className="mt-2 text-slate-500">Welcome back, {user.name}. Here's what's happening.</p>
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900">Finance Dashboard</h2>
+        <p className="mt-1 text-slate-500">Overview of your cashflow and business performance.</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        <Card className="relative overflow-hidden border-t-4 border-t-indigo-500">
-          <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-indigo-50 opacity-50 blur-2xl"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Role Status</CardTitle>
-            <div className="rounded-lg bg-indigo-100 p-2 text-indigo-600">
-              <ShieldAlert className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">{user.role}</div>
-            <p className="mt-1 text-xs text-slate-500">Current access level</p>
-          </CardContent>
-        </Card>
+      <DashboardFilterBar />
 
-        {["OWNER", "ADMIN_FINANCE"].includes(user.role) && (
-          <Card className="relative overflow-hidden group hover:border-blue-500/50 transition-colors">
-            <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-blue-50 opacity-50 blur-2xl"></div>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-slate-500">Users</CardTitle>
-              <div className="rounded-lg bg-blue-100 p-2 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                <Users className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-slate-900">Manage</div>
-              <Link href="/dashboard/users" className="mt-1 inline-flex items-center text-xs font-semibold text-blue-600 hover:text-blue-700">
-                View Staff <ArrowRight className="ml-1 h-3 w-3" />
-              </Link>
-            </CardContent>
-          </Card>
+      <div className="space-y-6">
+        <DashboardOverviewCards />
+        
+        {isAdvancedRole && (
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <DashboardMonthComparison />
+            </div>
+            <div className="lg:col-span-1">
+              <DashboardFinanceHealthCard />
+            </div>
+          </div>
         )}
 
-        <Card className="relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
-          <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-emerald-50 opacity-50 blur-2xl"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">Business Profile</CardTitle>
-            <div className="rounded-lg bg-emerald-100 p-2 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-              <Building className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">Access</div>
-            <Link href="/dashboard/business-profile" className="mt-1 inline-flex items-center text-xs font-semibold text-emerald-600 hover:text-emerald-700">
-              View Profile <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </CardContent>
-        </Card>
+        {isAdvancedRole && (
+          <DashboardMonthlyTrend />
+        )}
 
-        <Card className="relative overflow-hidden group hover:border-amber-500/50 transition-colors">
-          <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-amber-50 opacity-50 blur-2xl"></div>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-slate-500">App Settings</CardTitle>
-            <div className="rounded-lg bg-amber-100 p-2 text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
-              <Settings className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-slate-900">Configure</div>
-            <Link href="/dashboard/app-settings" className="mt-1 inline-flex items-center text-xs font-semibold text-amber-600 hover:text-amber-700">
-              View Settings <ArrowRight className="ml-1 h-3 w-3" />
-            </Link>
-          </CardContent>
-        </Card>
+        {isAdvancedRole && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DashboardDailyTrend />
+            <DashboardCategoryBreakdown />
+          </div>
+        )}
+
+        {isAdvancedRole && (
+          <DashboardTopTransactions />
+        )}
+
+        {isAdvancedRole && (
+          <div className="grid lg:grid-cols-2 gap-6">
+            <DashboardAccountBalances />
+            <DashboardBusinessUnitPerformance />
+          </div>
+        )}
+
+        {isAdvancedRole && (
+          <DashboardYearlySummary />
+        )}
+
+        <DashboardRecentTransactions />
       </div>
     </div>
   );

@@ -1,39 +1,33 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
 import { accountsApi } from "../../../../features/accounts/api";
-import { businessUnitsApi } from "../../../../features/business-units/api";
 import { Account } from "../../../../types/account";
-import { BusinessUnit } from "../../../../types/business-unit";
-import { PaginationMeta } from "../../../../types/common";
 import { useAuthStore } from "../../../../store/auth-store";
 import { Button } from "../../../../components/ui/button";
-import { PlusCircle, Pencil, Search } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { Modal } from "../../../../components/ui/modal";
 import { AccountForm } from "../../../../components/forms/account-form";
-import { DataTable } from "../../../../components/ui/data-table";
-import { StatusBadge } from "../../../../components/ui/status-badge";
 import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
-import { Input } from "../../../../components/ui/input";
 import { extractErrorMessage } from "../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
-import { AccountType } from "../../../../types/enums";
+import { useAccounts } from "../../../../features/accounts/hooks/use-accounts";
+import { AccountFilterBar } from "../../../../features/accounts/components/account-filter-bar";
+import { AccountTable } from "../../../../features/accounts/components/account-table";
 
 export default function AccountsPage() {
   const user = useAuthStore((state) => state.user);
-  const [data, setData] = useState<Account[]>([]);
-  const [businessUnits, setBusinessUnits] = useState<BusinessUnit[]>([]);
-  const [meta, setMeta] = useState<PaginationMeta | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [globalError, setGlobalError] = useState<string | null>(null);
+  const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
-  // Filters
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [buFilter, setBuFilter] = useState("");
+  const {
+    data,
+    meta,
+    loading,
+    globalError,
+    setGlobalError,
+    businessUnits,
+    fetchData,
+  } = useAccounts();
 
   // Modals
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -50,43 +44,6 @@ export default function AccountsPage() {
     message: "",
     action: async () => {},
   });
-
-  useEffect(() => {
-    businessUnitsApi.getBusinessUnits({ limit: 100, status: "ACTIVE" })
-      .then(res => setBusinessUnits(res.data))
-      .catch(err => console.error("Failed to fetch business units", err));
-  }, []);
-
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await accountsApi.getAccounts({
-        page,
-        limit: 10,
-        search,
-        status: statusFilter || undefined,
-        type: typeFilter || undefined,
-        businessUnitId: buFilter || undefined,
-      });
-      setData(res.data);
-      setMeta(res.meta);
-      setGlobalError(null);
-    } catch (err) {
-      setGlobalError("Failed to fetch accounts");
-    } finally {
-      setLoading(false);
-    }
-  }, [page, search, statusFilter, typeFilter, buFilter]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setPage(1);
-    setSearch(searchInput);
-  };
 
   const handleToggleStatus = (item: Account) => {
     const isActivating = item.status === "INACTIVE";
@@ -112,62 +69,6 @@ export default function AccountsPage() {
       },
     });
   };
-
-  const formatCurrency = (val: string) => {
-    const num = Number(val);
-    return isNaN(num) ? "0" : new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(num);
-  };
-
-  const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
-
-  const columns = [
-    { header: "Name", accessorKey: "name" as keyof Account },
-    { 
-      header: "Business Unit", 
-      cell: (item: Account) => item.businessUnit?.name || "-" 
-    },
-    { 
-      header: "Type", 
-      cell: (item: Account) => (
-        <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
-          {item.type}
-        </span>
-      )
-    },
-    { 
-      header: "Current Balance", 
-      cell: (item: Account) => formatCurrency(item.currentBalance)
-    },
-    {
-      header: "Status",
-      cell: (item: Account) => (
-        <StatusBadge
-          status={item.status}
-          canToggle={canMutate}
-          onToggle={() => handleToggleStatus(item)}
-        />
-      ),
-    },
-    {
-      header: "Actions",
-      className: "text-right",
-      cell: (item: Account) => (
-        <div className="flex justify-end gap-2">
-          {canMutate && (
-            <button
-              onClick={() => {
-                setEditingItem(item);
-                setIsFormOpen(true);
-              }}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      ),
-    },
-  ];
 
   return (
     <div className="space-y-6">
@@ -196,63 +97,19 @@ export default function AccountsPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
-            placeholder="Search..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-          />
-          <Button type="submit" variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-        <select
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          value={statusFilter}
-          onChange={(e) => {
-            setStatusFilter(e.target.value);
-            setPage(1);
-          }}
-        >
-          <option value="">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-        </select>
-        <select
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          value={typeFilter}
-          onChange={(e) => {
-            setTypeFilter(e.target.value);
-            setPage(1);
-          }}
-        >
-          <option value="">All Types</option>
-          {Object.values(AccountType).map((t) => (
-            <option key={t} value={t}>{t}</option>
-          ))}
-        </select>
-        <select
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          value={buFilter}
-          onChange={(e) => {
-            setBuFilter(e.target.value);
-            setPage(1);
-          }}
-        >
-          <option value="">All Business Units</option>
-          {businessUnits.map((bu) => (
-            <option key={bu.id} value={bu.id}>{bu.name}</option>
-          ))}
-        </select>
-      </div>
+      <AccountFilterBar businessUnits={businessUnits} />
 
-      <DataTable
+      {/* Table */}
+      <AccountTable
         data={data}
-        columns={columns}
         meta={meta}
-        onPageChange={setPage}
-        isLoading={loading}
+        loading={loading}
+        canMutate={canMutate}
+        onEdit={(item) => {
+          setEditingItem(item);
+          setIsFormOpen(true);
+        }}
+        onToggleStatus={handleToggleStatus}
       />
 
       {/* Form Modal */}
@@ -260,6 +117,7 @@ export default function AccountsPage() {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         title={editingItem ? "Edit Account" : "Create Account"}
+        className="max-w-2xl"
       >
         <AccountForm
           initialData={editingItem || undefined}

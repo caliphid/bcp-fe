@@ -204,7 +204,8 @@ export default function CrewPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Crew" : "Add Crew"}
+        title={editingItem ? "Edit Crew Member" : "Add Crew Member"}
+        className="max-w-2xl"
       >
         <CrewForm
           initialData={editingItem || undefined}
