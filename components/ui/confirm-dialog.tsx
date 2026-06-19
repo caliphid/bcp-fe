@@ -11,6 +11,7 @@ interface ConfirmDialogProps {
   isLoading?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  children?: React.ReactNode;
 }
 
 export function ConfirmDialog({
@@ -23,11 +24,13 @@ export function ConfirmDialog({
   isLoading = false,
   onConfirm,
   onCancel,
+  children,
 }: ConfirmDialogProps) {
   return (
     <Modal isOpen={isOpen} onClose={onCancel} title={title}>
       <div className="space-y-4">
         <p className="text-sm text-slate-600">{message}</p>
+        {children}
         <div className="flex justify-end space-x-3 pt-4">
           <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
             {cancelText}

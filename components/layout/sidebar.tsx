@@ -26,6 +26,8 @@ import {
   TrendingUp,
   Banknote,
   Landmark,
+  BookOpen,
+  Scale,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -65,7 +67,7 @@ function SidebarTooltip({
   return (
     <>
       {React.cloneElement(children, {
-        ref: ref as React.Ref<any>,
+        ref: ref as any,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
       })}
@@ -209,6 +211,42 @@ export function Sidebar() {
         },
       ],
     },
+
+    {
+      groupLabel: "Finance Control",
+      items: [
+        {
+          title: "Monthly Overview",
+          href: "/dashboard/finance/overview",
+          icon: <LayoutDashboard className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Account Ledger",
+          href: "/dashboard/finance/ledger",
+          icon: <BookOpen className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Account Transfers",
+          href: "/dashboard/finance/transfers",
+          icon: <ArrowRightLeft className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Balance Reconciliation",
+          href: "/dashboard/finance/reconciliation",
+          icon: <Scale className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+        {
+          title: "Financial Periods",
+          href: "/dashboard/finance/periods",
+          icon: <CalendarDays className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+      ],
+    },
     {
       groupLabel: "Reports & Analytics",
       items: [
@@ -326,7 +364,7 @@ export function Sidebar() {
           )}
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden py-6">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <nav className={cn("space-y-6", isMinimized ? "px-2" : "px-2")}>
           {navGroups.map((group, index) => {
             const visibleItems = group.items.filter((item) =>

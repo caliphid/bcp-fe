@@ -65,6 +65,10 @@ export const SearchableSelect = React.forwardRef<any, SearchableSelectProps>(
         isSearchable
         placeholder={placeholder || "-- Select --"}
         unstyled
+        menuPortalTarget={typeof document !== "undefined" ? document.body : null}
+        menuPosition="fixed"
+        menuShouldBlockScroll={false}
+        styles={{ menuPortal: base => ({ ...base, zIndex: 9999 }) }}
         className={cn(className, "border-0 border-transparent bg-transparent !p-0 shadow-none ring-0 outline-none focus:ring-0 focus:border-transparent h-auto m-0")}
         classNames={{
           control: (state) => cn(
