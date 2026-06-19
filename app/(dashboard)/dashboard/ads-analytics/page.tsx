@@ -31,7 +31,8 @@ export default function AdsAnalyticsPage() {
   const isOwnerOrFinance =
     user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
-  const [datePreset, setDatePreset] = useState<"today" | "this_week" | "this_month" | "custom">("this_month");
+  type DatePreset = "today" | "this_week" | "this_month" | "custom";
+  const [datePreset, setDatePreset] = useState<DatePreset>("this_month");
 
   const getToday = () => {
     const d = new Date();
@@ -63,7 +64,7 @@ export default function AdsAnalyticsPage() {
     endDate: "",
   });
 
-  const handlePresetChange = (preset: "today" | "this_week" | "this_month" | "custom") => {
+  const handlePresetChange = (preset: DatePreset) => {
     setDatePreset(preset);
     if (preset === "today") {
       setFilters(prev => ({ ...prev, month: "", year: "", startDate: getToday(), endDate: getToday() }));
@@ -123,7 +124,7 @@ export default function AdsAnalyticsPage() {
         
         <SearchableSelect
           value={datePreset}
-          onChange={(e) => handlePresetChange(e.target.value as any)}
+          onChange={(e) => handlePresetChange(e.target.value as DatePreset)}
           className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="today">Hari Ini</option>

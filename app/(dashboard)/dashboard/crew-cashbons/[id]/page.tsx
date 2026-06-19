@@ -1,4 +1,5 @@
 "use client";
+import { extractErrorMessage } from "@/lib/error";
 import { toast } from "react-hot-toast";
 
 import { useState } from "react";
@@ -50,8 +51,8 @@ export default function CrewCashbonDetailPage() {
         try {
           await crewCashbonsApi.voidCrewCashbon(id, { voidReason: reason });
           refetch();
-        } catch (e: any) {
-          toast.error(e?.response?.data?.message || "Gagal membatalkan cashbon");
+        } catch (e) {
+          toast.error(extractErrorMessage(e, "Gagal membatalkan cashbon"));
         }
       }
     } else if (reason !== null) {
@@ -64,8 +65,8 @@ export default function CrewCashbonDetailPage() {
       try {
         await crewCashbonsApi.closeCrewCashbon(id);
         refetch();
-      } catch (e: any) {
-        toast.error(e?.response?.data?.message || "Gagal menutup cashbon");
+      } catch (e) {
+        toast.error(extractErrorMessage(e, "Gagal menutup cashbon"));
       }
     }
   };
@@ -77,8 +78,8 @@ export default function CrewCashbonDetailPage() {
         try {
           await crewCashbonsApi.voidCashbonRepayment(repaymentId, { voidReason: reason });
           refetch();
-        } catch (e: any) {
-          toast.error(e?.response?.data?.message || "Gagal membatalkan pembayaran");
+        } catch (e) {
+          toast.error(extractErrorMessage(e, "Gagal membatalkan pembayaran"));
         }
       }
     } else if (reason !== null) {

@@ -1,4 +1,5 @@
 "use client";
+import { extractErrorMessage } from "@/lib/error";
 import { toast } from "react-hot-toast";
 import { useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -45,11 +46,8 @@ export default function ExternalPartiesPage() {
         toast.error("External party created successfully");
       }
       refetch();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(
-        Array.isArray(msg) ? msg[0] : msg || "Failed to save external party",
-      );
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Failed to save external party"));
       throw err;
     }
   };
@@ -64,9 +62,8 @@ export default function ExternalPartiesPage() {
         toast.error("Party activated");
       }
       refetch();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(Array.isArray(msg) ? msg[0] : msg || "Failed to toggle status");
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Failed to toggle status"));
     }
   };
 

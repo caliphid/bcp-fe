@@ -23,7 +23,7 @@ export function useDashboardOverview() {
 
         const res = await dashboardApi.getOverview(params);
         if (!ignore) { setData(res.data); setError(null); }
-      } catch (e: any) {
+      } catch (e) {
         if (!ignore) setError(e.response?.data?.message || "Error fetching overview");
       } finally {
         if (!ignore) setLoading(false);
@@ -67,7 +67,7 @@ function createDashboardHook<T>(apiCall: (params?: any) => Promise<{data: T}>, s
         try {
           const res = await apiCall(JSON.parse(filtersStr));
           if (!ignore) { setData(res.data); setError(null); }
-        } catch (e: any) {
+        } catch (e) {
           if (!ignore) setError(e.response?.data?.message || "Error fetching data");
         } finally {
           if (!ignore) setLoading(false);
@@ -134,7 +134,7 @@ export function useMonthComparison() {
           accountId: storeParams.accountId,
         });
         if (!ignore) { setData(res.data); setError(null); }
-      } catch (e: any) {
+      } catch (e) {
         if (!ignore) setError(e.response?.data?.message || "Error");
       } finally {
         if (!ignore) setLoading(false);

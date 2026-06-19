@@ -26,7 +26,7 @@ export default function UsersPage() {
     try {
       const res = await usersApi.getUsers();
       setUsers(res.data);
-    } catch (err: any) {
+    } catch (err) {
       setError("Failed to fetch users");
     } finally {
       setLoading(false);

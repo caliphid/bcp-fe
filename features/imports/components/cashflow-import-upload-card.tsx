@@ -70,8 +70,7 @@ export function CashflowImportUploadCard({ accounts, businessUnits }: Props) {
     try {
       const res = await importsApi.previewCashflow(formData);
       router.push(`/dashboard/imports/cashflow/${res.data.batchId}`);
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
+    } catch (err) {
       if (Array.isArray(msg)) {
         setError(msg.join(", "));
       } else {

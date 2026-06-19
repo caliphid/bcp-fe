@@ -1,4 +1,5 @@
 "use client";
+import { extractErrorMessage } from "@/lib/error";
 
 import { toast } from "react-hot-toast";
 import { useState } from "react";
@@ -57,9 +58,8 @@ export default function ReceivableDetailPage() {
       await externalMoneyApi.createCollection(id, payload);
       toast.success("Pengumpulan berhasil dicatat");
       refreshAll();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(Array.isArray(msg) ? msg[0] : msg || "Gagal mencatat pengumpulan");
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Gagal mencatat pengumpulan"));
       throw err;
     }
   };
@@ -69,9 +69,8 @@ export default function ReceivableDetailPage() {
       await externalMoneyApi.createWriteOff(id, payload);
       toast.success("Penghapusan berhasil dicatat");
       refreshAll();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(Array.isArray(msg) ? msg[0] : msg || "Gagal mencatat penghapusan");
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Gagal mencatat penghapusan"));
       throw err;
     }
   };
@@ -89,11 +88,8 @@ export default function ReceivableDetailPage() {
       });
       toast.success("Pengumpulan dibatalkan");
       refreshAll();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(
-        Array.isArray(msg) ? msg[0] : msg || "Gagal membatalkan pengumpulan",
-      );
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Gagal membatalkan pengumpulan"));
     }
   };
 
@@ -110,11 +106,8 @@ export default function ReceivableDetailPage() {
       });
       toast.success("Penghapusan dibatalkan");
       refreshAll();
-    } catch (err: any) {
-      const msg = err.response?.data?.message;
-      toast.error(
-        Array.isArray(msg) ? msg[0] : msg || "Gagal membatalkan penghapusan",
-      );
+    } catch (err) {
+      toast.error(extractErrorMessage(err, "Gagal membatalkan penghapusan"));
     }
   };
 
