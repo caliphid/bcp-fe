@@ -10,6 +10,7 @@ import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Category } from "../../types/category";
 import { CategoryType } from "../../types/enums";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 const schema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -83,7 +84,7 @@ export function CategoryForm({ initialData, categories, onSuccess, onCancel }: C
 
       <div className="space-y-2">
         <Label htmlFor="type">Transaction Type</Label>
-        <select
+        <SearchableSelect
           id="type"
           className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
           {...register("type")}
@@ -91,13 +92,13 @@ export function CategoryForm({ initialData, categories, onSuccess, onCancel }: C
           {Object.values(CategoryType).map((t) => (
             <option key={t} value={t}>{t}</option>
           ))}
-        </select>
+        </SearchableSelect>
         {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="parentId">Parent Category (Optional)</Label>
-        <select
+        <SearchableSelect
           id="parentId"
           className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
           {...register("parentId")}
@@ -106,7 +107,7 @@ export function CategoryForm({ initialData, categories, onSuccess, onCancel }: C
           {validParents.map((c) => (
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
-        </select>
+        </SearchableSelect>
         {errors.parentId && <p className="text-sm text-red-500">{errors.parentId.message}</p>}
       </div>
 

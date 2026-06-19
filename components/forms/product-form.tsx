@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { productsApi } from "../../features/products/api";
@@ -11,18 +11,28 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { Product } from "../../types/product";
 import { ProductType } from "../../types/enums";
 import { BusinessUnit } from "../../types/business-unit";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
+const formatInputMoney = (val: string) => {
+  const numeric = val.replace(/\D/g, "");
+  return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const unformatMoney = (val: string) => {
+  return parseInt(val.replace(/\./g, ""), 10) || 0;
+};
 
 const schema = z.object({
   businessUnitId: z.string().optional(),
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   type: z.nativeEnum(ProductType),
   sku: z.string().optional(),
-  defaultHpp: z.coerce.number().min(0, { message: "HPP must be positive" }),
-  defaultPrice: z.coerce.number().min(0, { message: "Price must be positive" }),
+  defaultHppStr: z.string().min(1, "Wajib diisi"),
+  defaultPriceStr: z.string().min(1, "Wajib diisi"),
   description: z.string().optional(),
-}).refine((data) => data.defaultPrice >= data.defaultHpp, {
+}).refine((data) => unformatMoney(data.defaultPriceStr) >= unformatMoney(data.defaultHppStr), {
   message: "Default price must be greater than or equal to HPP",
-  path: ["defaultPrice"], // This assigns the error to the defaultPrice field
+  path: ["defaultPriceStr"],
 });
 
 type FormData = z.infer<typeof schema>;
@@ -40,6 +50,7 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -48,8 +59,8 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
       name: initialData?.name || "",
       type: initialData?.type || ProductType.PHYSICAL_PRODUCT,
       sku: initialData?.sku || "",
-      defaultHpp: initialData ? Number(initialData.defaultHpp) : 0,
-      defaultPrice: initialData ? Number(initialData.defaultPrice) : 0,
+      defaultHppStr: initialData ? formatInputMoney(initialData.defaultHpp) : "0",
+      defaultPriceStr: initialData ? formatInputMoney(initialData.defaultPrice) : "0",
       description: initialData?.description || "",
     },
   });
@@ -58,7 +69,10 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
     setError(null);
     try {
       const payload = {
-        ...data,
+        name: data.name,
+        type: data.type,
+        defaultHpp: unformatMoney(data.defaultHppStr),
+        defaultPrice: unformatMoney(data.defaultPriceStr),
         businessUnitId: data.businessUnitId || undefined,
         sku: data.sku || undefined,
         description: data.description || undefined,
@@ -92,7 +106,7 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
 
         <div className="space-y-2">
           <Label htmlFor="type">Product Type</Label>
-          <select
+          <SearchableSelect
             id="type"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("type")}
@@ -100,7 +114,7 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
             {Object.values(ProductType).map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
         </div>
       </div>
@@ -114,7 +128,7 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
 
         <div className="space-y-2">
           <Label htmlFor="businessUnitId">Business Unit (Optional)</Label>
-          <select
+          <SearchableSelect
             id="businessUnitId"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("businessUnitId")}
@@ -123,22 +137,46 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
             {businessUnits.map((bu) => (
               <option key={bu.id} value={bu.id}>{bu.name}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.businessUnitId && <p className="text-sm text-red-500">{errors.businessUnitId.message}</p>}
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="defaultHpp">Default HPP</Label>
-          <Input id="defaultHpp" type="number" {...register("defaultHpp")} />
-          {errors.defaultHpp && <p className="text-sm text-red-500">{errors.defaultHpp.message}</p>}
+          <Label htmlFor="defaultHppStr">Default HPP</Label>
+          <Controller
+            name="defaultHppStr"
+            control={control}
+            render={({ field }) => (
+              <Input 
+                id="defaultHppStr"
+                type="text" 
+                inputMode="numeric"
+                value={field.value}
+                onChange={(e) => field.onChange(formatInputMoney(e.target.value))}
+              />
+            )}
+          />
+          {errors.defaultHppStr && <p className="text-sm text-red-500">{errors.defaultHppStr.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="defaultPrice">Default Price</Label>
-          <Input id="defaultPrice" type="number" {...register("defaultPrice")} />
-          {errors.defaultPrice && <p className="text-sm text-red-500">{errors.defaultPrice.message}</p>}
+          <Label htmlFor="defaultPriceStr">Default Price</Label>
+          <Controller
+            name="defaultPriceStr"
+            control={control}
+            render={({ field }) => (
+              <Input 
+                id="defaultPriceStr"
+                type="text" 
+                inputMode="numeric"
+                value={field.value}
+                onChange={(e) => field.onChange(formatInputMoney(e.target.value))}
+              />
+            )}
+          />
+          {errors.defaultPriceStr && <p className="text-sm text-red-500">{errors.defaultPriceStr.message}</p>}
         </div>
       </div>
 

@@ -13,6 +13,7 @@ import { TransactionType } from "../../types/enums";
 import { BusinessUnit } from "../../types/business-unit";
 import { Account } from "../../types/account";
 import { Category } from "../../types/category";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 const schema = z.object({
   transactionDate: z.string().min(1, { message: "Date is required" }),
@@ -119,7 +120,7 @@ export function TransactionForm({
 
         <div className="space-y-2">
           <Label htmlFor="type">Type</Label>
-          <select
+          <SearchableSelect
             id="type"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("type")}
@@ -131,7 +132,7 @@ export function TransactionForm({
             {Object.values(TransactionType).map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
         </div>
       </div>
@@ -139,7 +140,7 @@ export function TransactionForm({
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="accountId">Account</Label>
-          <select
+          <SearchableSelect
             id="accountId"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("accountId")}
@@ -148,13 +149,13 @@ export function TransactionForm({
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>{a.name} ({a.type})</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.accountId && <p className="text-sm text-red-500">{errors.accountId.message}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="categoryId">Category</Label>
-          <select
+          <SearchableSelect
             id="categoryId"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("categoryId")}
@@ -163,7 +164,7 @@ export function TransactionForm({
             {filteredCategories.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.categoryId && <p className="text-sm text-red-500">{errors.categoryId.message}</p>}
         </div>
       </div>
@@ -177,7 +178,7 @@ export function TransactionForm({
 
         <div className="space-y-2">
           <Label htmlFor="businessUnitId">Business Unit (Optional)</Label>
-          <select
+          <SearchableSelect
             id="businessUnitId"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("businessUnitId")}
@@ -186,7 +187,7 @@ export function TransactionForm({
             {businessUnits.map((bu) => (
               <option key={bu.id} value={bu.id}>{bu.name}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.businessUnitId && <p className="text-sm text-red-500">{errors.businessUnitId.message}</p>}
         </div>
       </div>

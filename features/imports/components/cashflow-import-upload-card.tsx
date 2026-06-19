@@ -9,6 +9,7 @@ import { Account } from "../../../types/account";
 import { BusinessUnit } from "../../../types/business-unit";
 import { importsApi } from "../api";
 import { useRouter } from "next/navigation";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface Props {
   accounts: Account[];
@@ -165,7 +166,7 @@ export function CashflowImportUploadCard({ accounts, businessUnits }: Props) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Default Account <span className="text-red-500">*</span></Label>
-                <select
+                <SearchableSelect
                   value={defaultAccountId}
                   onChange={(e) => setDefaultAccountId(e.target.value)}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -177,13 +178,13 @@ export function CashflowImportUploadCard({ accounts, businessUnits }: Props) {
                       {acc.name} ({acc.type})
                     </option>
                   ))}
-                </select>
+                </SearchableSelect>
                 <p className="text-xs text-slate-500">Fallback account if sheet name doesn't match any account.</p>
               </div>
 
               <div className="space-y-2">
                 <Label>Default Business Unit (Optional)</Label>
-                <select
+                <SearchableSelect
                   value={defaultBusinessUnitId}
                   onChange={(e) => setDefaultBusinessUnitId(e.target.value)}
                   className="flex h-10 w-full items-center justify-between rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -194,7 +195,7 @@ export function CashflowImportUploadCard({ accounts, businessUnits }: Props) {
                       {bu.name}
                     </option>
                   ))}
-                </select>
+                </SearchableSelect>
               </div>
 
               <div className="space-y-2">

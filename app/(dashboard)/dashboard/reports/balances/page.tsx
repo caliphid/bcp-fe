@@ -3,9 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { transactionsApi } from "../../../../../features/transactions/api";
 import { businessUnitsApi } from "../../../../../features/business-units/api";
-import { BusinessUnit } from "../../../../../types/master-data";
+import { BusinessUnit } from "../../../../../types/business-unit";
 import { AccountSummary } from "../../../../../types/transaction";
 import { TransactionAccountSummary } from "../../../../../features/transactions/components/transaction-account-summary";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export default function AccountBalancesPage() {
   const [businessUnits, setBusinessUnits] = useState<BusinessUnit[]>([]);
@@ -57,7 +58,7 @@ export default function AccountBalancesPage() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <select
+          <SearchableSelect
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             value={buFilter}
             onChange={(e) => setBuFilter(e.target.value)}
@@ -66,7 +67,7 @@ export default function AccountBalancesPage() {
             {businessUnits.map((bu) => (
               <option key={bu.id} value={bu.id}>{bu.name}</option>
             ))}
-          </select>
+          </SearchableSelect>
         </div>
       </div>
 

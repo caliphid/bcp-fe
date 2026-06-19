@@ -3,6 +3,7 @@ import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { useCategoryStore } from "../store/category-store";
 import { CategoryType } from "../../../types/enums";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function CategoryFilterBar() {
   const { filters, setFilter } = useCategoryStore();
@@ -25,7 +26,7 @@ export function CategoryFilterBar() {
           <Search className="h-4 w-4" />
         </Button>
       </form>
-      <select
+      <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.status}
         onChange={(e) => {
@@ -36,8 +37,8 @@ export function CategoryFilterBar() {
         <option value="">All Status</option>
         <option value="ACTIVE">Active</option>
         <option value="INACTIVE">Inactive</option>
-      </select>
-      <select
+      </SearchableSelect>
+      <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.type}
         onChange={(e) => {
@@ -49,7 +50,7 @@ export function CategoryFilterBar() {
         {Object.values(CategoryType).map((t) => (
           <option key={t} value={t}>{t}</option>
         ))}
-      </select>
+      </SearchableSelect>
     </div>
   );
 }

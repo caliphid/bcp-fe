@@ -6,6 +6,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Calendar, FilterX } from "lucide-react";
 import { Card, CardContent } from "../../../components/ui/card";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function DashboardFilterBar() {
   const { filters, setFilter, resetFilters } = useDashboardStore();
@@ -42,19 +43,19 @@ export function DashboardFilterBar() {
             
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500">Year</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.year}
                 onChange={(e) => setFilter("year", e.target.value)}
               >
                 <option value="">All Time</option>
                 {years.map(y => <option key={y} value={y}>{y}</option>)}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500">Month</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.month}
                 onChange={(e) => setFilter("month", e.target.value)}
@@ -62,7 +63,7 @@ export function DashboardFilterBar() {
               >
                 <option value="">All Months</option>
                 {months.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
@@ -87,38 +88,38 @@ export function DashboardFilterBar() {
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500">Business Unit</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.businessUnitId}
                 onChange={(e) => setFilter("businessUnitId", e.target.value)}
               >
                 <option value="">All Units</option>
                 {businessUnits?.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500">Account</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.accountId}
                 onChange={(e) => setFilter("accountId", e.target.value)}
               >
                 <option value="">All Accounts</option>
                 {accounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500">Category</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.categoryId}
                 onChange={(e) => setFilter("categoryId", e.target.value)}
               >
                 <option value="">All Categories</option>
                 {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              </SearchableSelect>
             </div>
             
           </div>

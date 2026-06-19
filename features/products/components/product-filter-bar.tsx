@@ -4,6 +4,7 @@ import { Button } from "../../../components/ui/button";
 import { useProductStore } from "../store/product-store";
 import { BusinessUnit } from "../../../types/business-unit";
 import { ProductType } from "../../../types/enums";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface FilterBarProps {
   businessUnits: BusinessUnit[];
@@ -30,7 +31,7 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
           <Search className="h-4 w-4" />
         </Button>
       </form>
-      <select
+      <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.status}
         onChange={(e) => {
@@ -41,8 +42,8 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
         <option value="">All Status</option>
         <option value="ACTIVE">Active</option>
         <option value="INACTIVE">Inactive</option>
-      </select>
-      <select
+      </SearchableSelect>
+      <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.type}
         onChange={(e) => {
@@ -54,8 +55,8 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
         {Object.values(ProductType).map((t) => (
           <option key={t} value={t}>{t}</option>
         ))}
-      </select>
-      <select
+      </SearchableSelect>
+      <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.businessUnitId}
         onChange={(e) => {
@@ -67,7 +68,7 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
         {businessUnits.map((bu) => (
           <option key={bu.id} value={bu.id}>{bu.name}</option>
         ))}
-      </select>
+      </SearchableSelect>
     </div>
   );
 }

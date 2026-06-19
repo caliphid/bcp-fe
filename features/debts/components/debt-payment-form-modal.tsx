@@ -7,6 +7,7 @@ import { DebtItem, CreateDebtPaymentPayload } from "../../../types/debt";
 import { useAccounts } from "../../accounts/hooks/use-accounts";
 import { useCategories } from "../../categories/hooks/use-categories";
 import { formatCurrency } from "../utils/formatters";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface DebtPaymentFormModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
   const { data: categories } = useCategories();
 
   const [formData, setFormData] = useState<Partial<CreateDebtPaymentPayload>>({});
+  const [amountStr, setAmountStr] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +41,11 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
         notes: "",
         attachmentUrl: "",
       });
+      setAmountStr(
+        debt && debt.monthlyInstallment && parseFloat(debt.monthlyInstallment) > 0
+          ? parseFloat(debt.monthlyInstallment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+          : ""
+      );
       setError(null);
     }
   }
@@ -110,17 +117,24 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
             <Label>Nominal Pembayaran (IDR) *</Label>
             <Input
               required
-              type="number"
-              min="1"
-              max={parseFloat(debt.currentBalance)}
-              value={formData.amount || ""}
-              onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })}
+              type="text"
+              inputMode="numeric"
+              value={amountStr}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "");
+                setAmountStr(val.replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+                setFormData({
+                  ...formData,
+                  amount: val ? parseFloat(val) : 0,
+                });
+              }}
+              placeholder="Cth. 500.000"
             />
           </div>
 
           <div className="space-y-2">
             <Label>Akun Sumber Dana *</Label>
-            <select
+            <SearchableSelect
               required
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               value={formData.accountId || ""}
@@ -130,12 +144,12 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
               {accounts?.filter(a => a.status === "ACTIVE").map(a => (
                 <option key={a.id} value={a.id}>{a.name}</option>
               ))}
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="space-y-2">
             <Label>Kategori (Opsional)</Label>
-            <select
+            <SearchableSelect
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               value={formData.categoryId || ""}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
@@ -144,7 +158,7 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
               {categories?.filter(c => c.status === "ACTIVE").map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="space-y-2">

@@ -5,6 +5,7 @@ import { Label } from "../../../components/ui/label";
 import { Button } from "../../../components/ui/button";
 import { DebtItem, CreateDebtPayload, DebtType } from "../../../types/debt";
 import { useBusinessUnits } from "../../business-units/hooks/use-business-units";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface DebtFormModalProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ export function DebtFormModal({
     interestRate: 0,
     monthlyInstallment: 0,
   });
+  const [principalStr, setPrincipalStr] = useState("");
+  const [installmentStr, setInstallmentStr] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +61,8 @@ export function DebtFormModal({
             : 0,
           notes: initialData.notes || "",
         });
+        setPrincipalStr(parseFloat(initialData.principalAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."));
+        setInstallmentStr(initialData.monthlyInstallment && parseFloat(initialData.monthlyInstallment) > 0 ? parseFloat(initialData.monthlyInstallment).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") : "");
       } else {
         setFormData({
           businessUnitId: "",
@@ -71,6 +76,8 @@ export function DebtFormModal({
           monthlyInstallment: 0,
           notes: "",
         });
+        setPrincipalStr("");
+        setInstallmentStr("");
       }
       setError(null);
     }
@@ -151,7 +158,7 @@ export function DebtFormModal({
 
           <div className="space-y-2">
             <Label>Tipe Hutang *</Label>
-            <select
+            <SearchableSelect
               required
               disabled={isPaidOff}
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
@@ -167,12 +174,12 @@ export function DebtFormModal({
               <option value="CREDIT_CARD">Kartu Kredit</option>
               <option value="PAYABLE">Hutang Usaha (Payable)</option>
               <option value="OTHER">Lainnya</option>
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="space-y-2">
             <Label>Unit Bisnis</Label>
-            <select
+            <SearchableSelect
               disabled={isPaidOff}
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               value={formData.businessUnitId || ""}
@@ -186,24 +193,26 @@ export function DebtFormModal({
                   {b.name}
                 </option>
               ))}
-            </select>
+            </SearchableSelect>
           </div>
 
           <div className="space-y-2">
             <Label>Nominal Pokok (IDR) *</Label>
             <Input
               required
-              type="number"
-              min="1"
+              type="text"
+              inputMode="numeric"
               disabled={isPaidOff || hasPayments}
-              value={formData.principalAmount || ""}
-              onChange={(e) =>
+              value={principalStr}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "");
+                setPrincipalStr(val.replace(/\B(?=(\d{3})+(?!\d))/g, "."));
                 setFormData({
                   ...formData,
-                  principalAmount: parseFloat(e.target.value),
-                })
-              }
-              placeholder="Cth. 10000000"
+                  principalAmount: val ? parseFloat(val) : 0,
+                });
+              }}
+              placeholder="Cth. 10.000.000"
             />
             {hasPayments && (
               <p className="text-xs text-amber-600">
@@ -215,16 +224,19 @@ export function DebtFormModal({
           <div className="space-y-2">
             <Label>Cicilan Bulanan (IDR) Estimasi</Label>
             <Input
-              type="number"
-              min="0"
+              type="text"
+              inputMode="numeric"
               disabled={isPaidOff}
-              value={formData.monthlyInstallment || ""}
-              onChange={(e) =>
+              value={installmentStr}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, "");
+                setInstallmentStr(val.replace(/\B(?=(\d{3})+(?!\d))/g, "."));
                 setFormData({
                   ...formData,
-                  monthlyInstallment: parseFloat(e.target.value),
-                })
-              }
+                  monthlyInstallment: val ? parseFloat(val) : 0,
+                });
+              }}
+              placeholder="Cth. 1.000.000"
             />
           </div>
 

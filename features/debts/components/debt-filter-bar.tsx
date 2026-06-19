@@ -6,6 +6,7 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { FilterX } from "lucide-react";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function DebtFilterBar() {
   const { filters, setFilter, resetFilters } = useDebtStore();
@@ -59,7 +60,7 @@ export function DebtFilterBar() {
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500 mb-1.5 block">Status</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.status || ""}
                 onChange={(e) => setFilter("status", e.target.value as any)}
@@ -73,12 +74,12 @@ export function DebtFilterBar() {
                     <option value="DEFAULTED">Macet (Defaulted)</option>
                   </>
                 )}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500 mb-1.5 block">Tipe</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.type || ""}
                 onChange={(e) => setFilter("type", e.target.value as any)}
@@ -91,12 +92,12 @@ export function DebtFilterBar() {
                 <option value="CREDIT_CARD">Kartu Kredit</option>
                 <option value="PAYABLE">Hutang Usaha</option>
                 <option value="OTHER">Lainnya</option>
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
               <Label className="text-xs text-slate-500 mb-1.5 block">Unit Bisnis</Label>
-              <select
+              <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.businessUnitId}
                 onChange={(e) => setFilter("businessUnitId", e.target.value)}
@@ -105,7 +106,7 @@ export function DebtFilterBar() {
                 {businessUnits?.map(b => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
-              </select>
+              </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">

@@ -2,6 +2,7 @@ import { Search } from "lucide-react";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { useBusinessUnitStore } from "../store/business-unit-store";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function BusinessUnitFilterBar() {
   const { filters, setFilter } = useBusinessUnitStore();
@@ -24,7 +25,7 @@ export function BusinessUnitFilterBar() {
           <Search className="h-4 w-4" />
         </Button>
       </form>
-      <select
+      <SearchableSelect
         className="flex h-11 w-48 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
         value={filters.status}
         onChange={(e) => {
@@ -35,7 +36,7 @@ export function BusinessUnitFilterBar() {
         <option value="">All Status</option>
         <option value="ACTIVE">Active</option>
         <option value="INACTIVE">Inactive</option>
-      </select>
+      </SearchableSelect>
     </div>
   );
 }

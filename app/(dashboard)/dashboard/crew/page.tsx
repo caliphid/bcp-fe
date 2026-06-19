@@ -15,6 +15,7 @@ import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { Input } from "../../../../components/ui/input";
 import { extractErrorMessage } from "../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export default function CrewPage() {
   const user = useAuthStore((state) => state.user);
@@ -178,7 +179,7 @@ export default function CrewPage() {
             <Search className="h-4 w-4" />
           </Button>
         </form>
-        <select
+        <SearchableSelect
           className="flex h-11 w-48 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
           value={statusFilter}
           onChange={(e) => {
@@ -189,7 +190,7 @@ export default function CrewPage() {
           <option value="">All Status</option>
           <option value="ACTIVE">Active</option>
           <option value="INACTIVE">Inactive</option>
-        </select>
+        </SearchableSelect>
       </div>
 
       <DataTable

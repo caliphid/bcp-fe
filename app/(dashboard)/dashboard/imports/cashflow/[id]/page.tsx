@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "react-hot-toast";
 
 import { use, useState } from "react";
 import { useAuthStore } from "../../../../../../store/auth-store";
@@ -45,7 +46,7 @@ export default function CashflowImportDetailPage({ params }: PageProps) {
       fetchDetail();
       fetchRows();
     } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to execute import");
+      toast.error(err.response?.data?.message || "Failed to execute import");
     } finally {
       setExecuting(false);
     }
@@ -59,7 +60,7 @@ export default function CashflowImportDetailPage({ params }: PageProps) {
       await importsApi.cancelBatch(batch.id);
       fetchDetail();
     } catch (err: any) {
-      alert(err.response?.data?.message || "Failed to cancel batch");
+      toast.error(err.response?.data?.message || "Failed to cancel batch");
     } finally {
       setCancelling(false);
     }

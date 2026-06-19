@@ -11,6 +11,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { User } from "../../types/auth";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 const schema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -66,7 +67,7 @@ export function UpdateUserForm({ user, onSuccess, onCancel }: UpdateUserFormProp
 
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
-        <select
+        <SearchableSelect
           id="role"
           className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
           {...register("role")}
@@ -74,7 +75,7 @@ export function UpdateUserForm({ user, onSuccess, onCancel }: UpdateUserFormProp
           <option value="STAFF_INPUT">Staff Input</option>
           <option value="ADMIN_FINANCE">Admin Finance</option>
           <option value="OWNER">Owner</option>
-        </select>
+        </SearchableSelect>
         {errors.role && <p className="text-sm text-red-500">{errors.role.message}</p>}
       </div>
 

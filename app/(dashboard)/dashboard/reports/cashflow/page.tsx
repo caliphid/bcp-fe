@@ -4,11 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import { transactionsApi } from "../../../../../features/transactions/api";
 import { businessUnitsApi } from "../../../../../features/business-units/api";
 import { accountsApi } from "../../../../../features/accounts/api";
-import { BusinessUnit } from "../../../../../types/master-data";
-import { Account } from "../../../../../types/master-data";
+import { BusinessUnit } from "../../../../../types/business-unit";
+import { Account } from "../../../../../types/account";
 import { MonthlySummary, CategorySummary } from "../../../../../types/transaction";
 import { TransactionMonthlySummary } from "../../../../../features/transactions/components/transaction-monthly-summary";
 import { TransactionCategorySummary } from "../../../../../features/transactions/components/transaction-category-summary";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export default function CashflowReportsPage() {
   const [businessUnits, setBusinessUnits] = useState<BusinessUnit[]>([]);
@@ -78,7 +79,7 @@ export default function CashflowReportsPage() {
       {/* Filters */}
       <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <select
+          <SearchableSelect
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             value={buFilter}
             onChange={(e) => setBuFilter(e.target.value)}
@@ -87,9 +88,9 @@ export default function CashflowReportsPage() {
             {businessUnits.map((bu) => (
               <option key={bu.id} value={bu.id}>{bu.name}</option>
             ))}
-          </select>
+          </SearchableSelect>
 
-          <select
+          <SearchableSelect
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             value={accountFilter}
             onChange={(e) => setAccountFilter(e.target.value)}
@@ -98,9 +99,9 @@ export default function CashflowReportsPage() {
             {accounts.map((acc) => (
               <option key={acc.id} value={acc.id}>{acc.name} ({acc.bankName})</option>
             ))}
-          </select>
+          </SearchableSelect>
 
-          <select
+          <SearchableSelect
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             value={yearFilter}
             onChange={(e) => setYearFilter(e.target.value)}
@@ -108,7 +109,7 @@ export default function CashflowReportsPage() {
             {[2024, 2025, 2026, 2027].map((y) => (
               <option key={y} value={y.toString()}>{y}</option>
             ))}
-          </select>
+          </SearchableSelect>
         </div>
       </div>
 

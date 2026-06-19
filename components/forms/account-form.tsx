@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { accountsApi } from "../../features/accounts/api";
@@ -12,13 +12,23 @@ import { Account } from "../../types/account";
 import { AccountType } from "../../types/enums";
 import { BusinessUnit } from "../../types/business-unit";
 import { useAuthStore } from "../../store/auth-store";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+
+const formatInputMoney = (val: string) => {
+  const numeric = val.replace(/\D/g, "");
+  return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+};
+
+const unformatMoney = (val: string) => {
+  return parseInt(val.replace(/\./g, ""), 10) || 0;
+};
 
 const schema = z.object({
   businessUnitId: z.string().optional(),
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   type: z.nativeEnum(AccountType),
-  initialBalance: z.coerce.number().min(0, { message: "Initial balance must be positive" }),
-  currentBalance: z.coerce.number().min(0, { message: "Current balance must be positive" }),
+  initialBalanceStr: z.string().min(1, "Wajib diisi"),
+  currentBalanceStr: z.string().min(1, "Wajib diisi"),
   accountNumber: z.string().optional(),
   bankName: z.string().optional(),
   notes: z.string().optional(),
@@ -41,6 +51,7 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
     register,
     handleSubmit,
     watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -48,8 +59,8 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
       businessUnitId: initialData?.businessUnitId || "",
       name: initialData?.name || "",
       type: initialData?.type || AccountType.BANK,
-      initialBalance: initialData ? Number(initialData.initialBalance) : 0,
-      currentBalance: initialData ? Number(initialData.currentBalance) : 0,
+      initialBalanceStr: initialData ? formatInputMoney(initialData.initialBalance) : "0",
+      currentBalanceStr: initialData ? formatInputMoney(initialData.currentBalance) : "0",
       accountNumber: initialData?.accountNumber || "",
       bankName: initialData?.bankName || "",
       notes: initialData?.notes || "",
@@ -61,9 +72,11 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
   const onSubmit = async (data: FormData) => {
     setError(null);
     try {
-      // Clean up optional fields
       const payload = {
-        ...data,
+        name: data.name,
+        type: data.type,
+        initialBalance: unformatMoney(data.initialBalanceStr),
+        currentBalance: unformatMoney(data.currentBalanceStr),
         businessUnitId: data.businessUnitId || undefined,
         accountNumber: data.accountNumber || undefined,
         bankName: data.bankName || undefined,
@@ -101,7 +114,7 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
 
         <div className="space-y-2">
           <Label htmlFor="type">Account Type</Label>
-          <select
+          <SearchableSelect
             id="type"
             className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
             {...register("type")}
@@ -109,14 +122,14 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
             {Object.values(AccountType).map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
-          </select>
+          </SearchableSelect>
           {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="businessUnitId">Business Unit (Optional)</Label>
-        <select
+        <SearchableSelect
           id="businessUnitId"
           className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
           {...register("businessUnitId")}
@@ -125,27 +138,48 @@ export function AccountForm({ initialData, businessUnits, onSuccess, onCancel }:
           {businessUnits.map((bu) => (
             <option key={bu.id} value={bu.id}>{bu.name}</option>
           ))}
-        </select>
+        </SearchableSelect>
         {errors.businessUnitId && <p className="text-sm text-red-500">{errors.businessUnitId.message}</p>}
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="initialBalance">Initial Balance</Label>
-          <Input id="initialBalance" type="number" {...register("initialBalance")} disabled={isEdit} />
-          {errors.initialBalance && <p className="text-sm text-red-500">{errors.initialBalance.message}</p>}
+          <Label htmlFor="initialBalanceStr">Initial Balance</Label>
+          <Controller
+            name="initialBalanceStr"
+            control={control}
+            render={({ field }) => (
+              <Input 
+                id="initialBalanceStr"
+                type="text" 
+                inputMode="numeric"
+                disabled={isEdit}
+                value={field.value}
+                onChange={(e) => field.onChange(formatInputMoney(e.target.value))}
+              />
+            )}
+          />
+          {errors.initialBalanceStr && <p className="text-sm text-red-500">{errors.initialBalanceStr.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="currentBalance">Current Balance</Label>
-          <Input 
-            id="currentBalance" 
-            type="number" 
-            {...register("currentBalance")} 
-            disabled={!canEditCurrentBalance}
-            className={!canEditCurrentBalance ? "opacity-50 cursor-not-allowed" : ""}
+          <Label htmlFor="currentBalanceStr">Current Balance</Label>
+          <Controller
+            name="currentBalanceStr"
+            control={control}
+            render={({ field }) => (
+              <Input 
+                id="currentBalanceStr"
+                type="text" 
+                inputMode="numeric"
+                disabled={!canEditCurrentBalance}
+                className={!canEditCurrentBalance ? "opacity-50 cursor-not-allowed" : ""}
+                value={field.value}
+                onChange={(e) => field.onChange(formatInputMoney(e.target.value))}
+              />
+            )}
           />
-          {errors.currentBalance && <p className="text-sm text-red-500">{errors.currentBalance.message}</p>}
+          {errors.currentBalanceStr && <p className="text-sm text-red-500">{errors.currentBalanceStr.message}</p>}
         </div>
       </div>
 
