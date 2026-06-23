@@ -1,6 +1,9 @@
 import { Transaction } from "../../../types/transaction";
 import { Modal } from "../../../components/ui/modal";
 import { StatusBadge } from "../../../components/ui/status-badge";
+import { env } from "../../../lib/env";
+import { useState } from "react";
+import { AttachmentViewerModal } from "../../../components/ui/attachment-viewer-modal";
 
 interface Props {
   isOpen: boolean;
@@ -9,6 +12,8 @@ interface Props {
 }
 
 export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) {
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+
   if (!transaction) return null;
 
   const formatCurrency = (val: string) => {
@@ -39,7 +44,7 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) 
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Transaction Details">
+    <Modal isOpen={isOpen} onClose={onClose} title="Transaction Details" className="max-w-2xl">
       <div className="space-y-1">
         <DetailRow label="Trx Code" value={transaction.transactionCode} />
         <DetailRow label="Date" value={formatDate(transaction.transactionDate)} />
@@ -81,9 +86,13 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) 
         
         {transaction.attachmentUrl && (
           <DetailRow label="Attachment" value={
-            <a href={transaction.attachmentUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+            <button 
+              type="button"
+              onClick={() => setIsViewerOpen(true)}
+              className="text-indigo-600 hover:underline text-sm font-medium"
+            >
               View Attachment
-            </a>
+            </button>
           } />
         )}
 
@@ -93,6 +102,12 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) 
           <DetailRow label="Updated At" value={formatDateTime(transaction.updatedAt)} />
         </div>
       </div>
+
+      <AttachmentViewerModal
+        isOpen={isViewerOpen}
+        onClose={() => setIsViewerOpen(false)}
+        url={transaction.attachmentUrl ? (transaction.attachmentUrl.startsWith('http') ? transaction.attachmentUrl : `${env.NEXT_PUBLIC_API_URL}${transaction.attachmentUrl}`) : null}
+      />
     </Modal>
   );
 }

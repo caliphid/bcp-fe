@@ -13,7 +13,7 @@ import {
 import { buildQueryString } from '../../lib/query';
 
 export const transactionsApi = {
-  getTransactions: async (params?: Record<string, any>) => {
+  getTransactions: async (params?: Record<string, unknown>) => {
     const query = params ? `?${buildQueryString(params)}` : '';
     const res = await api.get<ListResponse<Transaction>>(`/transactions${query}`);
     return res.data;
@@ -39,27 +39,46 @@ export const transactionsApi = {
     return res.data;
   },
   
-  getSummary: async (params?: Record<string, any>) => {
+  getSummary: async (params?: Record<string, unknown>) => {
     const query = params ? `?${buildQueryString(params)}` : '';
     const res = await api.get<BaseResponse<TransactionSummary>>(`/transactions/summary${query}`);
     return res.data;
   },
   
-  getMonthlySummary: async (params?: Record<string, any>) => {
+  getMonthlySummary: async (params?: Record<string, unknown>) => {
     const query = params ? `?${buildQueryString(params)}` : '';
     const res = await api.get<BaseResponse<MonthlySummary[]>>(`/transactions/monthly-summary${query}`);
     return res.data;
   },
   
-  getCategorySummary: async (params?: Record<string, any>) => {
+  getCategorySummary: async (params?: Record<string, unknown>) => {
     const query = params ? `?${buildQueryString(params)}` : '';
     const res = await api.get<BaseResponse<CategorySummary[]>>(`/transactions/category-summary${query}`);
     return res.data;
   },
   
-  getAccountSummary: async (params?: Record<string, any>) => {
+  getAccountSummary: async (params?: Record<string, unknown>) => {
     const query = params ? `?${buildQueryString(params)}` : '';
     const res = await api.get<BaseResponse<AccountSummary[]>>(`/transactions/account-summary${query}`);
     return res.data;
+  },
+
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await api.post<{ url: string }>('/uploads', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return res.data;
+  },
+  
+  downloadFile: async (url: string) => {
+    // URL could be full or relative
+    const res = await api.get(url, {
+      responseType: 'blob'
+    });
+    return res.data as Blob;
   }
 };
