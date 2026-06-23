@@ -1,15 +1,17 @@
+import { useState } from "react";
 import { useDashboardStore } from "../store/dashboard-store";
 import { useAccounts } from "../../accounts/hooks/use-accounts";
 import { useCategories } from "../../categories/hooks/use-categories";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
-import { Calendar, FilterX } from "lucide-react";
+import { Calendar, FilterX, Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "../../../components/ui/card";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export function DashboardFilterBar() {
   const { filters, setFilter, resetFilters } = useDashboardStore();
+  const [isExpanded, setIsExpanded] = useState(false);
   
   // These hooks from other features should fetch limit=100 & status=ACTIVE
   const { data: accounts, businessUnits } = useAccounts();
@@ -38,13 +40,13 @@ export function DashboardFilterBar() {
   return (
     <Card className="relative z-20 border-slate-200 shadow-sm mb-6">
       <CardContent className="p-4">
-        <div className="flex flex-col xl:flex-row gap-4 items-end">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 flex-1 w-full">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-end gap-4">
             
-            <div className="space-y-1.5">
+            <div className="w-full sm:w-40 space-y-1.5">
               <Label className="text-xs text-slate-500">Year</Label>
               <SearchableSelect
-                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full h-11 rounded-xl border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.year}
                 onChange={(e) => setFilter("year", e.target.value)}
               >
@@ -53,10 +55,10 @@ export function DashboardFilterBar() {
               </SearchableSelect>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="w-full sm:w-40 space-y-1.5">
               <Label className="text-xs text-slate-500">Month</Label>
               <SearchableSelect
-                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full h-11 rounded-xl border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.month}
                 onChange={(e) => setFilter("month", e.target.value)}
                 disabled={!filters.year}
@@ -66,73 +68,86 @@ export function DashboardFilterBar() {
               </SearchableSelect>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">Date From</Label>
-              <Input
-                type="date"
-                className="h-9"
-                value={filters.dateFrom}
-                onChange={(e) => setFilter("dateFrom", e.target.value)}
-              />
-            </div>
+            <Button
+              variant="outline"
+              className="h-11"
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+              {isExpanded ? <ChevronUp className="h-4 w-4 ml-1" /> : <ChevronDown className="h-4 w-4 ml-1" />}
+            </Button>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">Date To</Label>
-              <Input
-                type="date"
-                className="h-9"
-                value={filters.dateTo}
-                onChange={(e) => setFilter("dateTo", e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">Business Unit</Label>
-              <SearchableSelect
-                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                value={filters.businessUnitId}
-                onChange={(e) => setFilter("businessUnitId", e.target.value)}
-              >
-                <option value="">All Units</option>
-                {businessUnits?.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-              </SearchableSelect>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">Account</Label>
-              <SearchableSelect
-                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                value={filters.accountId}
-                onChange={(e) => setFilter("accountId", e.target.value)}
-              >
-                <option value="">All Accounts</option>
-                {accounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
-              </SearchableSelect>
-            </div>
-
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">Category</Label>
-              <SearchableSelect
-                className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-                value={filters.categoryId}
-                onChange={(e) => setFilter("categoryId", e.target.value)}
-              >
-                <option value="">All Categories</option>
-                {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </SearchableSelect>
-            </div>
-            
+            <Button 
+              variant="ghost" 
+              onClick={handleReset}
+              className="h-11 px-3 text-slate-500 hover:text-red-600 hover:bg-red-50 shrink-0"
+              title="Reset Filters"
+            >
+              <FilterX className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
           </div>
 
-          <Button 
-            variant="ghost" 
-            onClick={handleReset}
-            className="h-9 px-3 text-slate-500 hover:text-red-600 hover:bg-red-50 shrink-0"
-            title="Reset Filters"
-          >
-            <FilterX className="h-4 w-4 mr-2" />
-            Reset
-          </Button>
+          {isExpanded && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 pt-4 border-t border-slate-100">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Date From</Label>
+                <Input
+                  type="date"
+                  className="h-11"
+                  value={filters.dateFrom}
+                  onChange={(e) => setFilter("dateFrom", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Date To</Label>
+                <Input
+                  type="date"
+                  className="h-11"
+                  value={filters.dateTo}
+                  onChange={(e) => setFilter("dateTo", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Business Unit</Label>
+                <SearchableSelect
+                  className="w-full h-11 rounded-xl border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={filters.businessUnitId}
+                  onChange={(e) => setFilter("businessUnitId", e.target.value)}
+                >
+                  <option value="">All Units</option>
+                  {businessUnits?.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </SearchableSelect>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Account</Label>
+                <SearchableSelect
+                  className="w-full h-11 rounded-xl border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={filters.accountId}
+                  onChange={(e) => setFilter("accountId", e.target.value)}
+                >
+                  <option value="">All Accounts</option>
+                  {accounts?.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                </SearchableSelect>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Category</Label>
+                <SearchableSelect
+                  className="w-full h-11 rounded-xl border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+                  value={filters.categoryId}
+                  onChange={(e) => setFilter("categoryId", e.target.value)}
+                >
+                  <option value="">All Categories</option>
+                  {categories?.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </SearchableSelect>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
