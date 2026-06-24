@@ -1,13 +1,16 @@
 import { AccountLedgerResponse } from "../../../types/finance";
 import dayjs from "dayjs";
 import { ArrowDownLeft, ArrowUpRight, Ban } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
+import { PaginationMeta } from "@/types/common";
 
 interface AccountLedgerTableProps {
-  data?: AccountLedgerResponse;
+  data?: AccountLedgerResponse & { meta?: PaginationMeta };
   loading: boolean;
+  onPageChange: (page: number) => void;
 }
 
-export function AccountLedgerTable({ data, loading }: AccountLedgerTableProps) {
+export function AccountLedgerTable({ data, loading, onPageChange }: AccountLedgerTableProps) {
   const formatMoney = (val?: string) => {
     if (!val) return "Rp 0";
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(val));
@@ -95,6 +98,10 @@ export function AccountLedgerTable({ data, loading }: AccountLedgerTableProps) {
           </tbody>
         </table>
       </div>
+
+      {data.meta && (
+        <Pagination meta={data.meta} onPageChange={onPageChange} />
+      )}
     </div>
   );
 }

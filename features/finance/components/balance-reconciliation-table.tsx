@@ -1,5 +1,8 @@
 import { BalanceReconciliationResponse } from "../../../types/finance";
-import { CheckCircle2, AlertTriangle, AlertCircle } from "lucide-react";
+import { CheckCircle2, AlertTriangle, AlertCircle, Eye } from "lucide-react";
+import { useState } from "react";
+import { BalanceReconciliationDetailModal } from "./balance-reconciliation-detail-modal";
+import { Button } from "@/components/ui/button";
 
 interface BalanceReconciliationTableProps {
   data?: BalanceReconciliationResponse[];
@@ -7,6 +10,8 @@ interface BalanceReconciliationTableProps {
 }
 
 export function BalanceReconciliationTable({ data, loading }: BalanceReconciliationTableProps) {
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);
+
   const formatMoney = (val?: string) => {
     if (!val) return "Rp 0";
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(val));
@@ -45,6 +50,7 @@ export function BalanceReconciliationTable({ data, loading }: BalanceReconciliat
               <th className="px-6 py-4 text-right">Calculated Balance</th>
               <th className="px-6 py-4 text-right">Selisih</th>
               <th className="px-6 py-4 text-center">Status</th>
+              <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -78,11 +84,23 @@ export function BalanceReconciliationTable({ data, loading }: BalanceReconciliat
                     </div>
                   )}
                 </td>
+                <td className="px-6 py-4 text-right">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedAccountId(acc.accountId)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+                    <Eye className="h-4 w-4 mr-1.5" />
+                    Detail
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <BalanceReconciliationDetailModal 
+        accountId={selectedAccountId}
+        isOpen={!!selectedAccountId}
+        onClose={() => setSelectedAccountId(null)}
+      />
     </div>
   );
 }

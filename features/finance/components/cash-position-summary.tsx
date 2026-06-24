@@ -1,4 +1,6 @@
 import { MonthlyOverviewResponse } from "../../../types/finance";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export function CashPositionSummary({ data, loading }: { data?: MonthlyOverviewResponse, loading: boolean }) {
   const formatMoney = (val?: string) => {
@@ -41,6 +43,11 @@ export function CashPositionSummary({ data, loading }: { data?: MonthlyOverviewR
           <span className="text-base font-bold text-slate-800">Saldo Akhir Bulan</span>
           <div className="text-lg font-bold text-blue-600">{formatMoney(c?.closingBalance)}</div>
         </div>
+      </div>
+      <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+        <Link href="/dashboard/finance/cash-position" className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+          Lihat Detail Posisi Kas <ArrowRight className="h-4 w-4 ml-1" />
+        </Link>
       </div>
     </div>
   );

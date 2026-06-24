@@ -12,6 +12,9 @@ import { toast } from "react-hot-toast";
 import { extractErrorMessage } from "@/lib/error";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Button } from "@/components/ui/button";
+import { PeriodFormModal } from "@/features/finance/components/period-form-modal";
+import { Plus } from "lucide-react";
 
 export default function FinancialPeriodsPage() {
   const { user } = useAuthStore();
@@ -19,6 +22,7 @@ export default function FinancialPeriodsPage() {
   const [notes, setNotes] = useState("");
   const [yearFilter, setYearFilter] = useState(new Date().getFullYear().toString());
   const [processing, setProcessing] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const isAuthorized = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE" || user?.role === "STAFF_INPUT";
   const isOwner = user?.role === "OWNER";
@@ -93,6 +97,13 @@ export default function FinancialPeriodsPage() {
               </option>
             ))}
           </SearchableSelect>
+
+          {!isStaffInput && (
+            <Button onClick={() => setIsCreateModalOpen(true)} className="h-9 ml-2">
+              <Plus className="h-4 w-4 mr-2" />
+              Buat Periode Baru
+            </Button>
+          )}
         </div>
       </div>
 
@@ -138,6 +149,12 @@ export default function FinancialPeriodsPage() {
           </div>
         </ConfirmDialog>
       )}
+
+      <PeriodFormModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)} 
+        onSuccess={() => mutate()} 
+      />
     </div>
   );
 }

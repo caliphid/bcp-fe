@@ -1,4 +1,6 @@
 import { MonthlyOverviewResponse } from "../../../types/finance";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export function ProfitSummary({ data, loading }: { data?: MonthlyOverviewResponse, loading: boolean }) {
   const formatMoney = (val?: string) => {
@@ -53,6 +55,11 @@ export function ProfitSummary({ data, loading }: { data?: MonthlyOverviewRespons
             )}
           </div>
         </div>
+      </div>
+      <div className="mt-4 pt-4 border-t border-slate-100 flex justify-end">
+        <Link href="/dashboard/finance/profitability" className="inline-flex items-center text-sm font-semibold text-indigo-600 hover:text-indigo-700">
+          Lihat Detail Laba/Rugi <ArrowRight className="h-4 w-4 ml-1" />
+        </Link>
       </div>
     </div>
   );

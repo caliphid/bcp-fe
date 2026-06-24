@@ -56,6 +56,14 @@ export function ProfitVsCashflowPanel({ data, loading }: ProfitVsCashflowPanelPr
               <span className="font-medium text-slate-700">{formatMoney(adj.transfer)}</span>
             </div>
             <div className="flex justify-between text-sm">
+              <span className="text-slate-600">Transaksi Non-Tunai (Non-Cash)</span>
+              <span className="font-medium text-slate-700">{formatMoney(adj.nonCash)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-slate-600">Transaksi Belum Terpetakan (Unmapped)</span>
+              <span className="font-medium text-slate-700">{formatMoney(adj.unmapped)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
               <span className="text-slate-600">Mutasi Piutang Pelanggan</span>
               <span className="font-medium text-slate-700">{formatMoney(adj.receivables)}</span>
             </div>

@@ -1,7 +1,9 @@
 import { AccountTransferResponse } from "../../../types/finance";
 import dayjs from "dayjs";
-import { ArrowRight, Ban, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Ban, CheckCircle2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { TransferDetailModal } from "./transfer-detail-modal";
 
 interface TransfersTableProps {
   data?: AccountTransferResponse[];
@@ -11,6 +13,8 @@ interface TransfersTableProps {
 }
 
 export function TransfersTable({ data, loading, onVoidClick, isStaffInput }: TransfersTableProps) {
+  const [selectedTransferId, setSelectedTransferId] = useState<string | null>(null);
+
   const formatMoney = (val?: string) => {
     if (!val) return "Rp 0";
     return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(Number(val));
@@ -81,17 +85,29 @@ export function TransfersTable({ data, loading, onVoidClick, isStaffInput }: Tra
                   )}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  {!isStaffInput && row.status === 'POSTED' && (
-                    <Button variant="outline" size="sm" onClick={() => onVoidClick(row)} className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
-                      Void
+                  <div className="flex justify-end gap-2">
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedTransferId(row.id)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50">
+                      <Eye className="h-4 w-4 mr-1.5" />
+                      Detail
                     </Button>
-                  )}
+                    {!isStaffInput && row.status === 'POSTED' && (
+                      <Button variant="outline" size="sm" onClick={() => onVoidClick(row)} className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
+                        Void
+                      </Button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <TransferDetailModal
+        transferId={selectedTransferId}
+        isOpen={!!selectedTransferId}
+        onClose={() => setSelectedTransferId(null)}
+      />
     </div>
   );
 }

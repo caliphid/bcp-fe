@@ -88,6 +88,8 @@ export type ProfitVsCashflowResponse = {
     investing: string;
     equity: string;
     transfer: string;
+    nonCash: string;
+    unmapped: string;
     receivables: string;
     cashbon: string;
     debt: string;

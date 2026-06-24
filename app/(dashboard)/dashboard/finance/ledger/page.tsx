@@ -9,7 +9,7 @@ import { useAccountLedger } from "@/features/finance/hooks/use-finance-analytics
 
 export default function AccountLedgerPage() {
   const { user } = useAuthStore();
-  const { filters } = useFinanceStore();
+  const { filters, setFilter } = useFinanceStore();
 
   const isAuthorized = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE" || user?.role === "STAFF_INPUT";
 
@@ -46,7 +46,11 @@ export default function AccountLedgerPage() {
           <div className="text-slate-500 font-medium">Pilih salah satu rekening pada filter di atas untuk melihat buku besar.</div>
         </div>
       ) : (
-        <AccountLedgerTable data={data} loading={isLoading} />
+        <AccountLedgerTable 
+          data={data} 
+          loading={isLoading} 
+          onPageChange={(page) => setFilter("page", page)} 
+        />
       )}
     </div>
   );
