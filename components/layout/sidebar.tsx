@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "../../store/auth-store";
+import { useTranslation } from "../../hooks/use-translation";
 import {
   LayoutDashboard,
   Users,
@@ -25,7 +26,6 @@ import {
   FileSpreadsheet,
   TrendingUp,
   Banknote,
-  Landmark,
   BookOpen,
   Scale,
   ShoppingCart,
@@ -103,6 +103,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const activePortal = useAuthStore((state) => state.activePortal);
+  const { t } = useTranslation();
   const [isMinimized, setIsMinimized] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("sidebar_minimized") === "true";
@@ -124,35 +125,35 @@ export function Sidebar() {
 
   const navGroups = [
     {
-      groupLabel: "Main Menu",
+      groupKey: "sidebar.groups.mainMenu",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Overview",
+          titleKey: "sidebar.items.overview",
           href: "/dashboard",
           icon: <LayoutDashboard className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Transactions",
+          titleKey: "sidebar.items.transactions",
           href: "/dashboard/transactions",
           icon: <ArrowRightLeft className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Manajemen Hutang",
+          titleKey: "sidebar.items.debtManagement",
           href: "/dashboard/debts",
           icon: <Wallet className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Cicilan Hutang",
+          titleKey: "sidebar.items.debtInstallments",
           href: "/dashboard/debt-installments",
           icon: <CalendarDays className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Import Cashflow",
+          titleKey: "sidebar.items.importCashflow",
           href: "/dashboard/imports/cashflow",
           icon: <UploadCloud className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
@@ -160,23 +161,23 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Order & Inventory",
+      groupKey: "sidebar.groups.orderInventory",
       portals: ["OMS"],
       items: [
         {
-          title: "Sales Orders",
+          titleKey: "sidebar.items.salesOrders",
           href: "/dashboard/sales-orders",
           icon: <ShoppingCart className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Customer Returns",
+          titleKey: "sidebar.items.customerReturns",
           href: "/dashboard/customer-returns",
           icon: <ArrowRightLeft className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Return Reports",
+          titleKey: "sidebar.items.returnReports",
           href: "/dashboard/return-reports",
           icon: <FileText className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -184,35 +185,35 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Purchasing",
+      groupKey: "sidebar.groups.purchasing",
       portals: ["OMS"],
       items: [
         {
-          title: "Vendors",
+          titleKey: "sidebar.items.vendors",
           href: "/dashboard/purchasing/vendors",
           icon: <Truck className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Purchase Orders",
+          titleKey: "sidebar.items.purchaseOrders",
           href: "/dashboard/purchasing/purchase-orders",
           icon: <ShoppingCart className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Goods Receipts",
+          titleKey: "sidebar.items.goodsReceipts",
           href: "/dashboard/purchasing/goods-receipts",
           icon: <Box className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Vendor Payments",
+          titleKey: "sidebar.items.vendorPayments",
           href: "/dashboard/purchasing/vendor-payments",
           icon: <BadgeDollarSign className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Purchase Reports",
+          titleKey: "sidebar.items.purchaseReports",
           href: "/dashboard/purchasing/reports",
           icon: <FileText className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -220,23 +221,23 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Inventory Management",
+      groupKey: "sidebar.groups.inventoryManagement",
       portals: ["OMS"],
       items: [
         {
-          title: "Inventory",
+          titleKey: "sidebar.items.inventory",
           href: "/dashboard/inventory/stock",
           icon: <ClipboardList className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Low Stock Alert",
+          titleKey: "sidebar.items.lowStockAlert",
           href: "/dashboard/inventory/low-stock",
           icon: <AlertTriangle className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Movements Log",
+          titleKey: "sidebar.items.movementsLog",
           href: "/dashboard/inventory/movements",
           icon: <History className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -244,29 +245,29 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Ads & Sales",
+      groupKey: "sidebar.groups.adsSales",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Ad Platforms",
+          titleKey: "sidebar.items.adPlatforms",
           href: "/dashboard/ad-platforms",
           icon: <Megaphone className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Ad Campaigns",
+          titleKey: "sidebar.items.adCampaigns",
           href: "/dashboard/ad-campaigns",
           icon: <Target className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Ads Reports",
+          titleKey: "sidebar.items.adsReports",
           href: "/dashboard/ads-reports",
           icon: <FileSpreadsheet className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Performance Analytics",
+          titleKey: "sidebar.items.performanceAnalytics",
           href: "/dashboard/ads-analytics",
           icon: <TrendingUp className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
@@ -274,11 +275,11 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Crew Finance",
+      groupKey: "sidebar.groups.crewFinance",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Crew Cashbon",
+          titleKey: "sidebar.items.crewCashbon",
           href: "/dashboard/crew-cashbons",
           icon: <Banknote className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -286,60 +287,59 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Uang Eksternal",
+      groupKey: "sidebar.groups.externalMoney",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Pihak Eksternal",
+          titleKey: "sidebar.items.externalParties",
           href: "/dashboard/external-parties",
           icon: <Users className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Piutang",
+          titleKey: "sidebar.items.receivables",
           href: "/dashboard/receivables",
           icon: <Banknote className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Ringkasan Piutang",
+          titleKey: "sidebar.items.receivableSummary",
           href: "/dashboard/receivable-summary",
           icon: <TrendingUp className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
       ],
     },
-
     {
-      groupLabel: "Finance Control",
+      groupKey: "sidebar.groups.financeControl",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Monthly Overview",
+          titleKey: "sidebar.items.monthlyOverview",
           href: "/dashboard/finance/overview",
           icon: <LayoutDashboard className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Account Ledger",
+          titleKey: "sidebar.items.accountLedger",
           href: "/dashboard/finance/ledger",
           icon: <BookOpen className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Account Transfers",
+          titleKey: "sidebar.items.accountTransfers",
           href: "/dashboard/finance/transfers",
           icon: <ArrowRightLeft className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "Balance Reconciliation",
+          titleKey: "sidebar.items.balanceReconciliation",
           href: "/dashboard/finance/reconciliation",
           icon: <Scale className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Financial Periods",
+          titleKey: "sidebar.items.financialPeriods",
           href: "/dashboard/finance/periods",
           icon: <CalendarDays className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -347,17 +347,17 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Reports & Analytics",
+      groupKey: "sidebar.groups.reportsAnalytics",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Cashflow Reports",
+          titleKey: "sidebar.items.cashflowReports",
           href: "/dashboard/reports/cashflow",
           icon: <LayoutDashboard className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Account Balances",
+          titleKey: "sidebar.items.accountBalances",
           href: "/dashboard/reports/balances",
           icon: <Wallet className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
@@ -365,23 +365,23 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Master Data",
+      groupKey: "sidebar.groups.masterData",
       portals: ["FINANCE", "OMS"],
       items: [
         {
-          title: "Product Categories",
+          titleKey: "sidebar.items.productCategories",
           href: "/dashboard/product-categories",
           icon: <FolderTree className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Products",
+          titleKey: "sidebar.items.products",
           href: "/dashboard/products",
           icon: <Package className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Warehouses",
+          titleKey: "sidebar.items.warehouses",
           href: "/dashboard/warehouses",
           icon: <Warehouse className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
@@ -389,29 +389,29 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Finance Master",
+      groupKey: "sidebar.groups.financeMaster",
       portals: ["FINANCE"],
       items: [
         {
-          title: "Business Units",
+          titleKey: "sidebar.items.businessUnits",
           href: "/dashboard/business-units",
           icon: <Building2 className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Accounts",
+          titleKey: "sidebar.items.accounts",
           href: "/dashboard/accounts",
           icon: <Wallet className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Categories",
+          titleKey: "sidebar.items.categories",
           href: "/dashboard/categories",
           icon: <FolderTree className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Crew",
+          titleKey: "sidebar.items.crew",
           href: "/dashboard/crew",
           icon: <Users className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
@@ -419,23 +419,23 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Settings & Admin",
+      groupKey: "sidebar.groups.settingsAdmin",
       portals: ["FINANCE", "OMS"],
       items: [
         {
-          title: "Users",
+          titleKey: "sidebar.items.users",
           href: "/dashboard/users",
           icon: <Users className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Business Profile",
+          titleKey: "sidebar.items.businessProfile",
           href: "/dashboard/business-profile",
           icon: <Briefcase className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
         {
-          title: "App Settings",
+          titleKey: "sidebar.items.appSettings",
           href: "/dashboard/app-settings",
           icon: <Settings className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
@@ -475,10 +475,14 @@ export function Sidebar() {
           {!isMinimized && (
             <div className="flex flex-col overflow-hidden">
               <span className="text-2xl font-bold tracking-tight text-white leading-none">
-                {activePortal === 'OMS' ? 'Order' : 'Finance'}
+                {activePortal === "OMS"
+                  ? t("sidebar.brand.oms.title")
+                  : t("sidebar.brand.finance.title")}
               </span>
               <span className="text-[13px] font-medium text-slate-300 mt-1.5 leading-none tracking-wide">
-                {activePortal === 'OMS' ? 'Management' : 'Control Panel'}
+                {activePortal === "OMS"
+                  ? t("sidebar.brand.oms.subtitle")
+                  : t("sidebar.brand.finance.subtitle")}
               </span>
             </div>
           )}
@@ -501,10 +505,11 @@ export function Sidebar() {
               <div key={index} className="space-y-2">
                 {!isMinimized && (
                   <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 whitespace-nowrap overflow-hidden">
-                    {group.groupLabel}
+                    {t(group.groupKey)}
                   </div>
                 )}
                 {visibleItems.map((item) => {
+                  const title = t(item.titleKey);
                   const isActive =
                     pathname === item.href ||
                     (item.href !== "/dashboard" &&
@@ -512,7 +517,7 @@ export function Sidebar() {
                   return (
                     <SidebarTooltip
                       key={item.href}
-                      text={item.title}
+                      text={title}
                       isMinimized={isMinimized}
                     >
                       <Link
@@ -530,7 +535,7 @@ export function Sidebar() {
                         <div className="shrink-0">{item.icon}</div>
                         {!isMinimized && (
                           <span className="whitespace-nowrap overflow-hidden">
-                            {item.title}
+                            {title}
                           </span>
                         )}
                       </Link>
