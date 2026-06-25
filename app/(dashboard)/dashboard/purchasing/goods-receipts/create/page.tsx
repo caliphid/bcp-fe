@@ -101,12 +101,16 @@ function CreateGoodsReceiptContent() {
   useEffect(() => {
     if (po && po.items) {
       const items = po.items
-        .filter(item => item.outstandingQuantity > 0)
+        .map(item => {
+          const outstanding = item.outstandingQuantity ?? (item.orderedQuantity - (item.receivedQuantity || 0) - (item.cancelledQuantity || 0));
+          return { ...item, _outstanding: outstanding };
+        })
+        .filter(item => item._outstanding > 0)
         .map(item => ({
           purchaseOrderItemId: item.id,
           productName: item.productVariant?.product?.name || "Unknown",
           sku: item.productVariant?.sku || "-",
-          outstandingQuantity: item.outstandingQuantity,
+          outstandingQuantity: item._outstanding,
           receivedQuantity: 0,
           acceptedQuantity: 0,
           rejectedQuantity: 0,

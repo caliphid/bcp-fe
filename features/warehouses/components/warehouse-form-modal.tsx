@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { warehouseApi } from "../api";
@@ -38,6 +38,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -101,16 +102,23 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
 
         <div className="space-y-2">
           <Label htmlFor="businessUnitId">Business Unit (Optional)</Label>
-          <SearchableSelect
-            id="businessUnitId"
-            className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-            {...register("businessUnitId")}
-          >
-            <option value="">-- No Business Unit --</option>
-            {businessUnits.map((bu) => (
-              <option key={bu.id} value={bu.id}>{bu.name}</option>
-            ))}
-          </SearchableSelect>
+          <Controller
+            control={control}
+            name="businessUnitId"
+            render={({ field }) => (
+              <SearchableSelect
+                id="businessUnitId"
+                className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+                {...field}
+                onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+              >
+                <option value="">-- No Business Unit --</option>
+                {businessUnits.map((bu) => (
+                  <option key={bu.id} value={bu.id}>{bu.name}</option>
+                ))}
+              </SearchableSelect>
+            )}
+          />
           {errors.businessUnitId && <p className="text-sm text-red-500">{errors.businessUnitId.message}</p>}
         </div>
 

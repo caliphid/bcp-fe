@@ -20,18 +20,27 @@ import useSWR from "swr";
 import { usersApi } from "@/features/users/api";
 import { Warehouse } from "@/types/warehouse";
 
-const getMovementColor = (type: InventoryMovementType) => {
+const getMovementColor = (type: InventoryMovementType | string) => {
   switch (type) {
     case InventoryMovementType.OPENING_STOCK:
     case InventoryMovementType.STOCK_ADJUSTMENT_IN:
+    case InventoryMovementType.VENDOR_RECEIPT:
+    case InventoryMovementType.CUSTOMER_RETURN_RESTOCK:
+    case InventoryMovementType.SALE_RETURN:
       return "text-emerald-600 bg-emerald-50";
     case InventoryMovementType.STOCK_ADJUSTMENT_OUT:
     case InventoryMovementType.DAMAGED:
     case InventoryMovementType.SALE_FULFILLMENT:
-      return "text-red-600 bg-red-50";
+    case InventoryMovementType.CUSTOMER_RETURN_DAMAGED:
+    case InventoryMovementType.EXCHANGE_FULFILLMENT:
+      return "text-rose-600 bg-rose-50";
     case InventoryMovementType.SALE_RESERVATION:
+    case InventoryMovementType.EXCHANGE_RESERVATION:
       return "text-amber-600 bg-amber-50";
     case InventoryMovementType.SALE_RESERVATION_RELEASE:
+    case InventoryMovementType.VENDOR_RECEIPT_REVERSAL:
+    case InventoryMovementType.CUSTOMER_RETURN_REVERSAL:
+    case InventoryMovementType.EXCHANGE_RESERVATION_RELEASE:
       return "text-indigo-600 bg-indigo-50";
     default:
       return "text-slate-600 bg-slate-50";
@@ -39,7 +48,11 @@ const getMovementColor = (type: InventoryMovementType) => {
 };
 
 const formatMovementType = (type: string) => {
-  return type.replace(/_/g, " ");
+  if (!type) return "-";
+  return type
+    .split("_")
+    .map(word => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(" ");
 };
 
 export default function MovementsPage() {
@@ -150,6 +163,10 @@ export default function MovementsPage() {
           InventoryMovementType.OPENING_STOCK,
           InventoryMovementType.STOCK_ADJUSTMENT_IN,
           InventoryMovementType.SALE_RESERVATION_RELEASE,
+          InventoryMovementType.VENDOR_RECEIPT,
+          InventoryMovementType.CUSTOMER_RETURN_RESTOCK,
+          InventoryMovementType.SALE_RETURN,
+          InventoryMovementType.EXCHANGE_RESERVATION_RELEASE
         ].includes(item.movementType);
 
         return (

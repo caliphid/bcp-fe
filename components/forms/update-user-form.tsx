@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { usersApi } from "../../features/users/api";
@@ -32,6 +32,7 @@ export function UpdateUserForm({ user, onSuccess, onCancel }: UpdateUserFormProp
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -67,15 +68,22 @@ export function UpdateUserForm({ user, onSuccess, onCancel }: UpdateUserFormProp
 
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
-        <SearchableSelect
-          id="role"
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          {...register("role")}
-        >
-          <option value="STAFF_INPUT">Staff Input</option>
-          <option value="ADMIN_FINANCE">Admin Finance</option>
-          <option value="OWNER">Owner</option>
-        </SearchableSelect>
+        <Controller
+          control={control}
+          name="role"
+          render={({ field }) => (
+            <SearchableSelect
+              id="role"
+              className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              {...field}
+              onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+            >
+              <option value="STAFF_INPUT">Staff Input</option>
+              <option value="ADMIN_FINANCE">Admin Finance</option>
+              <option value="OWNER">Owner</option>
+            </SearchableSelect>
+          )}
+        />
         {errors.role && <p className="text-sm text-red-500">{errors.role.message}</p>}
       </div>
 

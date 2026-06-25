@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { appSettingsApi } from "../../features/app-settings/api";
@@ -33,6 +33,7 @@ export function UpdateAppSettingsForm({ initialData, onSuccess, onCancel }: Upda
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -73,30 +74,44 @@ export function UpdateAppSettingsForm({ initialData, onSuccess, onCancel }: Upda
 
       <div className="space-y-2">
         <Label htmlFor="currency">Default Currency</Label>
-        <SearchableSelect
-          id="currency"
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          {...register("currency")}
-        >
-          <option value="USD">USD ($)</option>
-          <option value="IDR">IDR (Rp)</option>
-          <option value="EUR">EUR (€)</option>
-          <option value="SGD">SGD (S$)</option>
-        </SearchableSelect>
+        <Controller
+          control={control}
+          name="currency"
+          render={({ field }) => (
+            <SearchableSelect
+              id="currency"
+              className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              {...field}
+              onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+            >
+              <option value="USD">USD ($)</option>
+              <option value="IDR">IDR (Rp)</option>
+              <option value="EUR">EUR (€)</option>
+              <option value="SGD">SGD (S$)</option>
+            </SearchableSelect>
+          )}
+        />
         {errors.currency && <p className="text-sm text-red-500">{errors.currency.message}</p>}
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="timezone">Timezone</Label>
-        <SearchableSelect
-          id="timezone"
-          className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
-          {...register("timezone")}
-        >
-          <option value="UTC">UTC</option>
-          <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
-          <option value="America/New_York">America/New_York (EST)</option>
-        </SearchableSelect>
+        <Controller
+          control={control}
+          name="timezone"
+          render={({ field }) => (
+            <SearchableSelect
+              id="timezone"
+              className="flex h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
+              {...field}
+              onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+            >
+              <option value="UTC">UTC</option>
+              <option value="Asia/Jakarta">Asia/Jakarta (WIB)</option>
+              <option value="America/New_York">America/New_York (EST)</option>
+            </SearchableSelect>
+          )}
+        />
         {errors.timezone && <p className="text-sm text-red-500">{errors.timezone.message}</p>}
       </div>
 

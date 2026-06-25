@@ -33,7 +33,10 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
     // Wait, let's just make the value accept the { value, label } object for AsyncSelect, 
     // or let the parent fetch it. Actually, `onChange` expects an event.
 
-    // Let's implement a wrapper that takes a string value, but internally manages the selected option.
+    // Keep track of the last controlled value to avoid race conditions
+    const [lastValue, setLastValue] = React.useState<string | number | undefined>(value);
+
+    // We need to fetch the initial label if value is provided and we only have the ID.
     const [selectedOption, setSelectedOption] = React.useState<{value: string, label: string} | null>(() => {
       if (value && Array.isArray(defaultOptions)) {
         return defaultOptions.find(opt => String(opt.value) === String(value)) || null;
@@ -42,13 +45,19 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
     });
 
     React.useEffect(() => {
-      if (!value) {
-        setSelectedOption(null);
-      } else if (value && !selectedOption && Array.isArray(defaultOptions)) {
-        const match = defaultOptions.find(opt => String(opt.value) === String(value));
-        if (match) setSelectedOption(match);
+      // If the controlled value changed from outside
+      if (value !== lastValue) {
+        setLastValue(value);
+        if (!value) {
+          setSelectedOption(null);
+        } else if (Array.isArray(defaultOptions)) {
+          const match = defaultOptions.find(opt => String(opt.value) === String(value));
+          setSelectedOption(match || { value: String(value), label: String(value) });
+        } else {
+          setSelectedOption({ value: String(value), label: String(value) });
+        }
       }
-    }, [value, defaultOptions, selectedOption]);
+    }, [value, defaultOptions, lastValue]);
 
     return (
       <AsyncSelect
@@ -58,6 +67,7 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
         value={selectedOption}
         onChange={(opt: any) => {
           setSelectedOption(opt || null);
+          setLastValue(opt ? opt.value : "");
           onChange?.({ target: { name, value: opt ? opt.value : "" }, option: opt || null });
         }}
         loadOptions={loadOptions}

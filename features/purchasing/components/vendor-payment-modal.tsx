@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { purchasingApi } from "../api";
 import { useAccounts } from "../../accounts/hooks/use-accounts";
+import { categoriesApi } from "../../categories/api";
 import { PaymentMethod } from "../types";
 import { extractErrorMessage } from "../../../lib/error";
 import { Modal } from "../../../components/ui/modal";
@@ -12,6 +13,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { AsyncSearchableSelect } from "../../../components/ui/async-searchable-select";
 import { formatInputMoney, unformatMoney, formatCurrency } from "../../debts/utils/formatters";
 import toast from "react-hot-toast";
 import { Loader2 } from "lucide-react";
@@ -32,6 +34,7 @@ const schema = z.object({
   principalAmountStr: z.string().min(1, "Principal amount is required"),
   interestAmountStr: z.string().optional(),
   feeAmountStr: z.string().optional(),
+  categoryId: z.string().optional(),
   notes: z.string().optional(),
 }).refine((data) => {
   const total = unformatMoney(data.amountStr);
@@ -59,12 +62,30 @@ export function VendorPaymentModal({
 
   const { data: accounts } = useAccounts();
 
+  const loadCategories = async (inputValue: string) => {
+    try {
+      const res = await categoriesApi.getCategories({
+        search: inputValue,
+        type: "OUT",
+        status: "ACTIVE",
+        limit: 50,
+      });
+      return (res.data || []).map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }));
+    } catch (err) {
+      return [];
+    }
+  };
+
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     reset,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -76,6 +97,7 @@ export function VendorPaymentModal({
       principalAmountStr: "",
       interestAmountStr: "0",
       feeAmountStr: "0",
+      categoryId: "",
       notes: "",
     },
   });
@@ -90,6 +112,7 @@ export function VendorPaymentModal({
         principalAmountStr: formatInputMoney(outstandingAmount.toString()),
         interestAmountStr: "0",
         feeAmountStr: "0",
+        categoryId: "",
         notes: "",
       });
       setError(null);
@@ -120,6 +143,7 @@ export function VendorPaymentModal({
         principalAmount: unformatMoney(data.principalAmountStr),
         interestAmount: unformatMoney(data.interestAmountStr || "0"),
         feeAmount: unformatMoney(data.feeAmountStr || "0"),
+        categoryId: data.categoryId || undefined,
         notes: data.notes || undefined,
       });
 
@@ -134,6 +158,7 @@ export function VendorPaymentModal({
       isOpen={isOpen}
       onClose={onClose}
       title="Record Vendor Payment"
+      className="max-w-lg"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {error && (
@@ -226,6 +251,23 @@ export function VendorPaymentModal({
               />
             </div>
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Kategori Pengeluaran (Opsional)</Label>
+          <Controller
+            control={control}
+            name="categoryId"
+            render={({ field }) => (
+              <AsyncSearchableSelect
+                className="w-full bg-white text-sm"
+                {...field}
+                loadOptions={loadCategories}
+                placeholder="-- Ketik nama kategori --"
+                onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+              />
+            )}
+          />
         </div>
 
         <div className="space-y-2">

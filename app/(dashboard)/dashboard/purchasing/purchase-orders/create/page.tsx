@@ -13,13 +13,13 @@ import { Label } from "../../../../../../components/ui/label";
 import { Alert, AlertDescription } from "../../../../../../components/ui/alert";
 import { Textarea } from "../../../../../../components/ui/textarea";
 import { SearchableSelect } from "../../../../../../components/ui/searchable-select";
+import { AsyncSearchableSelect } from "../../../../../../components/ui/async-searchable-select";
 import { PageHeader } from "../../../../../../components/ui/page-header";
 import { ArrowLeft, Plus, Trash2, Loader2 } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useVendors } from "../../../../../../features/purchasing/hooks/use-purchasing";
 import { useWarehouses } from "../../../../../../features/warehouses/hooks/use-warehouses";
-import { useProductVariants } from "../../../../../../features/products/hooks/use-products";
+import { productApi } from "../../../../../../features/products/api";
 import { VendorStatus } from "../../../../../../features/purchasing/types";
 import { formatInputMoney, unformatMoney } from "../../../../../../features/debts/utils/formatters";
 
@@ -51,14 +51,33 @@ export default function CreatePurchaseOrderPage() {
   const [error, setError] = useState<string | null>(null);
   
   // Data for selects
-  const { data: vendorsData } = useVendors({ limit: 100, vendorStatus: VendorStatus.ACTIVE });
-  const vendors = vendorsData || [];
+  const loadVendors = async (inputValue: string) => {
+    try {
+      const res = await purchasingApi.getVendors({ limit: 50, search: inputValue, vendorStatus: VendorStatus.ACTIVE });
+      return (res.data || []).map((v: any) => ({
+        value: v.id,
+        label: `${v.vendorCode} - ${v.name}`
+      }));
+    } catch (err) {
+      return [];
+    }
+  };
   
   const { data: warehousesData } = useWarehouses({ limit: 100, status: "ACTIVE" });
   const warehouses = warehousesData || [];
 
-  const { data: variantsData } = useProductVariants({ limit: 500, status: "ACTIVE" });
-  const variants = variantsData || [];
+  const loadProductVariants = async (inputValue: string) => {
+    try {
+      const res = await productApi.getProductVariants({ limit: 50, search: inputValue, status: "ACTIVE" });
+      return (res.data || []).map((v: any) => ({
+        value: v.id,
+        label: `${v.sku} - ${v.product?.name || "Unknown"} (${v.color || "-"} / ${v.size || "-"})`,
+        _unitCost: v.unitCost
+      }));
+    } catch (err) {
+      return [];
+    }
+  };
 
   const {
     register,
@@ -122,11 +141,11 @@ export default function CreatePurchaseOrderPage() {
     }
   };
 
-  const handleVariantSelect = (index: number, variantId: string) => {
+  const handleVariantSelect = (index: number, e: any) => {
+    const variantId = e?.target?.value || "";
     setValue(`items.${index}.productVariantId`, variantId);
-    const variant = variants.find(v => v.id === variantId);
-    if (variant) {
-      setValue(`items.${index}.unitCostStr`, formatInputMoney(String(variant.unitCost || "0")));
+    if (e?.option?._unitCost !== undefined) {
+      setValue(`items.${index}.unitCostStr`, formatInputMoney(String(e.option._unitCost || "0")));
     }
   };
 
@@ -162,16 +181,13 @@ export default function CreatePurchaseOrderPage() {
                 control={control}
                 name="vendorId"
                 render={({ field }) => (
-                  <SearchableSelect
-                    className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+                  <AsyncSearchableSelect
+                    className="w-full bg-white text-sm"
                     {...field}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  >
-                    <option value="">-- Select Vendor --</option>
-                    {vendors.map((v) => (
-                      <option key={v.id} value={v.id}>{v.vendorCode} - {v.name}</option>
-                    ))}
-                  </SearchableSelect>
+                    loadOptions={loadVendors}
+                    placeholder="-- Select Vendor --"
+                    onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
+                  />
                 )}
               />
               {errors.vendorId && <p className="text-sm text-red-500">{errors.vendorId.message}</p>}
@@ -250,21 +266,16 @@ export default function CreatePurchaseOrderPage() {
                     control={control}
                     name={`items.${index}.productVariantId`}
                     render={({ field: selectField }) => (
-                      <SearchableSelect
-                        className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+                      <AsyncSearchableSelect
+                        className="w-full bg-white text-sm"
                         {...selectField}
-                        onChange={(e) => {
-                          selectField.onChange(e.target.value);
-                          handleVariantSelect(index, e.target.value);
+                        loadOptions={loadProductVariants}
+                        placeholder="-- Select Product --"
+                        onChange={(e: any) => {
+                          selectField.onChange(e?.target?.value ?? e);
+                          handleVariantSelect(index, e);
                         }}
-                      >
-                        <option value="">-- Select Product --</option>
-                        {variants.map((v) => (
-                          <option key={v.id} value={v.id}>
-                            {v.sku} - {v.product?.name} ({v.color} / {v.size})
-                          </option>
-                        ))}
-                      </SearchableSelect>
+                      />
                     )}
                   />
                   {errors.items?.[index]?.productVariantId && <p className="text-[10px] text-red-500">{errors.items[index]?.productVariantId?.message}</p>}

@@ -190,21 +190,32 @@ export default function GoodsReceiptDetailPage({ params }: PageProps) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {gr.items?.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-50/50">
-                      <td className="px-4 py-4">
-                        <div className="font-medium text-slate-900">{item.productVariant?.sku}</div>
-                        <div className="text-xs text-slate-500">
-                          {item.productVariant?.product?.name}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 text-center font-medium">{item.receivedQuantity}</td>
-                      <td className="px-4 py-4 text-center font-bold text-emerald-600">{item.acceptedQuantity}</td>
-                      <td className="px-4 py-4 text-center font-bold text-rose-600">{item.rejectedQuantity}</td>
-                      {!isStaff && <td className="px-4 py-4 text-right text-slate-600">{formatCurrency(Number(item.unitCost || 0))}</td>}
-                      {!isStaff && <td className="px-4 py-4 text-right font-medium text-slate-900">{formatCurrency(Number(item.lineTotal || 0))}</td>}
-                    </tr>
-                  ))}
+                  {gr.items?.map((item: any) => {
+                    const variant = item.productVariant || item.purchaseOrderItem?.productVariant;
+                    const product = variant?.product || item.product || item.purchaseOrderItem?.product;
+                    const productName = product?.name || variant?.sku || "Unknown Product";
+                    const sku = variant?.sku || "Unknown SKU";
+                    
+                    const attrs = [];
+                    if (variant?.color) attrs.push(variant.color);
+                    if (variant?.size) attrs.push(variant.size);
+                    const attrStr = attrs.length > 0 ? attrs.join(" • ") : null;
+
+                    return (
+                      <tr key={item.id} className="hover:bg-slate-50/50">
+                        <td className="px-4 py-4">
+                          <div className="font-medium text-slate-900">{productName}</div>
+                          <div className="text-xs text-slate-600 font-mono mt-0.5">{sku}</div>
+                          {attrStr && <div className="text-[11px] text-slate-500 mt-1">{attrStr}</div>}
+                        </td>
+                        <td className="px-4 py-4 text-center font-medium">{item.receivedQuantity}</td>
+                        <td className="px-4 py-4 text-center font-bold text-emerald-600">{item.acceptedQuantity}</td>
+                        <td className="px-4 py-4 text-center font-bold text-rose-600">{item.rejectedQuantity}</td>
+                        {!isStaff && <td className="px-4 py-4 text-right text-slate-600">{formatCurrency(Number(item.unitCost || 0))}</td>}
+                        {!isStaff && <td className="px-4 py-4 text-right font-medium text-slate-900">{formatCurrency(Number(item.lineTotal || 0))}</td>}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

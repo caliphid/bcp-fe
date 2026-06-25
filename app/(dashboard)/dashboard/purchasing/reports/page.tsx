@@ -38,15 +38,19 @@ export default function PurchaseReportsPage() {
   const { data, isLoading } = useSWR(
     token ? [`/purchase-reports/${activeReport}`, startDate, endDate] : null,
     ([url, start, end]): Promise<any> => {
-      // Map to the appropriate endpoint based on activeReport
-      const params = { startDate, endDate };
+      // Map UI state to backend contract
+      const dateParams = {
+        ...(start ? { dateFrom: start } : {}),
+        ...(end ? { dateTo: end } : {}),
+      };
+      
       switch (activeReport) {
-        case "monthly": return purchasingApi.getMonthlyPurchaseReport(params);
-        case "vendor": return purchasingApi.getPurchaseByVendorReport(params);
-        case "product": return purchasingApi.getPurchaseByProductReport(params);
-        case "outstanding-receipts": return purchasingApi.getOutstandingReceiptsReport(params);
-        case "outstanding-payments": return purchasingApi.getOutstandingPaymentsReport(params);
-        case "goods-receipts": return purchasingApi.getGoodsReceiptsReport(params);
+        case "monthly": return purchasingApi.getMonthlyPurchaseReport(dateParams);
+        case "vendor": return purchasingApi.getPurchaseByVendorReport(dateParams);
+        case "product": return purchasingApi.getPurchaseByProductReport(dateParams);
+        case "outstanding-receipts": return purchasingApi.getOutstandingReceiptsReport({});
+        case "outstanding-payments": return purchasingApi.getOutstandingPaymentsReport({});
+        case "goods-receipts": return purchasingApi.getGoodsReceiptsReport(dateParams);
       }
     }
   );
