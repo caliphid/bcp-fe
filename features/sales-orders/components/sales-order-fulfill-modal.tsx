@@ -1,12 +1,14 @@
+import { useState } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { PackageCheck, AlertTriangle, Loader2 } from "lucide-react";
 import { SalesOrder } from "@/types/sales-order";
 
 interface SalesOrderFulfillModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => Promise<void>;
+  onConfirm: (data: { notes?: string }) => Promise<void>;
   isLoading: boolean;
   order?: SalesOrder | null;
 }
@@ -18,11 +20,13 @@ export function SalesOrderFulfillModal({
   isLoading,
   order,
 }: SalesOrderFulfillModalProps) {
+  const [notes, setNotes] = useState("");
+
   if (!order) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Fulfill Sales Order">
-      <div className="p-6 text-center space-y-6">
+    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Fulfill Sales Order" className="max-w-lg">
+      <div className="text-center space-y-5">
         <div className="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <PackageCheck className="w-8 h-8" />
         </div>
@@ -38,19 +42,27 @@ export function SalesOrderFulfillModal({
           <AlertTriangle className="w-5 h-5 shrink-0 text-indigo-600" />
           <div className="space-y-1">
             <p className="font-semibold text-indigo-900">Perhatian:</p>
-            <ul className="list-disc list-inside space-y-1 text-indigo-800/90">
-              <li>Aksi ini akan <strong>mengurangi stok fisik (<span className="italic">onHand</span>)</strong>.</li>
-              <li>Status stok <em>reserved</em> sebelumnya akan dilepas (dikonsumsi).</li>
-              <li>Pastikan pesanan sudah benar-benar siap atau sedang dikirimkan.</li>
-            </ul>
+            <p className="text-indigo-800/90">
+              Fulfill order akan mengurangi reserved stock dan stok fisik (on hand). Pastikan reservasi stok masih valid sebelum melanjutkan.
+            </p>
           </div>
+        </div>
+
+        <div className="text-left space-y-2">
+          <label className="text-sm font-semibold text-slate-700">Catatan Fulfill (Opsional)</label>
+          <Input 
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Tulis catatan jika ada..."
+            disabled={isLoading}
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3 pt-4">
           <Button variant="outline" onClick={onClose} disabled={isLoading} className="w-full">
             Kembali
           </Button>
-          <Button variant="default" onClick={onConfirm} disabled={isLoading} className="w-full bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white">
+          <Button variant="default" onClick={() => onConfirm({ notes: notes.trim() || undefined })} disabled={isLoading} className="w-full bg-indigo-600 hover:bg-indigo-700 border-indigo-600 text-white">
             {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
             Fulfill Order
           </Button>

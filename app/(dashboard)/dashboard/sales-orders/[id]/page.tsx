@@ -86,7 +86,8 @@ export default function SalesOrderDetailPage() {
   }
 
   const handleConfirmOrderClick = () => {
-    if (!order.warehouseId) {
+    const wId = order.warehouseId || (order as any).warehouse?.id;
+    if (!wId) {
       toast.error("Gagal: Warehouse belum dipilih. Silakan edit pesanan terlebih dahulu.");
       return;
     }
@@ -125,17 +126,21 @@ export default function SalesOrderDetailPage() {
     }
   };
 
-  const handleFulfillSubmit = async () => {
+  const handleFulfillSubmit = async (data: { notes?: string }) => {
     setIsSubmitting(true);
     try {
-      await salesOrderApi.fulfillSalesOrder(id);
+      await salesOrderApi.fulfillSalesOrder(id, data);
       toast.success("Sales Order berhasil di-fulfill. Stok fisik telah dikurangi.");
       setIsFulfillOpen(false);
       mutate();
     } catch (error: any) {
-      const msg = error?.response?.data?.message;
-      if (msg && msg.includes("Reserved stock discrepancy")) {
-        toast.error(`Error Blocking: ${msg} Silakan cek sistem inventory!`, { duration: 10000 });
+      const msg = error?.response?.data?.message || "";
+      if (msg.includes("Reserved stock discrepancy") || msg.includes("on hand lower than reserved")) {
+        toast.error(
+          "Fulfillment gagal karena pengurangan stok akan membuat on hand lebih kecil dari reserved. Cek reservation atau penyesuaian inventory pada variant terkait terlebih dahulu.",
+          { duration: 10000 }
+        );
+        mutate(); // Refetch to get the latest status
       } else {
         toast.error(msg || "Gagal melakukan fulfillment pesanan.");
       }

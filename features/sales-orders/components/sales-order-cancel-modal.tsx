@@ -30,8 +30,8 @@ export function SalesOrderCancelModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Cancel Sales Order">
-      <div className="p-6 text-center space-y-6">
+    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Cancel Sales Order" className="max-w-lg">
+      <div className="text-center space-y-5">
         <div className="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <Ban className="w-8 h-8" />
         </div>

@@ -66,8 +66,8 @@ export const salesOrderApi = {
     return res.data;
   },
 
-  fulfillSalesOrder: async (id: string) => {
-    const res = await api.post<BaseResponse<SalesOrder>>(`/sales-orders/${id}/fulfill`);
+  fulfillSalesOrder: async (id: string, data?: { notes?: string }) => {
+    const res = await api.post<BaseResponse<SalesOrder>>(`/sales-orders/${id}/fulfill`, data);
     return res.data;
   },
 

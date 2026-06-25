@@ -126,7 +126,7 @@ export default function CreatePurchaseOrderPage() {
     setValue(`items.${index}.productVariantId`, variantId);
     const variant = variants.find(v => v.id === variantId);
     if (variant) {
-      setValue(`items.${index}.unitCostStr`, formatInputMoney(variant.unitCost || "0"));
+      setValue(`items.${index}.unitCostStr`, formatInputMoney(String(variant.unitCost || "0")));
     }
   };
 
@@ -253,7 +253,10 @@ export default function CreatePurchaseOrderPage() {
                       <SearchableSelect
                         className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
                         {...selectField}
-                        onChange={(e) => handleVariantSelect(index, e.target.value)}
+                        onChange={(e) => {
+                          selectField.onChange(e.target.value);
+                          handleVariantSelect(index, e.target.value);
+                        }}
                       >
                         <option value="">-- Select Product --</option>
                         {variants.map((v) => (

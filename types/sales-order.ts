@@ -21,15 +21,16 @@ export enum PaymentStatus {
 export interface SalesOrderItem {
   id: string;
   salesOrderId: string;
-  productId: string;
-  product?: Product;
+  productVariantId: string;
+  product?: Product; // Legacy or alternative relation
+  productVariant?: import('./product').ProductVariant;
   quantity: number;
-  price: string;
-  discount: string;
-  subtotal: string;
+  unitPrice: string;
+  discountAmount: string;
+  lineTotal: string;
   unitCostSnapshot?: string | null;
   totalCostSnapshot?: string | null;
-  variant?: { unitCost?: string | null };
+  notes?: string;
 }
 
 export interface SalesOrderReceivable {
@@ -79,9 +80,9 @@ export interface SalesOrder {
   refunds?: SalesOrderRefund[];
   
   subtotal: string;
-  discount: string;
-  shipping: string;
-  tax: string;
+  discountAmount: string;
+  shippingAmount: string;
+  taxAmount: string;
   platformFeeRate?: string;
   platformFeeAmount?: string;
   grandTotal: string;
@@ -107,19 +108,20 @@ export interface CreateSalesOrderRequest {
   salesChannel: string;
   orderType: string;
   notes?: string;
-  discount?: string;
-  shipping?: string;
-  tax?: string;
-  platformFeeRate?: string;
+  discountAmount?: string | number;
+  shippingAmount?: string | number;
+  taxAmount?: string | number;
+  platformFeeRate?: string | number;
+  items?: CreateSalesOrderItemRequest[];
 }
 
 export type UpdateSalesOrderRequest = Partial<CreateSalesOrderRequest>;
 
 export interface CreateSalesOrderItemRequest {
-  productId: string;
+  productVariantId: string;
   quantity: number;
-  price: string;
-  discount?: string;
+  discountAmount?: string | number;
+  notes?: string;
 }
 
 export type UpdateSalesOrderItemRequest = Partial<CreateSalesOrderItemRequest>;
@@ -151,6 +153,8 @@ export interface CreateSalesOrderPaymentRequest {
   paymentDate: string | Date;
   accountId: string;
   amount: string;
+  method: string;
+  categoryId?: string;
   notes?: string;
 }
 

@@ -10,7 +10,7 @@ function cn(...inputs: ClassValue[]) {
 
 interface AsyncSearchableSelectProps {
   value?: string | number;
-  onChange?: (e: { target: { name?: string; value: string } }) => void;
+  onChange?: (e: { target: { name?: string; value: string }; option?: any }) => void;
   loadOptions: (inputValue: string) => Promise<{ value: string; label: string }[]>;
   defaultOptions?: { value: string; label: string }[] | boolean;
   disabled?: boolean;
@@ -58,7 +58,7 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
         value={selectedOption}
         onChange={(opt: any) => {
           setSelectedOption(opt || null);
-          onChange?.({ target: { name, value: opt ? opt.value : "" } });
+          onChange?.({ target: { name, value: opt ? opt.value : "" }, option: opt || null });
         }}
         loadOptions={loadOptions}
         defaultOptions={defaultOptions}

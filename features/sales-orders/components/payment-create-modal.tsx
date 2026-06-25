@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Modal } from "@/components/ui/modal";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { useAccounts } from "@/features/accounts/hooks/use-accounts";
+import { categoriesApi } from "@/features/categories/api";
+import { AsyncSearchableSelect } from "@/components/ui/async-searchable-select";
 import { SalesOrder, CreateSalesOrderPaymentRequest } from "@/types/sales-order";
 import { Loader2, DollarSign } from "lucide-react";
 import toast from "react-hot-toast";
@@ -27,6 +30,8 @@ export function PaymentCreateModal({
   const [formData, setFormData] = useState({
     paymentDate: new Date().toISOString().split("T")[0],
     accountId: "",
+    categoryId: "",
+    method: "BANK_TRANSFER",
     amount: "",
     notes: "",
   });
@@ -34,6 +39,23 @@ export function PaymentCreateModal({
   const grandTotal = parseFloat(order.grandTotal || "0");
   const paidAmount = order.payments?.filter(p => p.status === 'POSTED').reduce((acc, p) => acc + parseFloat(p.amount), 0) || 0;
   const remainingBalance = grandTotal - paidAmount;
+
+  const loadCategories = async (inputValue: string) => {
+    try {
+      const res = await categoriesApi.getCategories({
+        search: inputValue,
+        type: "IN",
+        status: "ACTIVE",
+        limit: 50,
+      });
+      return res.data.map((c: any) => ({
+        value: c.id,
+        label: c.name,
+      }));
+    } catch (error) {
+      return [];
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,25 +73,34 @@ export function PaymentCreateModal({
       return;
     }
 
-    await onSubmit({
+    const payload: CreateSalesOrderPaymentRequest = {
       paymentDate: formData.paymentDate,
       accountId: formData.accountId,
+      method: formData.method,
       amount: formData.amount,
       notes: formData.notes,
-    });
+    };
+    
+    if (formData.categoryId) {
+      payload.categoryId = formData.categoryId;
+    }
+
+    await onSubmit(payload);
     
     // Reset
     setFormData({
       paymentDate: new Date().toISOString().split("T")[0],
       accountId: "",
+      categoryId: "",
+      method: "BANK_TRANSFER",
       amount: "",
       notes: "",
     });
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Create Payment">
-      <div className="p-6">
+    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Create Payment" className="max-w-lg">
+      <div>
         <div className="flex items-center gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
             <DollarSign className="w-6 h-6 text-emerald-600" />
@@ -107,8 +138,26 @@ export function PaymentCreateModal({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label>Akun Penerima (Cash In)</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Metode Pembayaran</Label>
+              <select
+                className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+                disabled={isLoading}
+                value={formData.method}
+                onChange={(e) => setFormData({ ...formData, method: e.target.value })}
+              >
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+                <option value="CASH">Cash</option>
+                <option value="EWALLET">E-Wallet</option>
+                <option value="MARKETPLACE_BALANCE">Marketplace Balance</option>
+                <option value="OTHER">Lainnya</option>
+              </select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Akun Penerima (Cash In)</Label>
             <select
               className="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               required
@@ -123,35 +172,40 @@ export function PaymentCreateModal({
                 </option>
               ))}
             </select>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <Label>Nominal Pembayaran</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">Rp</span>
-              <Input
-                type="number"
+            <div className="space-y-2">
+              <Label>Nominal Pembayaran</Label>
+              <CurrencyInput
                 required
-                min="1"
-                step="0.01"
-                max={remainingBalance}
                 disabled={isLoading}
-                className="pl-10 font-medium"
-                value={formData.amount}
-                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                value={Number(formData.amount || 0)}
+                onChange={(val) => setFormData({ ...formData, amount: String(val) })}
                 placeholder={remainingBalance.toString()}
               />
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, amount: remainingBalance.toString() })}
+                  className="text-xs text-primary-600 font-medium hover:underline"
+                >
+                  Isi Full (Pelunasan)
+                </button>
+              </div>
             </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setFormData({ ...formData, amount: remainingBalance.toString() })}
-                className="text-xs text-primary-600 font-medium hover:underline"
-              >
-                Isi Full (Pelunasan)
-              </button>
+
+            <div className="space-y-2">
+              <Label>Kategori Pemasukan (Opsional)</Label>
+              <AsyncSearchableSelect
+                value={formData.categoryId}
+                onChange={(e: any) => setFormData({ ...formData, categoryId: e.target.value })}
+                loadOptions={loadCategories}
+                placeholder="-- Ketik nama kategori --"
+                className="bg-white text-sm"
+              />
             </div>
-          </div>
+
 
           <div className="space-y-2">
             <Label>Catatan (Opsional)</Label>

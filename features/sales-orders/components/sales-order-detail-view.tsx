@@ -2,6 +2,27 @@ import { SalesOrder } from "../../../types/sales-order";
 import { formatMoney } from "../../../lib/utils";
 import dayjs from "dayjs";
 import { Clock, CheckCircle2, Loader2, Ban, CreditCard, Receipt, Truck } from "lucide-react";
+import { useProductVariant } from "../../products/hooks/use-products";
+
+function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string, color?: string, size?: string }) {
+  const { data } = useProductVariant(initialName ? undefined : variantId);
+  const name = initialName || data?.product?.name || `Product ID: ${variantId}`;
+  const sku = initialSku || data?.sku;
+  const vColor = color || data?.color;
+  const vSize = size || data?.size;
+  
+  return (
+    <>
+      <div className="font-semibold text-slate-800">
+        {name}
+        {vColor && vSize && ` (${vColor} / ${vSize})`}
+      </div>
+      <div className="text-xs text-slate-500">
+        {sku && <span className="mr-2">{sku}</span>}
+      </div>
+    </>
+  );
+}
 
 interface SalesOrderDetailViewProps {
   order: SalesOrder;
@@ -151,21 +172,20 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
               {order.items.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-4">
-                    <div className="font-semibold text-slate-800">{item.product?.name || `ID: ${item.productId}`}</div>
-                    {item.product?.sku && <div className="text-xs text-slate-500">{item.product.sku}</div>}
+                    <VariantDisplayName 
+                      variantId={item.productVariantId}
+                      initialName={item.productVariant?.product?.name || item.product?.name}
+                      initialSku={item.productVariant?.sku || item.product?.sku}
+                      color={item.productVariant?.color}
+                      size={item.productVariant?.size}
+                    />
                   </td>
-                  <td className="px-6 py-4 text-right font-medium text-slate-700">
-                    {formatMoney(item.price)}
+                  <td className="px-4 py-3 text-right font-medium text-slate-700">{formatMoney(item.unitPrice)}</td>
+                  <td className="px-4 py-3 text-center font-bold text-slate-800">{item.quantity}</td>
+                  <td className="px-4 py-3 text-right font-medium text-red-500">
+                    {Number(item.discountAmount) > 0 ? `-${formatMoney(item.discountAmount)}` : "-"}
                   </td>
-                  <td className="px-6 py-4 text-center font-bold text-slate-800">
-                    {item.quantity}
-                  </td>
-                  <td className="px-6 py-4 text-right font-medium text-red-500">
-                    {Number(item.discount) > 0 ? `-${formatMoney(item.discount)}` : "-"}
-                  </td>
-                  <td className="px-6 py-4 text-right font-bold text-slate-900">
-                    {formatMoney(item.subtotal)}
-                  </td>
+                  <td className="px-4 py-3 text-right font-bold text-slate-900">{formatMoney(item.lineTotal)}</td>
                   {order.items.some(i => i.totalCostSnapshot !== null && i.totalCostSnapshot !== undefined) && (
                     <td className="px-6 py-4 text-right font-medium text-rose-600 bg-rose-50/30">
                       {item.totalCostSnapshot ? formatMoney(item.totalCostSnapshot) : "-"}
@@ -182,19 +202,29 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
           <div className="w-full md:w-1/2 ml-auto space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500 font-semibold uppercase tracking-wide">Item Subtotal</span>
-              <span className="font-bold text-slate-800">{formatMoney(order.subtotal)}</span>
+              <span className="font-bold text-slate-800">
+                {formatMoney(order.items?.reduce((acc, item) => acc + (Number(item.unitPrice || 0) * Number(item.quantity || 0)), 0))}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-500 font-semibold uppercase tracking-wide">Global Discount</span>
-              <span className="font-bold text-red-600">-{formatMoney(order.discount)}</span>
+              <span className="text-slate-500 font-semibold uppercase tracking-wide">Total Discount</span>
+              <span className="font-bold text-red-600">
+                -{formatMoney(Number(order.discountAmount || 0) + order.items?.reduce((acc, item) => acc + Number(item.discountAmount || 0), 0))}
+              </span>
             </div>
+            {Number(order.platformFeeAmount) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-500 font-semibold uppercase tracking-wide">Platform Fee</span>
+                <span className="font-bold text-slate-800">{formatMoney(order.platformFeeAmount || 0)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span className="text-slate-500 font-semibold uppercase tracking-wide">Shipping</span>
-              <span className="font-bold text-slate-800">+{formatMoney(order.shipping)}</span>
+              <span className="font-bold text-slate-800">+{formatMoney(order.shippingAmount)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-slate-500 font-semibold uppercase tracking-wide">Tax</span>
-              <span className="font-bold text-slate-800">+{formatMoney(order.tax)}</span>
+              <span className="font-bold text-slate-800">+{formatMoney(order.taxAmount)}</span>
             </div>
             {order.salesChannel === 'MARKETPLACE' && Number(order.platformFeeAmount) > 0 && (
               <div className="flex justify-between text-sm">

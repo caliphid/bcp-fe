@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { SalesOrder, CreateSalesOrderRequest, UpdateSalesOrderRequest } from "../../../types/sales-order";
+import { SalesOrder, CreateSalesOrderRequest } from "../../../types/sales-order";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { CurrencyInput } from "../../../components/ui/currency-input";
 import { Save, Loader2, Lock } from "lucide-react";
 import dayjs from "dayjs";
+import { useBusinessUnits } from "../../business-units/hooks/use-business-units";
+import { useWarehouses } from "../../warehouses/hooks/use-warehouses";
 
 interface SalesOrderFormProps {
   initialData?: SalesOrder;
@@ -11,22 +14,41 @@ interface SalesOrderFormProps {
   isLoading: boolean;
 }
 
+const SALES_CHANNELS = [
+  { label: 'Online', value: 'ONLINE' },
+  { label: 'Offline', value: 'OFFLINE' },
+  { label: 'Marketplace', value: 'MARKETPLACE' },
+  { label: 'Social Commerce', value: 'SOCIAL_COMMERCE' },
+  { label: 'Other', value: 'OTHER' },
+];
+
+const ORDER_TYPES = [
+  { label: 'Regular', value: 'REGULAR' },
+  { label: 'Preorder', value: 'PREORDER' },
+  { label: 'Custom', value: 'CUSTOM' },
+  { label: 'Other', value: 'OTHER' },
+];
+
 export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderFormProps) {
   const isReadOnly = initialData && initialData.status !== 'DRAFT';
+
+  const { data: businessUnits } = useBusinessUnits();
+  const { data: warehouses } = useWarehouses({ limit: 100, status: 'ACTIVE' });
 
   const [formData, setFormData] = useState<CreateSalesOrderRequest>({
     orderDate: initialData?.orderDate ? dayjs(initialData.orderDate).format("YYYY-MM-DD") : dayjs().format("YYYY-MM-DD"),
     customerName: initialData?.customerName || "",
     customerPhone: initialData?.customerPhone || "",
     customerAddress: initialData?.customerAddress || "",
-    salesChannel: initialData?.salesChannel || "",
-    orderType: initialData?.orderType || "",
+    salesChannel: initialData?.salesChannel || "ONLINE",
+    orderType: initialData?.orderType || "REGULAR",
     notes: initialData?.notes || "",
-    discount: initialData?.discount || "0",
-    shipping: initialData?.shipping || "0",
-    tax: initialData?.tax || "0",
-    businessUnitId: initialData?.businessUnitId || "",
-    warehouseId: initialData?.warehouseId || "",
+    discountAmount: initialData?.discountAmount || "0",
+    shippingAmount: initialData?.shippingAmount || "0",
+    taxAmount: initialData?.taxAmount || "0",
+    platformFeeRate: initialData?.platformFeeRate || "0",
+    businessUnitId: initialData?.businessUnitId || initialData?.businessUnit?.id || "",
+    warehouseId: initialData?.warehouseId || (initialData as any)?.warehouse?.id || "",
   });
 
   const handleChange = (field: keyof CreateSalesOrderRequest, value: string) => {
@@ -36,7 +58,20 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isReadOnly) return;
-    onSubmit(formData);
+    
+    // Sanitize optional UUIDs and unformat amounts if necessary
+    const payload = { ...formData };
+    if (!payload.businessUnitId || payload.businessUnitId === "") delete payload.businessUnitId;
+    if (!payload.warehouseId || payload.warehouseId === "") delete payload.warehouseId;
+    
+    if (payload.salesChannel !== 'MARKETPLACE') {
+      payload.platformFeeRate = 0;
+    }
+    
+    // Empty array since Opsi B flow doesn't create items immediately
+    payload.items = [];
+    
+    onSubmit(payload);
   };
 
   return (
@@ -96,6 +131,36 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
               onChange={e => handleChange('customerAddress', e.target.value)} 
             />
           </div>
+          
+          <div>
+            <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Business Unit</label>
+            <select
+              className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+              disabled={isReadOnly}
+              value={formData.businessUnitId || ""}
+              onChange={e => handleChange('businessUnitId', e.target.value)}
+            >
+              <option value="">-- Pilih Business Unit (Optional) --</option>
+              {businessUnits?.map((bu: any) => (
+                <option key={bu.id} value={bu.id}>{bu.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Gudang / Warehouse</label>
+            <select
+              className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
+              disabled={isReadOnly}
+              value={formData.warehouseId || ""}
+              onChange={e => handleChange('warehouseId', e.target.value)}
+            >
+              <option value="">-- Pilih Gudang (Optional saat Draft) --</option>
+              {warehouses?.map((w: any) => (
+                <option key={w.id} value={w.id}>{w.warehouseCode} - {w.name}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -103,24 +168,47 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
           
           <div>
             <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Sales Channel <span className="text-red-500">*</span></label>
-            <Input 
-              required 
-              placeholder="e.g. Tokopedia, Offline, WhatsApp"
+            <select
+              required
+              className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isReadOnly}
-              value={formData.salesChannel} 
-              onChange={e => handleChange('salesChannel', e.target.value)} 
-            />
+              value={formData.salesChannel}
+              onChange={e => handleChange('salesChannel', e.target.value)}
+            >
+              {SALES_CHANNELS.map(c => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
           </div>
+
+          {formData.salesChannel === 'MARKETPLACE' && (
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Platform Fee Rate (%)</label>
+              <Input 
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                disabled={isReadOnly}
+                value={formData.platformFeeRate} 
+                onChange={e => handleChange('platformFeeRate', e.target.value)} 
+              />
+            </div>
+          )}
 
           <div>
             <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Order Type <span className="text-red-500">*</span></label>
-            <Input 
-              required 
-              placeholder="e.g. B2C, B2B, RESELLER"
+            <select
+              required
+              className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
               disabled={isReadOnly}
-              value={formData.orderType} 
-              onChange={e => handleChange('orderType', e.target.value)} 
-            />
+              value={formData.orderType}
+              onChange={e => handleChange('orderType', e.target.value)}
+            >
+              {ORDER_TYPES.map(t => (
+                <option key={t.value} value={t.value}>{t.label}</option>
+              ))}
+            </select>
           </div>
 
           <div>
@@ -140,32 +228,26 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl">
           <div>
             <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Diskon Order (Rp)</label>
-            <Input 
-              type="number"
-              min="0"
+            <CurrencyInput 
               disabled={isReadOnly}
-              value={formData.discount} 
-              onChange={e => handleChange('discount', e.target.value)} 
+              value={Number(formData.discountAmount)} 
+              onChange={val => handleChange('discountAmount', String(val))} 
             />
           </div>
           <div>
             <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Biaya Pengiriman (Rp)</label>
-            <Input 
-              type="number"
-              min="0"
+            <CurrencyInput 
               disabled={isReadOnly}
-              value={formData.shipping} 
-              onChange={e => handleChange('shipping', e.target.value)} 
+              value={Number(formData.shippingAmount)} 
+              onChange={val => handleChange('shippingAmount', String(val))} 
             />
           </div>
           <div>
             <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Pajak / Tax (Rp)</label>
-            <Input 
-              type="number"
-              min="0"
+            <CurrencyInput 
               disabled={isReadOnly}
-              value={formData.tax} 
-              onChange={e => handleChange('tax', e.target.value)} 
+              value={Number(formData.taxAmount)} 
+              onChange={val => handleChange('taxAmount', String(val))} 
             />
           </div>
         </div>

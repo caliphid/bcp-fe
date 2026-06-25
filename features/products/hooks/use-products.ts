@@ -7,10 +7,7 @@ export function useProducts(params?: Record<string, any>) {
   
   const { data, error, isLoading, mutate } = useSWR(
     token ? ['/products', params] : null,
-    () => productApi.getProducts(params),
-    {
-      revalidateOnFocus: false,
-    }
+    () => productApi.getProducts(params)
   );
 
   return {
@@ -46,10 +43,7 @@ export function useProductVariants(params?: Record<string, any>) {
   
   const { data, error, isLoading, mutate } = useSWR(
     token ? ['/product-variants', params] : null,
-    () => productApi.getProductVariants(params),
-    {
-      revalidateOnFocus: false,
-    }
+    () => productApi.getProductVariants(params)
   );
 
   return {

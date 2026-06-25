@@ -84,7 +84,7 @@ export function RefundCreateModal({ isOpen, onClose, onSubmit, isLoading, order 
       itemsSelected.forEach(([itemId, qty]) => {
         const orderItem = order.items.find(i => i.id === itemId);
         if (orderItem) {
-          const valPerItem = parseFloat(orderItem.subtotal) / orderItem.quantity;
+          const valPerItem = parseFloat(orderItem.lineTotal) / orderItem.quantity;
           max += valPerItem * qty;
         }
       });
@@ -94,7 +94,7 @@ export function RefundCreateModal({ isOpen, onClose, onSubmit, isLoading, order 
         const returned = alreadyReturnedMap[orderItem.id] || 0;
         const remaining = orderItem.quantity - returned;
         if (remaining > 0) {
-          const valPerItem = parseFloat(orderItem.subtotal) / orderItem.quantity;
+          const valPerItem = parseFloat(orderItem.lineTotal) / orderItem.quantity;
           max += valPerItem * remaining;
         }
       });
@@ -279,7 +279,7 @@ export function RefundCreateModal({ isOpen, onClose, onSubmit, isLoading, order 
                               {item.product?.name || "Unknown"}
                               {item.product?.sku && <span className="block text-xs text-slate-500">{item.product.sku}</span>}
                             </td>
-                            <td className="px-4 py-3 text-slate-600">{formatMoney(item.price)}</td>
+                            <td className="px-4 py-3 text-slate-600">{formatMoney(item.unitPrice)}</td>
                             <td className="px-4 py-3 text-center">{item.quantity}</td>
                             <td className="px-4 py-3 text-center text-amber-600 font-medium">{returned}</td>
                             <td className="px-4 py-3 text-center text-emerald-600 font-bold">{remaining}</td>

@@ -33,7 +33,17 @@ export default function EditSalesOrderPage() {
   const handleUpdateHeader = async (data: any) => {
     setIsSubmitting(true);
     try {
-      await salesOrderApi.updateSalesOrder(id, data);
+      const payload = {
+        ...data,
+        // Include existing items so the backend doesn't delete them on update
+        items: order?.items?.map(item => ({
+          productVariantId: item.productVariantId,
+          quantity: item.quantity,
+          discountAmount: item.discountAmount,
+          notes: item.notes
+        })) || []
+      };
+      await salesOrderApi.updateSalesOrder(id, payload);
       toast.success("Header pesanan berhasil diupdate");
       mutate();
     } catch (error: any) {
@@ -86,6 +96,7 @@ export default function EditSalesOrderPage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
       <PageHeader
+        backHref={`/dashboard/sales-orders/${id}`}
         title={isReadOnly ? "Sales Order Detail" : "Edit Draft Sales Order"}
         description={`Sales Order #${order.orderCode} - Status: ${order.status}`}
       />

@@ -21,8 +21,8 @@ export function SalesOrderConfirmModal({
   if (!order) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Confirm Sales Order">
-      <div className="p-6 text-center space-y-6">
+    <Modal isOpen={isOpen} onClose={isLoading ? () => {} : onClose} title="Confirm Sales Order" className="max-w-lg">
+      <div className="text-center space-y-5">
         <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
           <CheckCircle2 className="w-8 h-8" />
         </div>
