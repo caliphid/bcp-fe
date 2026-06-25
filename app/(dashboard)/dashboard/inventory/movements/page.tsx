@@ -10,9 +10,15 @@ import { useInventoryMovements } from "../../../../../features/inventory/hooks/u
 import { useWarehouses } from "../../../../../features/warehouses/hooks/use-warehouses";
 import { DataTable } from "../../../../../components/ui/data-table";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { InventoryMovement, InventoryMovementType } from "../../../../../types/inventory";
+import {
+  InventoryMovement,
+  InventoryMovementType,
+} from "../../../../../types/inventory";
 import { formatDate } from "../../../../../lib/utils";
 import Link from "next/link";
+import useSWR from "swr";
+import { usersApi } from "@/features/users/api";
+import { Warehouse } from "@/types/warehouse";
 
 const getMovementColor = (type: InventoryMovementType) => {
   switch (type) {
@@ -43,10 +49,22 @@ export default function MovementsPage() {
   const [warehouseFilter, setWarehouseFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
 
-  const { data: warehousesData } = useWarehouses({ limit: 100, status: "ACTIVE" });
+  const { data: warehousesData } = useWarehouses({
+    limit: 100,
+    status: "ACTIVE",
+  });
   const warehouses = warehousesData || [];
 
-  const { data: movementsData, meta, isLoading, error } = useInventoryMovements({
+  const { data: usersResponse } = useSWR("users-list", usersApi.getUsers);
+  const users = usersResponse?.data || [];
+  const usersMap = new Map(users.map((u) => [u.id, u]));
+
+  const {
+    data: movementsData,
+    meta,
+    isLoading,
+    error,
+  } = useInventoryMovements({
     page,
     limit: 20,
     search: searchQuery || undefined,
@@ -64,69 +82,105 @@ export default function MovementsPage() {
   };
 
   const columns = [
-    { 
-      header: "Date", 
+    {
+      header: "Date",
       cell: (item: InventoryMovement) => (
         <div>
-          <div className="font-medium text-slate-900">{formatDate(item.movementDate as string)}</div>
-          <div className="text-xs text-slate-500">{new Date(item.movementDate).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
-        </div>
-      )
-    },
-    { 
-      header: "Warehouse", 
-      cell: (item: InventoryMovement) => item.warehouse?.name || "-" 
-    },
-    { 
-      header: "Product / Variant", 
-      cell: (item: InventoryMovement) => (
-        <div>
-          <Link href={`/dashboard/products/${item.productId}`} className="font-semibold text-indigo-600 hover:underline">
-            {item.product?.name}
-          </Link>
+          <div className="font-medium text-slate-900">
+            {formatDate(item.movementDate as string)}
+          </div>
           <div className="text-xs text-slate-500">
-            {item.variant?.sku} • {item.variant?.color} • {item.variant?.size}
+            {new Date(item.movementDate).toLocaleTimeString("id-ID", {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </div>
         </div>
-      )
+      ),
     },
-    { 
-      header: "Type", 
+    {
+      header: "Warehouse",
+      cell: (item: InventoryMovement) => item.warehouse?.name || "-",
+    },
+    {
+      header: "Product / Variant",
+      cell: (item: InventoryMovement) => {
+        const variant = item.productVariant || item.variant;
+        const product = item.product || variant?.product;
+        const productId = item.productId || product?.id;
+
+        return (
+          <div>
+            {productId ? (
+              <Link
+                href={`/dashboard/products/${productId}`}
+                className="font-semibold text-indigo-600 hover:underline"
+              >
+                {product?.name || "-"}
+              </Link>
+            ) : (
+              <span className="font-semibold text-slate-900">
+                {product?.name || "-"}
+              </span>
+            )}
+            <div className="text-xs text-slate-500 mt-1">
+              {variant
+                ? `${variant.sku} • ${variant.color} • ${variant.size}`
+                : "-"}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      header: "Type",
       cell: (item: InventoryMovement) => (
-        <span className={`inline-flex px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${getMovementColor(item.movementType)}`}>
+        <span
+          className={`inline-flex px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${getMovementColor(item.movementType)}`}
+        >
           {formatMovementType(item.movementType)}
         </span>
-      )
+      ),
     },
-    { 
-      header: "Qty", 
+    {
+      header: "Qty",
       className: "text-right font-bold text-slate-900",
       cell: (item: InventoryMovement) => {
         const isPositive = [
           InventoryMovementType.OPENING_STOCK,
           InventoryMovementType.STOCK_ADJUSTMENT_IN,
-          InventoryMovementType.SALE_RESERVATION_RELEASE
+          InventoryMovementType.SALE_RESERVATION_RELEASE,
         ].includes(item.movementType);
-        
+
         return (
           <span className={isPositive ? "text-emerald-600" : "text-red-600"}>
-            {isPositive ? "+" : ""}{item.quantity}
+            {isPositive ? "+" : ""}
+            {item.quantity}
           </span>
         );
-      }
+      },
     },
-    { 
-      header: "Reference", 
+    {
+      header: "Reference",
       cell: (item: InventoryMovement) => (
         <div>
-          <div className="text-sm font-medium text-slate-700">{item.referenceCode || "-"}</div>
-          {item.reason && <div className="text-xs text-slate-500 mt-0.5">{item.reason}</div>}
+          <div className="text-sm font-medium text-slate-700">
+            {item.referenceCode || "-"}
+          </div>
+          {item.reason && (
+            <div className="text-xs text-slate-500 mt-0.5">{item.reason}</div>
+          )}
         </div>
-      )
+      ),
     },
-    { 
-      header: "User", 
-      cell: (item: InventoryMovement) => item.createdBy?.name || "-" 
+    {
+      header: "User",
+      cell: (item: any) => {
+        const creator =
+          item.createdBy ||
+          usersMap.get(item.createdById || item.created_by_id);
+        return creator?.name || "-";
+      },
     },
   ];
 
@@ -134,8 +188,12 @@ export default function MovementsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Movement Log</h2>
-          <p className="mt-1 text-sm text-slate-500">View history of inventory movements and adjustments.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+            Movement Log
+          </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            View history of inventory movements and adjustments.
+          </p>
         </div>
       </div>
 
@@ -166,8 +224,10 @@ export default function MovementsPage() {
           }}
         >
           <option value="">All Warehouses</option>
-          {warehouses.map((w: any) => (
-            <option key={w.id} value={w.id}>{w.name}</option>
+          {warehouses.map((w: Warehouse) => (
+            <option key={w.id} value={w.id}>
+              {w.name}
+            </option>
           ))}
         </SearchableSelect>
         <SearchableSelect
@@ -179,9 +239,13 @@ export default function MovementsPage() {
           }}
         >
           <option value="">All Movement Types</option>
-          {Object.values(InventoryMovementType).map((t: any) => (
-            <option key={t} value={t}>{formatMovementType(t)}</option>
-          ))}
+          {Object.values(InventoryMovementType).map(
+            (t: InventoryMovementType) => (
+              <option key={t} value={t}>
+                {formatMovementType(t)}
+              </option>
+            ),
+          )}
         </SearchableSelect>
       </div>
 

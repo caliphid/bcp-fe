@@ -34,14 +34,21 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
     // or let the parent fetch it. Actually, `onChange` expects an event.
 
     // Let's implement a wrapper that takes a string value, but internally manages the selected option.
-    const [selectedOption, setSelectedOption] = React.useState<{value: string, label: string} | null>(null);
+    const [selectedOption, setSelectedOption] = React.useState<{value: string, label: string} | null>(() => {
+      if (value && Array.isArray(defaultOptions)) {
+        return defaultOptions.find(opt => String(opt.value) === String(value)) || null;
+      }
+      return null;
+    });
 
-    // If parent updates value to empty, clear it
     React.useEffect(() => {
       if (!value) {
         setSelectedOption(null);
+      } else if (value && !selectedOption && Array.isArray(defaultOptions)) {
+        const match = defaultOptions.find(opt => String(opt.value) === String(value));
+        if (match) setSelectedOption(match);
       }
-    }, [value]);
+    }, [value, defaultOptions, selectedOption]);
 
     return (
       <AsyncSelect

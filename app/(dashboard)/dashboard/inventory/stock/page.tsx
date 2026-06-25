@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../../../../../store/auth-store";
 import { Button } from "../../../../../components/ui/button";
-import { PlusCircle, Search, AlertTriangle } from "lucide-react";
+import { PlusCircle, Search, AlertTriangle, SlidersHorizontal } from "lucide-react";
 import { Input } from "../../../../../components/ui/input";
 import { extractErrorMessage } from "../../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../../components/ui/alert";
@@ -44,6 +44,20 @@ export default function StockPage() {
 
   const [isOpeningStockOpen, setIsOpeningStockOpen] = useState(false);
   const [isAdjustmentOpen, setIsAdjustmentOpen] = useState(false);
+  const [adjustmentTarget, setAdjustmentTarget] = useState<{
+    warehouseId?: string;
+    variantId?: string;
+    variantLabel?: string;
+  } | null>(null);
+
+  const handleAdjustRow = (item: InventoryStock) => {
+    setAdjustmentTarget({
+      warehouseId: item.warehouseId || item.warehouse?.id || (item as any).warehouse_id,
+      variantId: item.productVariantId || item.variant?.id || (item as any).variant_id || (item as any).product_variant_id,
+      variantLabel: `${item.product?.name} - ${item.color} - ${item.size} (${item.sku})`
+    });
+    setIsAdjustmentOpen(true);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,6 +105,25 @@ export default function StockPage() {
         </div>
       )
     },
+    {
+      header: "Actions",
+      className: "text-right",
+      cell: (item: InventoryStock) => (
+        canMutate ? (
+          <div className="flex justify-end">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleAdjustRow(item)}
+              title="Adjust Stock"
+              className="text-slate-500 hover:text-primary-600"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        ) : null
+      )
+    }
   ];
 
   return (
@@ -178,11 +211,18 @@ export default function StockPage() {
       {isAdjustmentOpen && (
         <StockAdjustmentModal
           isOpen={isAdjustmentOpen}
-          onClose={() => setIsAdjustmentOpen(false)}
+          onClose={() => {
+            setIsAdjustmentOpen(false);
+            setAdjustmentTarget(null);
+          }}
           warehouses={warehouses}
           variants={variants}
+          initialWarehouseId={adjustmentTarget?.warehouseId}
+          initialVariantId={adjustmentTarget?.variantId}
+          initialVariantLabel={adjustmentTarget?.variantLabel}
           onSuccess={() => {
             setIsAdjustmentOpen(false);
+            setAdjustmentTarget(null);
             fetchData();
           }}
         />

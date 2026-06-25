@@ -37,9 +37,21 @@ interface StockAdjustmentModalProps {
   onSuccess: () => void;
   warehouses: Warehouse[];
   variants: ProductVariant[];
+  initialWarehouseId?: string;
+  initialVariantId?: string;
+  initialVariantLabel?: string;
 }
 
-export function StockAdjustmentModal({ isOpen, onClose, onSuccess, warehouses, variants }: StockAdjustmentModalProps) {
+export function StockAdjustmentModal({ 
+  isOpen, 
+  onClose, 
+  onSuccess, 
+  warehouses, 
+  variants,
+  initialWarehouseId,
+  initialVariantId,
+  initialVariantLabel
+}: StockAdjustmentModalProps) {
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -50,11 +62,11 @@ export function StockAdjustmentModal({ isOpen, onClose, onSuccess, warehouses, v
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
-      warehouseId: "",
+      warehouseId: initialWarehouseId || "",
       movementDate: new Date().toISOString().split("T")[0],
       type: "STOCK_ADJUSTMENT_IN",
       reason: "",
-      items: [{ productVariantId: "", quantity: 1 }],
+      items: [{ productVariantId: initialVariantId || "", quantity: 1 }],
     },
   });
 
@@ -188,6 +200,11 @@ export function StockAdjustmentModal({ isOpen, onClose, onSuccess, warehouses, v
                         className="flex w-full"
                         placeholder="Search Product Variant..."
                         loadOptions={loadVariantOptions}
+                        defaultOptions={
+                          initialVariantId && initialVariantLabel && index === 0
+                            ? [{ value: initialVariantId, label: initialVariantLabel }]
+                            : true
+                        }
                         onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
                       />
                     )}

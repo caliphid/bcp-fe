@@ -38,6 +38,7 @@ export interface InventoryMovement {
   product?: Product;
   productVariantId: string;
   variant?: ProductVariant;
+  productVariant?: ProductVariant;
   movementType: InventoryMovementType;
   movementDate: string | Date;
   quantity: number;
