@@ -7,6 +7,8 @@ import { LogOut, User as UserIcon, Bell } from "lucide-react";
 export function Topbar() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const activePortal = useAuthStore((state) => state.activePortal);
+  const setActivePortal = useAuthStore((state) => state.setActivePortal);
   const router = useRouter();
 
   const handleLogout = () => {
@@ -14,12 +16,43 @@ export function Topbar() {
     router.push("/login");
   };
 
+  const handlePortalSwitch = (portal: "FINANCE" | "OMS") => {
+    setActivePortal(portal);
+    if (portal === "FINANCE") {
+      router.push("/dashboard");
+    } else {
+      router.push("/dashboard/sales-orders");
+    }
+  };
+
   if (!user) return null;
 
   return (
     <header className="sticky top-0 z-30 flex h-20 items-center justify-between border-b border-slate-200 bg-white/80 px-8 backdrop-blur-md">
-      <div className="flex items-center">
-        {/* Breadcrumbs or dynamic page title could go here */}
+      <div className="flex items-center gap-4">
+        {/* Module Switcher */}
+        <div className="flex bg-slate-100 p-1 rounded-lg">
+          <button
+            onClick={() => handlePortalSwitch("FINANCE")}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+              activePortal === "FINANCE" || !activePortal
+                ? "bg-white text-primary-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Finance
+          </button>
+          <button
+            onClick={() => handlePortalSwitch("OMS")}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${
+              activePortal === "OMS"
+                ? "bg-white text-primary-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700"
+            }`}
+          >
+            Order Management
+          </button>
+        </div>
       </div>
       <div className="flex items-center space-x-6">
         <button className="relative text-slate-400 hover:text-slate-600 transition-colors">

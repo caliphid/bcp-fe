@@ -24,7 +24,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
   const { data: businessUnits } = useBusinessUnits();
   const { data: platforms } = useAdPlatforms({ status: "ACTIVE" });
   const { data: allProducts } = useProducts();
-  const products = allProducts.filter(p => p.status === "ACTIVE");
+  const products = (allProducts || []).filter((p: any) => p.status === "ACTIVE");
 
   const [formData, setFormData] = useState({
     reportDate: new Date().toISOString().split("T")[0],
@@ -110,7 +110,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
   const handleUpdateItem = (index: number, field: keyof CreateAdsReportItemPayload, value: any) => {
     const newItems = [...items];
     if (field === 'productId') {
-      const prod = products.find(p => p.id === value);
+      const prod = products.find((p: any) => p.id === value);
       if (prod) {
         newItems[index] = {
           ...newItems[index],
@@ -209,7 +209,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
               onChange={(e) => setFormData({ ...formData, businessUnitId: e.target.value, campaignId: "" })}
             >
               <option value="" disabled>Pilih Unit Bisnis</option>
-              {businessUnits?.map((b) => (
+              {businessUnits?.map((b: any) => (
                 <option key={b.id} value={b.id}>{b.name}</option>
               ))}
             </SearchableSelect>
@@ -223,7 +223,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
               onChange={(e) => setFormData({ ...formData, platformId: e.target.value, campaignId: "" })}
             >
               <option value="" disabled>Pilih Platform</option>
-              {platforms?.map((p) => (
+              {platforms?.map((p: any) => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </SearchableSelect>
@@ -237,7 +237,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
               disabled={!formData.businessUnitId || !formData.platformId}
             >
               <option value="">Tidak ada / Keseluruhan</option>
-              {campaigns?.map((c) => (
+              {campaigns?.map((c: any) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </SearchableSelect>
@@ -272,7 +272,7 @@ export function AdsReportForm({ onSubmit, loading }: AdsReportFormProps) {
                     onChange={(e) => handleUpdateItem(index, "productId", e.target.value)}
                   >
                     <option value="" disabled>Pilih Produk</option>
-                    {products?.map((p) => (
+                    {products?.map((p: any) => (
                       <option key={p.id} value={p.id}>{p.name}</option>
                     ))}
                   </SearchableSelect>

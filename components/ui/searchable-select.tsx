@@ -29,23 +29,24 @@ export const SearchableSelect = React.forwardRef<any, SearchableSelectProps>(
       React.Children.forEach(nodes, (child) => {
         if (!React.isValidElement(child)) return;
 
-        if (child.type === "option" || child.props?.value !== undefined) {
-          if (child.props.value === "" && !placeholder) {
-            placeholder = child.props.children as string;
+        if (child.type === "option" || (child.props as any)?.value !== undefined) {
+          if ((child.props as any).value === "" && !placeholder) {
+            placeholder = (child.props as any).children as string;
             return;
           }
 
+          const childProps = child.props as any;
           const opt = {
-            value: String(child.props.value),
-            label: String(child.props.children),
+            value: String(childProps.value),
+            label: String(childProps.children),
           };
           options.push(opt);
 
-          if (String(child.props.value) === String(value)) {
+          if (String(childProps.value) === String(value)) {
             selectedOption = opt;
           }
-        } else if (child.props && child.props.children) {
-          extractOptions(child.props.children);
+        } else if ((child.props as any) && (child.props as any).children) {
+          extractOptions((child.props as any).children);
         }
       });
     };

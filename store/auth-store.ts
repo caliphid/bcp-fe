@@ -9,6 +9,8 @@ interface AuthState {
   logout: () => void;
   updateUser: (user: User) => void;
   fetchMe: () => Promise<void>;
+  activePortal: 'FINANCE' | 'OMS' | null;
+  setActivePortal: (portal: 'FINANCE' | 'OMS' | null) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -16,9 +18,11 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
-      login: (token, user) => set({ token, user }),
-      logout: () => set({ token: null, user: null }),
+      login: (token, user) => set({ token, user, activePortal: null }),
+      logout: () => set({ token: null, user: null, activePortal: null }),
       updateUser: (user) => set({ user }),
+      activePortal: null,
+      setActivePortal: (portal) => set({ activePortal: portal }),
       fetchMe: async () => {
         try {
           const { authApi } = await import("../features/auth/api");

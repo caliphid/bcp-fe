@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { productsApi } from "../../features/products/api";
+import { productApi } from "../../features/products/api";
 import { extractErrorMessage } from "../../lib/error";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -71,17 +71,17 @@ export function ProductForm({ initialData, businessUnits, onSuccess, onCancel }:
       const payload = {
         name: data.name,
         type: data.type,
-        defaultHpp: unformatMoney(data.defaultHppStr),
-        defaultPrice: unformatMoney(data.defaultPriceStr),
+        defaultHpp: unformatMoney(data.defaultHppStr).toString(),
+        defaultPrice: unformatMoney(data.defaultPriceStr).toString(),
         businessUnitId: data.businessUnitId || undefined,
         sku: data.sku || undefined,
         description: data.description || undefined,
       };
 
       if (initialData) {
-        await productsApi.updateProduct(initialData.id, payload);
+        await productApi.updateProduct(initialData.id, payload);
       } else {
-        await productsApi.createProduct(payload);
+        await productApi.createProduct(payload);
       }
       onSuccess();
     } catch (err) {

@@ -24,7 +24,7 @@ export function useDashboardOverview() {
         const res = await dashboardApi.getOverview(params);
         if (!ignore) { setData(res.data); setError(null); }
       } catch (e) {
-        if (!ignore) setError(e.response?.data?.message || "Error fetching overview");
+        if (!ignore) setError((e as any).response?.data?.message || "Error fetching overview");
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -68,7 +68,7 @@ function createDashboardHook<T>(apiCall: (params?: any) => Promise<{data: T}>, s
           const res = await apiCall(JSON.parse(filtersStr));
           if (!ignore) { setData(res.data); setError(null); }
         } catch (e) {
-          if (!ignore) setError(e.response?.data?.message || "Error fetching data");
+          if (!ignore) setError((e as any).response?.data?.message || "Error fetching data");
         } finally {
           if (!ignore) setLoading(false);
         }
@@ -135,7 +135,7 @@ export function useMonthComparison() {
         });
         if (!ignore) { setData(res.data); setError(null); }
       } catch (e) {
-        if (!ignore) setError(e.response?.data?.message || "Error");
+        if (!ignore) setError((e as any).response?.data?.message || "Error");
       } finally {
         if (!ignore) setLoading(false);
       }

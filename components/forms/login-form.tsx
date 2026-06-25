@@ -42,7 +42,7 @@ export function LoginForm() {
     try {
       const res = await authApi.login(data);
       login(res.data.accessToken, res.data.user);
-      router.push("/dashboard");
+      router.push("/portals");
     } catch (err) {
       setError(extractErrorMessage(err));
     }

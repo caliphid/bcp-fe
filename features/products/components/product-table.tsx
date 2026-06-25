@@ -4,6 +4,7 @@ import { DataTable } from "../../../components/ui/data-table";
 import { StatusBadge } from "../../../components/ui/status-badge";
 import { Pencil } from "lucide-react";
 import { useProductStore } from "../store/product-store";
+import Link from "next/link";
 
 interface ProductTableProps {
   data: Product[];
@@ -30,7 +31,15 @@ export function ProductTable({
   };
 
   const columns = [
-    { header: "Name", accessorKey: "name" as keyof Product },
+    { 
+      header: "Name", 
+      accessorKey: "name" as keyof Product,
+      cell: (item: Product) => (
+        <Link href={`/dashboard/products/${item.id}`} className="font-semibold text-indigo-600 hover:underline">
+          {item.name}
+        </Link>
+      )
+    },
     { header: "SKU", cell: (item: Product) => item.sku || "-" },
     { 
       header: "Business Unit", 

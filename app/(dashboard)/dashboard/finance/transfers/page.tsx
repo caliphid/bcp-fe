@@ -102,7 +102,7 @@ export default function AccountTransfersPage() {
           message={`Anda yakin ingin membatalkan (VOID) transfer ${voidTarget.transferCode} senilai Rp ${new Intl.NumberFormat("id-ID").format(Number(voidTarget.amount))}? Aksi ini tidak dapat dibatalkan.`}
           confirmText={voiding ? "Memproses..." : "Ya, Void Transfer"}
           onConfirm={handleVoid}
-          isDanger
+          isDestructive
         >
           <div className="mt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">

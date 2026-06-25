@@ -60,7 +60,7 @@ export function TransferFormModal({ isOpen, onClose, onSuccess }: TransferFormMo
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Buat Transfer Internal" size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} title="Buat Transfer Internal">
       <form onSubmit={handleSubmit} className="p-6 space-y-4">
         
         <div className="bg-indigo-50 border border-indigo-100 p-4 rounded-xl text-sm text-indigo-800 mb-4">

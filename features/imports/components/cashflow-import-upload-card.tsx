@@ -71,6 +71,8 @@ export function CashflowImportUploadCard({ accounts, businessUnits }: Props) {
       const res = await importsApi.previewCashflow(formData);
       router.push(`/dashboard/imports/cashflow/${res.data.batchId}`);
     } catch (err) {
+      const e = err as any;
+      const msg = e.response?.data?.message;
       if (Array.isArray(msg)) {
         setError(msg.join(", "));
       } else {

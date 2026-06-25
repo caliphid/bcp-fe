@@ -76,7 +76,6 @@ export function ExternalPartyFormModal({
       isOpen={isOpen}
       onClose={onClose}
       title={party ? "Edit Pihak Eksternal" : "Add External Party"}
-      size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

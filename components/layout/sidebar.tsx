@@ -28,6 +28,11 @@ import {
   Landmark,
   BookOpen,
   Scale,
+  ShoppingCart,
+  Warehouse,
+  ClipboardList,
+  AlertTriangle,
+  History,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -66,8 +71,8 @@ function SidebarTooltip({
 
   return (
     <>
-      {React.cloneElement(children, {
-        ref: ref as any,
+      {React.cloneElement(children as any, {
+        ref,
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
       })}
@@ -93,6 +98,7 @@ function SidebarTooltip({
 export function Sidebar() {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const activePortal = useAuthStore((state) => state.activePortal);
   const [isMinimized, setIsMinimized] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("sidebar_minimized") === "true";
@@ -115,6 +121,7 @@ export function Sidebar() {
   const navGroups = [
     {
       groupLabel: "Main Menu",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Overview",
@@ -149,7 +156,44 @@ export function Sidebar() {
       ],
     },
     {
+      groupLabel: "Order Management",
+      portals: ["OMS"],
+      items: [
+        {
+          title: "Sales Orders",
+          href: "/dashboard/sales-orders",
+          icon: <ShoppingCart className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+      ],
+    },
+    {
+      groupLabel: "Inventory Management",
+      portals: ["OMS"],
+      items: [
+        {
+          title: "Inventory",
+          href: "/dashboard/inventory/stock",
+          icon: <ClipboardList className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Low Stock Alert",
+          href: "/dashboard/inventory/low-stock",
+          icon: <AlertTriangle className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Movements Log",
+          href: "/dashboard/inventory/movements",
+          icon: <History className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+      ],
+    },
+    {
       groupLabel: "Ads & Sales",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Ad Platforms",
@@ -179,6 +223,7 @@ export function Sidebar() {
     },
     {
       groupLabel: "Crew Finance",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Crew Cashbon",
@@ -190,6 +235,7 @@ export function Sidebar() {
     },
     {
       groupLabel: "Uang Eksternal",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Pihak Eksternal",
@@ -214,6 +260,7 @@ export function Sidebar() {
 
     {
       groupLabel: "Finance Control",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Monthly Overview",
@@ -249,6 +296,7 @@ export function Sidebar() {
     },
     {
       groupLabel: "Reports & Analytics",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Cashflow Reports",
@@ -266,6 +314,31 @@ export function Sidebar() {
     },
     {
       groupLabel: "Master Data",
+      portals: ["FINANCE", "OMS"],
+      items: [
+        {
+          title: "Product Categories",
+          href: "/dashboard/product-categories",
+          icon: <FolderTree className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+        {
+          title: "Products",
+          href: "/dashboard/products",
+          icon: <Package className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+        {
+          title: "Warehouses",
+          href: "/dashboard/warehouses",
+          icon: <Warehouse className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+      ],
+    },
+    {
+      groupLabel: "Finance Master",
+      portals: ["FINANCE"],
       items: [
         {
           title: "Business Units",
@@ -286,12 +359,6 @@ export function Sidebar() {
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
         {
-          title: "Products",
-          href: "/dashboard/products",
-          icon: <Package className="h-5 w-5" />,
-          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
-        },
-        {
           title: "Crew",
           href: "/dashboard/crew",
           icon: <Users className="h-5 w-5" />,
@@ -301,6 +368,7 @@ export function Sidebar() {
     },
     {
       groupLabel: "Settings & Admin",
+      portals: ["FINANCE", "OMS"],
       items: [
         {
           title: "Users",
@@ -355,10 +423,10 @@ export function Sidebar() {
           {!isMinimized && (
             <div className="flex flex-col overflow-hidden">
               <span className="text-2xl font-bold tracking-tight text-white leading-none">
-                Business
+                {activePortal === 'OMS' ? 'Order' : 'Finance'}
               </span>
               <span className="text-[13px] font-medium text-slate-300 mt-1.5 leading-none tracking-wide">
-                Control Panel
+                {activePortal === 'OMS' ? 'Management' : 'Control Panel'}
               </span>
             </div>
           )}
@@ -367,6 +435,10 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <nav className={cn("space-y-6", isMinimized ? "px-2" : "px-2")}>
           {navGroups.map((group, index) => {
+            if (activePortal && group.portals && !group.portals.includes(activePortal)) {
+              return null;
+            }
+
             const visibleItems = group.items.filter((item) =>
               item.allowedRoles.includes(role),
             );

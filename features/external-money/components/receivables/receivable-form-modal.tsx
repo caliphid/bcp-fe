@@ -109,7 +109,7 @@ export function ReceivableFormModal({
   ];
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Tambah Piutang / Pinjaman" size="lg" className="max-w-2xl">
+    <Modal isOpen={isOpen} onClose={onClose} title="Tambah Piutang / Pinjaman" className="max-w-2xl">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>

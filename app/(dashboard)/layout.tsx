@@ -13,6 +13,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const token = useAuthStore((state) => state.token);
+  const activePortal = useAuthStore((state) => state.activePortal);
   const fetchMe = useAuthStore((state) => state.fetchMe);
   const [mounted, setMounted] = useState(false);
 
@@ -24,14 +25,16 @@ export default function DashboardLayout({
     if (mounted) {
       if (!token) {
         router.push("/login");
+      } else if (!activePortal) {
+        router.push("/portals");
       } else {
         fetchMe();
       }
     }
-  }, [mounted, token, router, fetchMe]);
+  }, [mounted, token, activePortal, router, fetchMe]);
 
   // Prevent hydration mismatch and hide content while checking auth
-  if (!mounted || !token) {
+  if (!mounted || !token || !activePortal) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-50">
         <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
