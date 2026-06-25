@@ -156,7 +156,7 @@ export function Sidebar() {
       ],
     },
     {
-      groupLabel: "Order Management",
+      groupLabel: "Order & Inventory",
       portals: ["OMS"],
       items: [
         {

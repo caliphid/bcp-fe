@@ -50,7 +50,7 @@ export function Topbar() {
                 : "text-slate-500 hover:text-slate-700"
             }`}
           >
-            Order Management
+            Order & Inventory
           </button>
         </div>
       </div>
