@@ -3,6 +3,8 @@ import { formatMoney } from "../../../lib/utils";
 import dayjs from "dayjs";
 import { Clock, CheckCircle2, Loader2, Ban, CreditCard, Receipt, Truck } from "lucide-react";
 import { useProductVariant } from "../../products/hooks/use-products";
+import Link from "next/link";
+import { Button } from "../../../components/ui/button";
 
 function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string, color?: string, size?: string }) {
   const { data } = useProductVariant(initialName ? undefined : variantId);
@@ -239,6 +241,26 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Customer Returns Section */}
+      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+          <h3 className="font-bold text-slate-800">Customer Returns</h3>
+          <div className="flex gap-2">
+            <Link href={`/dashboard/customer-returns?salesOrderId=${order.id}`}>
+              <Button variant="outline" size="sm">View Returns</Button>
+            </Link>
+            {canEdit && (
+              <Link href={`/dashboard/customer-returns/create?salesOrderId=${order.id}`}>
+                <Button size="sm">Create Return</Button>
+              </Link>
+            )}
+          </div>
+        </div>
+        <p className="text-sm text-slate-500">
+          Untuk retur, penukaran, atau komplain dari pelanggan terkait pesanan ini.
+        </p>
       </div>
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">

@@ -169,6 +169,18 @@ export function Sidebar() {
           icon: <ShoppingCart className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
+        {
+          title: "Customer Returns",
+          href: "/dashboard/customer-returns",
+          icon: <ArrowRightLeft className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Return Reports",
+          href: "/dashboard/return-reports",
+          icon: <FileText className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
       ],
     },
     {
