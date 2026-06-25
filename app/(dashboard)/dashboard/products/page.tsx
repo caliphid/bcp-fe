@@ -7,8 +7,6 @@ import toast from "react-hot-toast";
 import { useAuthStore } from "../../../../store/auth-store";
 import { Button } from "../../../../components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { Modal } from "../../../../components/ui/modal";
-import { ProductForm } from "../../../../components/forms/product-form";
 import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { extractErrorMessage } from "../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
@@ -17,8 +15,10 @@ import { useBusinessUnits } from "../../../../features/business-units/hooks/use-
 import { useProductStore } from "../../../../features/products/store/product-store";
 import { ProductFilterBar } from "../../../../features/products/components/product-filter-bar";
 import { ProductTable } from "../../../../features/products/components/product-table";
+import { useRouter } from "next/navigation";
 
 export default function ProductsPage() {
+  const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
   const { filters } = useProductStore();
@@ -35,12 +35,9 @@ export default function ProductsPage() {
     businessUnitId: filters.businessUnitId || undefined,
   });
 
+
   const data = productsData || [];
   const globalError = error ? extractErrorMessage(error) : null;
-
-  // Modals
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Product | null>(null);
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -111,29 +108,10 @@ export default function ProductsPage() {
         loading={loading}
         canMutate={canMutate}
         onEdit={(item) => {
-          setEditingItem(item);
-          setIsFormOpen(true);
+          router.push(`/dashboard/products/${item.id}/edit`);
         }}
         onToggleStatus={handleToggleStatus}
       />
-
-      {/* Form Modal (For Edit Only) */}
-      <Modal
-        isOpen={isFormOpen && editingItem !== null}
-        onClose={() => setIsFormOpen(false)}
-        title="Edit Product"
-        className="max-w-2xl"
-      >
-        <ProductForm
-          initialData={editingItem || undefined}
-          businessUnits={businessUnits}
-          onSuccess={() => {
-            setIsFormOpen(false);
-            fetchData();
-          }}
-          onCancel={() => setIsFormOpen(false)}
-        />
-      </Modal>
 
       {/* Confirm Dialog */}
       <ConfirmDialog

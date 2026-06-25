@@ -33,6 +33,10 @@ import {
   ClipboardList,
   AlertTriangle,
   History,
+  Truck,
+  Box,
+  BadgeDollarSign,
+  FileText,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -163,6 +167,42 @@ export function Sidebar() {
           title: "Sales Orders",
           href: "/dashboard/sales-orders",
           icon: <ShoppingCart className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+      ],
+    },
+    {
+      groupLabel: "Purchasing",
+      portals: ["OMS"],
+      items: [
+        {
+          title: "Vendors",
+          href: "/dashboard/purchasing/vendors",
+          icon: <Truck className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Purchase Orders",
+          href: "/dashboard/purchasing/purchase-orders",
+          icon: <ShoppingCart className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Goods Receipts",
+          href: "/dashboard/purchasing/goods-receipts",
+          icon: <Box className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Vendor Payments",
+          href: "/dashboard/purchasing/vendor-payments",
+          icon: <BadgeDollarSign className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          title: "Purchase Reports",
+          href: "/dashboard/purchasing/reports",
+          icon: <FileText className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
       ],

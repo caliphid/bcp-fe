@@ -175,10 +175,10 @@ export default function MovementsPage() {
     },
     {
       header: "User",
-      cell: (item: any) => {
+      cell: (item: InventoryMovement) => {
         const creator =
           item.createdBy ||
-          usersMap.get(item.createdById || item.created_by_id);
+          usersMap.get((item as any).createdById || (item as any).created_by_id);
         return creator?.name || "-";
       },
     },

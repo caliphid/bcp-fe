@@ -13,6 +13,20 @@ export const formatCurrency = (amount: number | string | null | undefined): stri
   }).format(num);
 };
 
+export const formatInputMoney = (val: string): string => {
+  if (!val) return "";
+  const num = val.replace(/\D/g, "");
+  if (!num) return "";
+  return "Rp " + new Intl.NumberFormat("id-ID").format(parseInt(num, 10));
+};
+
+export const unformatMoney = (val: string): number => {
+  if (!val) return 0;
+  const num = val.replace(/\D/g, "");
+  if (!num) return 0;
+  return parseFloat(num);
+};
+
 export const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return "-";
   const date = new Date(dateString);

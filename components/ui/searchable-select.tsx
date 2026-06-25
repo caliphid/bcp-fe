@@ -36,9 +36,16 @@ export const SearchableSelect = React.forwardRef<any, SearchableSelectProps>(
           }
 
           const childProps = child.props as any;
+          const extractText = (node: any): string => {
+            if (typeof node === "string" || typeof node === "number") return String(node);
+            if (Array.isArray(node)) return node.map(extractText).join("");
+            if (React.isValidElement(node)) return extractText((node.props as any).children);
+            return "";
+          };
+
           const opt = {
             value: String(childProps.value),
-            label: String(childProps.children),
+            label: extractText(childProps.children),
           };
           options.push(opt);
 
