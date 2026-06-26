@@ -9,8 +9,10 @@ import { SalesOrdersTable } from "@/features/sales-orders/components/sales-order
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function SalesOrdersPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { filters, setFilter } = useSalesOrdersStore();
 
@@ -33,7 +35,7 @@ export default function SalesOrdersPage() {
   if (!isAuthorized) {
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm">
-        <p className="text-slate-500">Anda tidak memiliki akses ke halaman ini.</p>
+        <p className="text-slate-500">{t("pages.salesOrders.noAccess")}</p>
       </div>
     );
   }
@@ -42,13 +44,13 @@ export default function SalesOrdersPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-start">
         <PageHeader
-          title="Sales Orders"
-          description="Kelola pesanan pelanggan dan draft order."
+          title={t("pages.salesOrders.title")}
+          description={t("pages.salesOrders.subtitle")}
         />
         {canCreate && (
           <Link href="/dashboard/sales-orders/create">
             <Button className="shadow-md shadow-primary-500/20">
-              <Plus className="w-4 h-4 mr-2" /> Buat Sales Order
+              <Plus className="w-4 h-4 mr-2" /> {t("pages.salesOrders.createOrder")}
             </Button>
           </Link>
         )}

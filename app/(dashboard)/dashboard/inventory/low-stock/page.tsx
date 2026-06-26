@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "../../../../../store/auth-store";
 import { Search, AlertTriangle } from "lucide-react";
 import { Input } from "../../../../../components/ui/input";
@@ -15,6 +16,7 @@ import { InventoryStock } from "../../../../../types/inventory";
 import Link from "next/link";
 
 export default function LowStockPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -40,12 +42,12 @@ export default function LowStockPage() {
   };
 
   const columns = [
-    { 
-      header: "Warehouse", 
-      cell: (item: InventoryStock) => item.warehouse?.name || "-" 
+    {
+      header: t("common.labels.warehouse"),
+      cell: (item: InventoryStock) => item.warehouse?.name || "-"
     },
-    { 
-      header: "Product", 
+    {
+      header: t("common.labels.product"),
       cell: (item: InventoryStock) => (
         <div>
           <Link href={`/dashboard/products/${item.productId}`} className="font-semibold text-indigo-600 hover:underline">
@@ -55,17 +57,17 @@ export default function LowStockPage() {
         </div>
       )
     },
-    { 
-      header: "Variant", 
+    {
+      header: t("common.labels.variant"),
       cell: (item: InventoryStock) => `${item.color} - ${item.size}`
     },
-    { 
-      header: "Minimum Stock", 
+    {
+      header: t("common.labels.minimumStock"),
       className: "text-right font-medium text-slate-500",
       accessorKey: "minimumStock" as keyof InventoryStock
     },
-    { 
-      header: "Available", 
+    {
+      header: t("common.labels.available"),
       className: "text-right font-bold text-red-600",
       cell: (item: InventoryStock) => (
         <div className="flex items-center justify-end gap-2 text-red-600">
@@ -81,9 +83,9 @@ export default function LowStockPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-            Low Stock Alerts
+            {t("pages.lowStock.title")}
           </h2>
-          <p className="mt-1 text-sm text-slate-500">Items that have fallen below their minimum stock threshold.</p>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.lowStock.subtitle")}</p>
         </div>
       </div>
 
@@ -97,7 +99,7 @@ export default function LowStockPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <form onSubmit={handleSearch} className="flex gap-2 col-span-2 sm:col-span-1 lg:col-span-2">
           <Input
-            placeholder="Search SKU or product..."
+            placeholder={t("pages.lowStock.searchPlaceholder")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -113,7 +115,7 @@ export default function LowStockPage() {
             setPage(1);
           }}
         >
-          <option value="">All Warehouses</option>
+          <option value="">{t("common.labels.allWarehouses")}</option>
           {warehouses.map((w: any) => (
             <option key={w.id} value={w.id}>{w.name}</option>
           ))}

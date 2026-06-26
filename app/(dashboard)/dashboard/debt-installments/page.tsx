@@ -22,8 +22,10 @@ import { debtInstallmentsApi } from "../../../../features/debt-installments/api"
 import { DebtInstallmentItem } from "../../../../types/installment";
 import { useOverdueInstallments } from "../../../../features/debt-installments/hooks/use-overdue-installments";
 import { useUpcomingInstallments } from "../../../../features/debt-installments/hooks/use-upcoming-installments";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function DebtInstallmentPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   const canEdit = user?.role !== "STAFF_INPUT";
 
@@ -88,8 +90,8 @@ export default function DebtInstallmentPage() {
     <div className="p-6 max-w-[1600px] mx-auto pb-24">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Cicilan Hutang</h1>
-          <p className="text-slate-500 mt-1">Kelola jadwal dan transaksi pembayaran hutang</p>
+          <h1 className="text-2xl font-bold text-slate-800">{t("pages.debtInstallments.title")}</h1>
+          <p className="text-slate-500 mt-1">{t("pages.debtInstallments.subtitle")}</p>
         </div>
         
         {canEdit && (
@@ -99,7 +101,7 @@ export default function DebtInstallmentPage() {
               className="flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-xl hover:bg-indigo-50 transition-colors font-medium text-sm"
             >
               <CalendarDays className="h-4 w-4" />
-              Buat Jadwal
+              {t("pages.debtInstallments.createSchedule")}
             </button>
             <button
               onClick={() => {
@@ -109,7 +111,7 @@ export default function DebtInstallmentPage() {
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm shadow-indigo-200 transition-colors font-medium text-sm"
             >
               <Plus className="h-4 w-4" />
-              Tambah Manual
+              {t("pages.debtInstallments.addManual")}
             </button>
           </div>
         )}

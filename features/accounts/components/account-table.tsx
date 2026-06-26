@@ -4,6 +4,7 @@ import { DataTable } from "../../../components/ui/data-table";
 import { StatusBadge } from "../../../components/ui/status-badge";
 import { Pencil } from "lucide-react";
 import { useAccountStore } from "../store/account-store";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface AccountTableProps {
   data: Account[];
@@ -22,6 +23,7 @@ export function AccountTable({
   onEdit,
   onToggleStatus,
 }: AccountTableProps) {
+  const { t } = useTranslation();
   const { setFilter } = useAccountStore();
 
   const formatCurrency = (val: string) => {
@@ -30,25 +32,25 @@ export function AccountTable({
   };
 
   const columns = [
-    { header: "Name", accessorKey: "name" as keyof Account },
-    { 
-      header: "Business Unit", 
-      cell: (item: Account) => item.businessUnit?.name || "-" 
+    { header: t("features.accounts.table.colName"), accessorKey: "name" as keyof Account },
+    {
+      header: t("features.accounts.table.colBusinessUnit"),
+      cell: (item: Account) => item.businessUnit?.name || "-"
     },
-    { 
-      header: "Type", 
+    {
+      header: t("features.accounts.table.colType"),
       cell: (item: Account) => (
         <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
           {item.type}
         </span>
       )
     },
-    { 
-      header: "Current Balance", 
+    {
+      header: t("features.accounts.table.colCurrentBalance"),
       cell: (item: Account) => formatCurrency(item.currentBalance)
     },
     {
-      header: "Status",
+      header: t("features.accounts.table.colStatus"),
       cell: (item: Account) => (
         <StatusBadge
           status={item.status}
@@ -58,7 +60,7 @@ export function AccountTable({
       ),
     },
     {
-      header: "Actions",
+      header: t("features.accounts.table.colActions"),
       className: "text-right",
       cell: (item: Account) => (
         <div className="flex justify-end gap-2">

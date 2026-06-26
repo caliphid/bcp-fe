@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "@/store/auth-store";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import { extractErrorMessage } from "@/lib/error";
 import { Input } from "@/components/ui/input";
 
 export default function AccountTransfersPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [voidTarget, setVoidTarget] = useState<AccountTransferResponse | null>(
@@ -36,7 +38,7 @@ export default function AccountTransfersPage() {
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm">
         <p className="text-slate-500">
-          Anda tidak memiliki akses ke halaman ini.
+          {t("pages.accountTransfers.noAccess")}
         </p>
       </div>
     );
@@ -44,18 +46,18 @@ export default function AccountTransfersPage() {
 
   const handleVoid = async () => {
     if (!voidTarget || !voidReason) {
-      toast.error("Alasan void harus diisi");
+      toast.error(t("pages.accountTransfers.voidReasonRequired"));
       return;
     }
     setVoiding(true);
     try {
       await financeApi.voidAccountTransfer(voidTarget.id, { voidReason });
-      toast.success("Transfer berhasil di-void");
+      toast.success(t("pages.accountTransfers.voidSuccess"));
       mutate();
       setVoidTarget(null);
       setVoidReason("");
     } catch (err) {
-      toast.error(extractErrorMessage(err, "Gagal melakukan void"));
+      toast.error(extractErrorMessage(err, t("pages.accountTransfers.voidFailed")));
     } finally {
       setVoiding(false);
     }
@@ -65,13 +67,13 @@ export default function AccountTransfersPage() {
     <div className="space-y-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center">
         <PageHeader
-          title="Account Transfers"
-          description="Daftar mutasi / perpindahan dana internal antar rekening"
+          title={t("pages.accountTransfers.title")}
+          description={t("pages.accountTransfers.subtitle")}
         />
         {!isStaffInput && (
           <Button onClick={() => setIsCreateModalOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Transfer Internal
+            {t("pages.accountTransfers.newTransfer")}
           </Button>
         )}
       </div>
@@ -98,18 +100,18 @@ export default function AccountTransfersPage() {
             setVoidTarget(null);
             setVoidReason("");
           }}
-          title="Void Transfer"
-          message={`Anda yakin ingin membatalkan (VOID) transfer ${voidTarget.transferCode} senilai Rp ${new Intl.NumberFormat("id-ID").format(Number(voidTarget.amount))}? Aksi ini tidak dapat dibatalkan.`}
-          confirmText={voiding ? "Memproses..." : "Ya, Void Transfer"}
+          title={t("pages.accountTransfers.voidTransfer")}
+          message={t("pages.accountTransfers.confirmVoid").replace("{code}", voidTarget.transferCode).replace("{amount}", new Intl.NumberFormat("id-ID").format(Number(voidTarget.amount)))}
+          confirmText={voiding ? t("common.actions.processing") : t("pages.accountTransfers.confirmVoidBtn")}
           onConfirm={handleVoid}
           isDestructive
         >
           <div className="mt-4">
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Alasan Void *
+              {t("pages.accountTransfers.voidReason")}
             </label>
             <Input
-              placeholder="Masukkan alasan pembatalan..."
+              placeholder={t("pages.accountTransfers.voidReasonPh")}
               value={voidReason}
               onChange={(e) => setVoidReason(e.target.value)}
               required

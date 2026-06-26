@@ -90,7 +90,14 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
           
           <div className="grid grid-cols-2 gap-y-3 text-sm">
             <span className="text-slate-500">Nama Pelanggan</span>
-            <span className="font-bold text-slate-900">{order.customerName}</span>
+            <span className="font-bold text-slate-900">
+              {order.customerName}
+              {order.customerId && (
+                <Link href={`/dashboard/customers/${order.customerId}`} className="ml-2 text-indigo-600 hover:underline text-xs font-semibold">
+                  (Lihat Profil)
+                </Link>
+              )}
+            </span>
 
             <span className="text-slate-500">Nomor Telepon</span>
             <span className="font-medium text-slate-800">{order.customerPhone || "-"}</span>

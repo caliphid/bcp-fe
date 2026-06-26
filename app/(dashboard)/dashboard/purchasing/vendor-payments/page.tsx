@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/use-translation";
 import { useVendorPayments } from "../../../../../features/purchasing/hooks/use-purchasing";
 import { VendorPayment, VendorPaymentStatus, PaymentMethod } from "../../../../../features/purchasing/types";
 import { useAuthStore } from "../../../../../store/auth-store";
@@ -13,6 +14,7 @@ import { formatCurrency } from "../../../../../features/debts/utils/formatters";
 import { formatDate } from "../../../../../lib/utils";
 
 export default function VendorPaymentsPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const isStaff = user?.role === "STAFF_INPUT";
 
@@ -27,7 +29,7 @@ export default function VendorPaymentsPage() {
 
   const columns = [
     {
-      header: "Payment Ref & Date",
+      header: t("pages.vendorPayments.columns.paymentRefDate"),
       cell: (item: VendorPayment) => (
         <div>
           <Link href={`/dashboard/purchasing/vendor-payments/${item.id}`} className="font-semibold text-primary-600 hover:underline">
@@ -38,7 +40,7 @@ export default function VendorPaymentsPage() {
       ),
     },
     {
-      header: "Purchase Order",
+      header: t("pages.vendorPayments.columns.purchaseOrder"),
       cell: (item: VendorPayment) => (
         <Link href={`/dashboard/purchasing/purchase-orders/${item.purchaseOrderId}`} className="font-medium text-slate-700 hover:underline hover:text-primary-600">
           {item.purchaseOrder?.purchaseOrderCode || "-"}
@@ -46,19 +48,19 @@ export default function VendorPaymentsPage() {
       ),
     },
     {
-      header: "Vendor",
+      header: t("pages.vendorPayments.columns.vendor"),
       cell: (item: VendorPayment) => (
         <span className="font-medium text-slate-700">{item.vendor?.name || "-"}</span>
       ),
     },
     {
-      header: "Method",
+      header: t("pages.vendorPayments.columns.method"),
       cell: (item: VendorPayment) => (
         <span className="text-slate-700">{item.paymentMethod.replace(/_/g, " ")}</span>
       ),
     },
     {
-      header: "Status",
+      header: t("pages.vendorPayments.columns.status"),
       cell: (item: VendorPayment) => {
         let bg = "bg-slate-100 text-slate-800";
         switch (item.status) {
@@ -73,13 +75,13 @@ export default function VendorPaymentsPage() {
       },
     },
     {
-      header: "Amount",
+      header: t("pages.vendorPayments.columns.amount"),
       cell: (item: VendorPayment) => (
         <span className="font-medium text-slate-900">{formatCurrency(Number(item.amount || 0))}</span>
       ),
     },
     {
-      header: "Actions",
+      header: t("pages.vendorPayments.columns.actions"),
       cell: (item: VendorPayment) => (
         <Link href={`/dashboard/purchasing/vendor-payments/${item.id}`}>
           <Button variant="outline" size="sm">
@@ -94,8 +96,8 @@ export default function VendorPaymentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Vendor Payments</h2>
-          <p className="mt-1 text-sm text-slate-500">Track outgoing payments to suppliers.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.vendorPayments.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.vendorPayments.subtitle")}</p>
         </div>
       </div>
 
@@ -116,7 +118,7 @@ export default function VendorPaymentsPage() {
               setPage(1);
             }}
           >
-            <option value="">All Statuses</option>
+            <option value="">{t("pages.vendorPayments.allStatuses")}</option>
             {Object.values(VendorPaymentStatus).map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
@@ -128,7 +130,7 @@ export default function VendorPaymentsPage() {
         columns={columns as any}
         data={data || []}
         isLoading={isLoading}
-        emptyMessage="No vendor payments found"
+        emptyMessage={t("pages.vendorPayments.noPaymentsFound")}
       />
 
       {/* Pagination */}
@@ -140,24 +142,24 @@ export default function VendorPaymentsPage() {
               disabled={page === 1}
               variant="outline"
             >
-              Previous
+              {t("common.actions.previous")}
             </Button>
             <Button
               onClick={() => setPage(page + 1)}
               disabled={page * meta.limit >= meta.total}
               variant="outline"
             >
-              Next
+              {t("common.actions.next")}
             </Button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-slate-700">
-                Showing <span className="font-medium">{(page - 1) * meta.limit + 1}</span> to{" "}
+                {t("common.labels.showing")} <span className="font-medium">{(page - 1) * meta.limit + 1}</span> {t("common.labels.to")}{" "}
                 <span className="font-medium">
                   {Math.min(page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-medium">{meta.total}</span> results
+                {t("common.labels.of")} <span className="font-medium">{meta.total}</span> {t("common.labels.results")}
               </p>
             </div>
             <div>
@@ -168,7 +170,7 @@ export default function VendorPaymentsPage() {
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
-                  Previous
+                  {t("common.actions.previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -176,7 +178,7 @@ export default function VendorPaymentsPage() {
                   onClick={() => setPage(page + 1)}
                   disabled={page * meta.limit >= meta.total}
                 >
-                  Next
+                  {t("common.actions.next")}
                 </Button>
               </nav>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/use-translation";
 import { usePurchaseOrders } from "../../../../../features/purchasing/hooks/use-purchasing";
 import { PurchaseOrder, PurchaseOrderStatus, PurchaseOrderPaymentStatus } from "../../../../../features/purchasing/types";
 import { useAuthStore } from "../../../../../store/auth-store";
@@ -13,6 +14,7 @@ import { formatCurrency } from "../../../../../features/debts/utils/formatters";
 import { formatDate } from "../../../../../lib/utils";
 
 export default function PurchaseOrdersPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const isStaff = user?.role === "STAFF_INPUT";
 
@@ -31,7 +33,7 @@ export default function PurchaseOrdersPage() {
 
   const columns = [
     {
-      header: "PO Number & Date",
+      header: t("pages.purchaseOrders.columns.poNumberDate"),
       cell: (item: PurchaseOrder) => (
         <div>
           <Link href={`/dashboard/purchasing/purchase-orders/${item.id}`} className="font-semibold text-primary-600 hover:underline">
@@ -42,13 +44,13 @@ export default function PurchaseOrdersPage() {
       ),
     },
     {
-      header: "Vendor",
+      header: t("pages.purchaseOrders.columns.vendor"),
       cell: (item: PurchaseOrder) => (
         <span className="font-medium text-slate-700">{item.vendor?.name || "-"}</span>
       ),
     },
     {
-      header: "Status",
+      header: t("pages.purchaseOrders.columns.status"),
       cell: (item: PurchaseOrder) => {
         let bg = "bg-slate-100 text-slate-800";
         switch (item.status) {
@@ -68,7 +70,7 @@ export default function PurchaseOrdersPage() {
       },
     },
     {
-      header: "Payment Status",
+      header: t("pages.purchaseOrders.columns.paymentStatus"),
       cell: (item: PurchaseOrder) => {
         let bg = "bg-slate-100 text-slate-800";
         switch (item.paymentStatus) {
@@ -90,13 +92,13 @@ export default function PurchaseOrdersPage() {
   if (!isStaff) {
     columns.push(
       {
-        header: "Total Amount",
+        header: t("pages.purchaseOrders.columns.totalAmount"),
         cell: (item: PurchaseOrder) => (
           <span className="font-medium text-slate-900">{formatCurrency(Number(item.totalAmount || 0))}</span>
         ),
       },
       {
-        header: "Outstanding",
+        header: t("pages.purchaseOrders.columns.outstanding"),
         cell: (item: PurchaseOrder) => (
           <span className={`font-medium ${Number(item.outstandingAmount || 0) > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
             {formatCurrency(Number(item.outstandingAmount || 0))}
@@ -107,7 +109,7 @@ export default function PurchaseOrdersPage() {
   }
 
   columns.push({
-    header: "Actions",
+    header: t("pages.purchaseOrders.columns.actions"),
     cell: (item: PurchaseOrder) => (
       <Link href={`/dashboard/purchasing/purchase-orders/${item.id}`}>
         <Button variant="outline" size="sm">
@@ -121,12 +123,12 @@ export default function PurchaseOrdersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Purchase Orders</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage purchasing from suppliers.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.purchaseOrders.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.purchaseOrders.subtitle")}</p>
         </div>
         <Link href="/dashboard/purchasing/purchase-orders/create">
           <Button className="w-full sm:w-auto shadow-primary-500/30 shadow-md">
-            <PlusCircle className="mr-2 h-4 w-4" /> Create PO
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.purchaseOrders.createPO")}
           </Button>
         </Link>
       </div>
@@ -143,7 +145,7 @@ export default function PurchaseOrdersPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search PO number..."
+            placeholder={t("pages.purchaseOrders.searchPlaceholder")}
             className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             value={search}
             onChange={(e) => {
@@ -161,7 +163,7 @@ export default function PurchaseOrdersPage() {
               setPage(1);
             }}
           >
-            <option value="">All PO Statuses</option>
+            <option value="">{t("pages.purchaseOrders.allPOStatuses")}</option>
             {Object.values(PurchaseOrderStatus).map(s => (
               <option key={s} value={s}>{s.replace(/_/g, " ")}</option>
             ))}
@@ -176,7 +178,7 @@ export default function PurchaseOrdersPage() {
               setPage(1);
             }}
           >
-            <option value="">All Payment Statuses</option>
+            <option value="">{t("pages.purchaseOrders.allPaymentStatuses")}</option>
             {Object.values(PurchaseOrderPaymentStatus).map(s => (
               <option key={s} value={s}>{s.replace(/_/g, " ")}</option>
             ))}
@@ -188,7 +190,7 @@ export default function PurchaseOrdersPage() {
         columns={columns}
         data={data || []}
         isLoading={isLoading}
-        emptyMessage="No purchase orders found"
+        emptyMessage={t("pages.purchaseOrders.noPOsFound")}
       />
 
       {/* Pagination */}
@@ -200,24 +202,24 @@ export default function PurchaseOrdersPage() {
               disabled={page === 1}
               variant="outline"
             >
-              Previous
+              {t("common.actions.previous")}
             </Button>
             <Button
               onClick={() => setPage(page + 1)}
               disabled={page * meta.limit >= meta.total}
               variant="outline"
             >
-              Next
+              {t("common.actions.next")}
             </Button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-slate-700">
-                Showing <span className="font-medium">{(page - 1) * meta.limit + 1}</span> to{" "}
+                {t("common.labels.showing")} <span className="font-medium">{(page - 1) * meta.limit + 1}</span> {t("common.labels.to")}{" "}
                 <span className="font-medium">
                   {Math.min(page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-medium">{meta.total}</span> results
+                {t("common.labels.of")} <span className="font-medium">{meta.total}</span> {t("common.labels.results")}
               </p>
             </div>
             <div>
@@ -228,7 +230,7 @@ export default function PurchaseOrdersPage() {
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
-                  Previous
+                  {t("common.actions.previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -236,7 +238,7 @@ export default function PurchaseOrdersPage() {
                   onClick={() => setPage(page + 1)}
                   disabled={page * meta.limit >= meta.total}
                 >
-                  Next
+                  {t("common.actions.next")}
                 </Button>
               </nav>
             </div>

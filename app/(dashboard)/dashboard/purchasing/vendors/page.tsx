@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { useVendors } from "../../../../../features/purchasing/hooks/use-purchasing";
 import { Vendor, VendorStatus } from "../../../../../features/purchasing/types";
 import { purchasingApi } from "../../../../../features/purchasing/api";
@@ -14,6 +15,7 @@ import { VendorFormModal } from "../../../../../features/purchasing/components/v
 import toast from "react-hot-toast";
 
 export default function VendorsPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -47,10 +49,10 @@ export default function VendorsPage() {
     const isActivating = item.status === VendorStatus.INACTIVE;
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Vendor" : "Deactivate Vendor",
+      title: isActivating ? t("pages.vendors.activateVendor") : t("pages.vendors.deactivateVendor"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}? It cannot be deactivated if there are active purchase orders.`,
+        ? t("pages.vendors.confirmActivate").replace("{name}", item.name)
+        : t("pages.vendors.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -58,7 +60,7 @@ export default function VendorsPage() {
           } else {
             await purchasingApi.deactivateVendor(item.id);
           }
-          toast.success(`Vendor ${item.name} ${isActivating ? 'activated' : 'deactivated'} successfully!`);
+          toast.success(isActivating ? t("pages.vendors.activatedMsg").replace("{name}", item.name) : t("pages.vendors.deactivatedMsg").replace("{name}", item.name));
           mutate();
           setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         } catch (err) {
@@ -71,22 +73,22 @@ export default function VendorsPage() {
 
   const columns = [
     {
-      header: "Code",
+      header: t("common.labels.code"),
       cell: (item: Vendor) => (
         <span className="font-medium text-slate-900">{item.vendorCode}</span>
       ),
     },
     {
-      header: "Name",
+      header: t("common.labels.name"),
       cell: (item: Vendor) => (
         <div>
           <div className="font-semibold text-slate-800">{item.name}</div>
-          {item.contactPerson && <div className="text-sm text-slate-500">Contact: {item.contactPerson}</div>}
+          {item.contactPerson && <div className="text-sm text-slate-500">{t("pages.vendors.contactLabel")} {item.contactPerson}</div>}
         </div>
       ),
     },
     {
-      header: "Contact Info",
+      header: t("common.labels.contactInfo"),
       cell: (item: Vendor) => (
         <div className="text-sm">
           {item.phone && <div>{item.phone}</div>}
@@ -96,15 +98,15 @@ export default function VendorsPage() {
       ),
     },
     {
-      header: "Payment Term",
+      header: t("common.labels.paymentTerm"),
       cell: (item: Vendor) => (
         <span className="text-sm">
-          {item.paymentTermDays === 0 ? "Cash (0 days)" : `${item.paymentTermDays} days`}
+          {item.paymentTermDays === 0 ? t("pages.vendors.cashDays") : `${item.paymentTermDays} days`}
         </span>
       ),
     },
     {
-      header: "Status",
+      header: t("common.labels.status"),
       cell: (item: Vendor) => (
         <span
           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -118,7 +120,7 @@ export default function VendorsPage() {
       ),
     },
     {
-      header: "Actions",
+      header: t("common.labels.actions"),
       cell: (item: Vendor) => (
         <div className="flex items-center gap-2">
           {canMutate && (
@@ -156,8 +158,8 @@ export default function VendorsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Vendors</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage supplier information and terms.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.vendors.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.vendors.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -167,7 +169,7 @@ export default function VendorsPage() {
             }}
             className="w-full sm:w-auto shadow-primary-500/30 shadow-md"
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Vendor
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.vendors.createVendor")}
           </Button>
         )}
       </div>
@@ -184,7 +186,7 @@ export default function VendorsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search vendor name..."
+            placeholder={t("pages.vendors.searchPlaceholder")}
             className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             value={search}
             onChange={(e) => {
@@ -202,9 +204,9 @@ export default function VendorsPage() {
               setPage(1);
             }}
           >
-            <option value="">All Statuses</option>
-            <option value={VendorStatus.ACTIVE}>Active</option>
-            <option value={VendorStatus.INACTIVE}>Inactive</option>
+            <option value="">{t("pages.vendors.allStatuses")}</option>
+            <option value={VendorStatus.ACTIVE}>{t("common.status.active")}</option>
+            <option value={VendorStatus.INACTIVE}>{t("common.status.inactive")}</option>
           </select>
         </div>
       </div>
@@ -213,7 +215,7 @@ export default function VendorsPage() {
         columns={columns}
         data={data || []}
         isLoading={isLoading}
-        emptyMessage="No vendors found"
+        emptyMessage={t("pages.vendors.noVendorsFound")}
       />
 
       {/* Pagination */}
@@ -225,24 +227,24 @@ export default function VendorsPage() {
               disabled={page === 1}
               variant="outline"
             >
-              Previous
+              {t("common.actions.previous")}
             </Button>
             <Button
               onClick={() => setPage(page + 1)}
               disabled={page * meta.limit >= meta.total}
               variant="outline"
             >
-              Next
+              {t("common.actions.next")}
             </Button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-slate-700">
-                Showing <span className="font-medium">{(page - 1) * meta.limit + 1}</span> to{" "}
+                {t("common.labels.showing")} <span className="font-medium">{(page - 1) * meta.limit + 1}</span> {t("common.labels.to")}{" "}
                 <span className="font-medium">
                   {Math.min(page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-medium">{meta.total}</span> results
+                {t("common.labels.of")} <span className="font-medium">{meta.total}</span> {t("common.labels.results")}
               </p>
             </div>
             <div>
@@ -253,7 +255,7 @@ export default function VendorsPage() {
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
-                  Previous
+                  {t("common.actions.previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -261,7 +263,7 @@ export default function VendorsPage() {
                   onClick={() => setPage(page + 1)}
                   disabled={page * meta.limit >= meta.total}
                 >
-                  Next
+                  {t("common.actions.next")}
                 </Button>
               </nav>
             </div>

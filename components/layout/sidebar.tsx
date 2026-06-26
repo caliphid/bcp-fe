@@ -369,6 +369,12 @@ export function Sidebar() {
       portals: ["FINANCE", "OMS"],
       items: [
         {
+          titleKey: "sidebar.items.customers",
+          href: "/dashboard/customers",
+          icon: <Users className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
           titleKey: "sidebar.items.productCategories",
           href: "/dashboard/product-categories",
           icon: <FolderTree className="h-5 w-5" />,

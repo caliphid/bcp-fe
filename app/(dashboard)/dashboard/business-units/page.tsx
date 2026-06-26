@@ -14,8 +14,10 @@ import { Alert, AlertDescription } from "../../../../components/ui/alert";
 import { useBusinessUnits } from "../../../../features/business-units/hooks/use-business-units";
 import { BusinessUnitFilterBar } from "../../../../features/business-units/components/business-unit-filter-bar";
 import { BusinessUnitTable } from "../../../../features/business-units/components/business-unit-table";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function BusinessUnitsPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER";
 
@@ -48,10 +50,10 @@ export default function BusinessUnitsPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Business Unit" : "Deactivate Business Unit",
+      title: isActivating ? t("pages.businessUnits.activateUnit") : t("pages.businessUnits.deactivateUnit"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}? This will fail if it's still used by active accounts or products.`,
+        ? t("pages.businessUnits.confirmActivate").replace("{name}", item.name)
+        : t("pages.businessUnits.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -73,8 +75,8 @@ export default function BusinessUnitsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Business Units</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage your business units and brands.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.businessUnits.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.businessUnits.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -84,7 +86,7 @@ export default function BusinessUnitsPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Unit
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.businessUnits.createUnit")}
           </Button>
         )}
       </div>
@@ -115,7 +117,7 @@ export default function BusinessUnitsPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Business Unit" : "Create Business Unit"}
+        title={editingItem ? t("pages.businessUnits.editUnit") : t("pages.businessUnits.createModal")}
         className="max-w-2xl"
       >
         <BusinessUnitForm

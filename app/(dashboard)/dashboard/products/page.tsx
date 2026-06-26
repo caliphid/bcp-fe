@@ -16,8 +16,10 @@ import { useProductStore } from "../../../../features/products/store/product-sto
 import { ProductFilterBar } from "../../../../features/products/components/product-filter-bar";
 import { ProductTable } from "../../../../features/products/components/product-table";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function ProductsPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
@@ -55,10 +57,10 @@ export default function ProductsPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Product" : "Deactivate Product",
+      title: isActivating ? t("pages.products.activateProduct") : t("pages.products.deactivateProduct"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}?`,
+        ? t("pages.products.confirmActivate").replace("{name}", item.name)
+        : t("pages.products.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -80,13 +82,13 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Products</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage master data for products and services.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.products.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.products.subtitle")}</p>
         </div>
         {canMutate && (
           <Link href="/dashboard/products/create">
             <Button className="w-full sm:w-auto shadow-primary-500/30 shadow-md">
-              <PlusCircle className="mr-2 h-4 w-4" /> Create Product
+              <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.products.createProduct")}
             </Button>
           </Link>
         )}

@@ -8,6 +8,7 @@ import { BusinessUnit } from "../../../types/business-unit";
 import { Account } from "../../../types/account";
 import { Category } from "../../../types/category";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface FilterBarProps {
   isStaffInput: boolean;
@@ -17,6 +18,7 @@ interface FilterBarProps {
 }
 
 export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, categories }: FilterBarProps) {
+  const { t } = useTranslation();
   const { filters, setFilter, setFilters, resetFilters } = useTransactionStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -29,7 +31,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex flex-1 gap-2">
           <Input
-            placeholder="Search code or desc..."
+            placeholder={t("features.transactions.filterBar.searchPh")}
             value={filters.searchInput}
             onChange={(e) => {
               setFilters({ 
@@ -54,7 +56,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                   setFilters({ status: e.target.value, page: 1 });
                 }}
               >
-                <option value="">All Status</option>
+                <option value="">{t("features.transactions.filterBar.allStatus")}</option>
                 <option value="POSTED">POSTED</option>
                 <option value="VOID">VOID</option>
               </SearchableSelect>
@@ -83,7 +85,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                 setFilters({ type: e.target.value, page: 1 });
               }}
             >
-              <option value="">All Types</option>
+              <option value="">{t("features.transactions.filterBar.allTypes")}</option>
               <option value="IN">IN</option>
               <option value="OUT">OUT</option>
             </SearchableSelect>
@@ -95,7 +97,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                 setFilters({ businessUnitId: e.target.value, page: 1 });
               }}
             >
-              <option value="">All Business Units</option>
+              <option value="">{t("features.transactions.filterBar.allBusinessUnits")}</option>
               {businessUnits.map((bu) => (
                 <option key={bu.id} value={bu.id}>{bu.name}</option>
               ))}
@@ -108,7 +110,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                 setFilters({ accountId: e.target.value, page: 1 });
               }}
             >
-              <option value="">All Accounts</option>
+              <option value="">{t("features.transactions.filterBar.allAccounts")}</option>
               {accounts.map((acc) => (
                 <option key={acc.id} value={acc.id}>{acc.name}</option>
               ))}
@@ -121,7 +123,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                 setFilters({ categoryId: e.target.value, page: 1 });
               }}
             >
-              <option value="">All Categories</option>
+              <option value="">{t("features.transactions.filterBar.allCategories")}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
@@ -153,20 +155,20 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
               value={filters.sortBy}
               onChange={(e) => { setFilters({ sortBy: e.target.value, page: 1 }); }}
             >
-              <option value="transactionDate">Sort By Date</option>
-              <option value="amount">Sort By Amount</option>
-              <option value="type">Sort By Type</option>
-              <option value="status">Sort By Status</option>
-              <option value="createdAt">Sort By Created At</option>
-              <option value="updatedAt">Sort By Updated At</option>
+              <option value="transactionDate">{t("features.transactions.filterBar.sortByDate")}</option>
+              <option value="amount">{t("features.transactions.filterBar.sortByAmount")}</option>
+              <option value="type">{t("features.transactions.filterBar.sortByType")}</option>
+              <option value="status">{t("features.transactions.filterBar.sortByStatus")}</option>
+              <option value="createdAt">{t("features.transactions.filterBar.sortByCreatedAt")}</option>
+              <option value="updatedAt">{t("features.transactions.filterBar.sortByUpdatedAt")}</option>
             </SearchableSelect>
             <SearchableSelect
               className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               value={filters.sortOrder}
               onChange={(e) => { setFilters({ sortOrder: e.target.value, page: 1 }); }}
             >
-              <option value="desc">Descending</option>
-              <option value="asc">Ascending</option>
+              <option value="desc">{t("features.transactions.filterBar.descending")}</option>
+              <option value="asc">{t("features.transactions.filterBar.ascending")}</option>
             </SearchableSelect>
 
             <div className="flex items-center gap-2">
@@ -175,7 +177,7 @@ export function TransactionFilterBar({ isStaffInput, businessUnits, accounts, ca
                 className="w-full h-11"
                 onClick={() => resetFilters(isStaffInput)}
               >
-                Reset Filter
+                {t("features.transactions.filterBar.resetFilter")}
               </Button>
             </div>
           </div>

@@ -1,8 +1,10 @@
 import { Card, CardContent } from "../../../components/ui/card";
 import { ArrowDownRight, ArrowUpRight, ArrowRightLeft, Target, Wallet, Activity } from "lucide-react";
 import { useDashboardOverview } from "../hooks/use-dashboard-widgets";
+import { useTranslation } from "../../../hooks/use-translation";
 
 export function DashboardOverviewCards() {
+  const { t } = useTranslation();
   const { data, loading } = useDashboardOverview();
 
   const formatCurrency = (val: string) => {
@@ -30,7 +32,7 @@ export function DashboardOverviewCards() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Total Income</p>
+              <p className="text-sm font-medium text-slate-500">{t("features.dashboard.overview.totalIncome")}</p>
               <h3 className="text-2xl font-bold text-emerald-600 mt-1">{formatCurrency(summary.totalIn)}</h3>
             </div>
             <div className="bg-emerald-100 p-3 rounded-full text-emerald-600">
@@ -39,7 +41,7 @@ export function DashboardOverviewCards() {
           </div>
           <div className="mt-4 text-xs text-slate-500 flex items-center">
             <Target className="h-3 w-3 mr-1" />
-            {summary.inCount} transactions
+            {summary.inCount} {t("features.dashboard.overview.transactions")}
           </div>
         </CardContent>
       </Card>
@@ -48,7 +50,7 @@ export function DashboardOverviewCards() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Total Expense</p>
+              <p className="text-sm font-medium text-slate-500">{t("features.dashboard.overview.totalExpense")}</p>
               <h3 className="text-2xl font-bold text-red-600 mt-1">{formatCurrency(summary.totalOut)}</h3>
             </div>
             <div className="bg-red-100 p-3 rounded-full text-red-600">
@@ -57,7 +59,7 @@ export function DashboardOverviewCards() {
           </div>
           <div className="mt-4 text-xs text-slate-500 flex items-center">
             <Target className="h-3 w-3 mr-1" />
-            {summary.outCount} transactions
+            {summary.outCount} {t("features.dashboard.overview.transactions")}
           </div>
         </CardContent>
       </Card>
@@ -66,7 +68,7 @@ export function DashboardOverviewCards() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Net Cashflow</p>
+              <p className="text-sm font-medium text-slate-500">{t("features.dashboard.overview.netCashflow")}</p>
               <h3 className={`text-2xl font-bold mt-1 ${Number(summary.netCashflow) >= 0 ? "text-slate-900" : "text-red-600"}`}>
                 {formatCurrency(summary.netCashflow)}
               </h3>
@@ -77,7 +79,7 @@ export function DashboardOverviewCards() {
           </div>
           <div className="mt-4 text-xs text-slate-500 flex items-center">
             <ArrowRightLeft className="h-3 w-3 mr-1" />
-            {summary.transactionCount} total transactions
+            {summary.transactionCount} {t("features.dashboard.overview.transactions")}
           </div>
         </CardContent>
       </Card>
@@ -86,7 +88,7 @@ export function DashboardOverviewCards() {
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-slate-500">Current Balance</p>
+              <p className="text-sm font-medium text-slate-500">{t("features.dashboard.overview.currentBalance")}</p>
               <h3 className="text-2xl font-bold text-slate-900 mt-1">
                 {data.accountBalance ? formatCurrency(data.accountBalance.totalCurrentBalance) : "-"}
               </h3>
@@ -97,7 +99,7 @@ export function DashboardOverviewCards() {
           </div>
           <div className="mt-4 text-xs text-slate-500 flex items-center">
             <Target className="h-3 w-3 mr-1" />
-            {data.accountBalance ? `${data.accountBalance.activeAccountsCount} active accounts` : "No data"}
+            {data.accountBalance ? `${data.accountBalance.activeAccountsCount} ${t("features.dashboard.overview.activeAccounts")}` : t("features.dashboard.overview.noData")}
           </div>
         </CardContent>
       </Card>

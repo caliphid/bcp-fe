@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { Plus } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 import { PageHeader } from "../../../../components/ui/page-header";
@@ -15,6 +16,7 @@ import { adCampaignsApi } from "../../../../features/ad-campaigns/api";
 import { AdCampaignItem, AdCampaignStatus } from "../../../../types/ads";
 
 export default function AdCampaignsPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { params } = useAdCampaignStore();
   const { data, meta, isLoading, mutate } = useAdCampaigns(params);
@@ -59,13 +61,13 @@ export default function AdCampaignsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ad Campaigns"
-        description="Kelola seluruh campaign periklanan dan budgeting"
+        title={t("pages.adCampaigns.title")}
+        description={t("pages.adCampaigns.subtitle")}
       >
         {canMutate && (
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Campaign
+            {t("pages.adCampaigns.addCampaign")}
           </Button>
         )}
       </PageHeader>

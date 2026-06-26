@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Warehouse } from "../../../types/warehouse";
 import { BusinessUnit } from "../../../types/business-unit";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 const schema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -32,6 +33,7 @@ interface WarehouseFormModalProps {
 }
 
 export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, initialData }: WarehouseFormModalProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -77,7 +79,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? "Edit Warehouse" : "Create Warehouse"}
+      title={initialData ? t("features.warehouses.form.editTitle") : t("features.warehouses.form.createTitle")}
       className="max-w-xl"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -88,20 +90,20 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="name">Warehouse Name <span className="text-red-500">*</span></Label>
-          <Input id="name" placeholder="e.g. Gudang Utama" {...register("name")} />
+          <Label htmlFor="name">{t("features.warehouses.form.name")}</Label>
+          <Input id="name" placeholder={t("features.warehouses.form.namePh")} {...register("name")} />
           {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="warehouseCode">Warehouse Code (Optional)</Label>
-          <Input id="warehouseCode" placeholder="e.g. WH-001" {...register("warehouseCode")} />
-          <p className="text-xs text-slate-500">Leave empty to auto-generate</p>
+          <Label htmlFor="warehouseCode">{t("features.warehouses.form.code")}</Label>
+          <Input id="warehouseCode" placeholder={t("features.warehouses.form.codePh")} {...register("warehouseCode")} />
+          <p className="text-xs text-slate-500">{t("features.warehouses.form.codeNote")}</p>
           {errors.warehouseCode && <p className="text-sm text-red-500">{errors.warehouseCode.message}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="businessUnitId">Business Unit (Optional)</Label>
+          <Label htmlFor="businessUnitId">{t("features.warehouses.form.businessUnit")}</Label>
           <Controller
             control={control}
             name="businessUnitId"
@@ -112,7 +114,7 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
                 {...field}
                 onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
               >
-                <option value="">-- No Business Unit --</option>
+                <option value="">{t("features.warehouses.form.noBusinessUnit")}</option>
                 {businessUnits.map((bu) => (
                   <option key={bu.id} value={bu.id}>{bu.name}</option>
                 ))}
@@ -123,8 +125,8 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="address">Address (Optional)</Label>
-          <Input id="address" placeholder="e.g. Jl. Raya No. 1" {...register("address")} />
+          <Label htmlFor="address">{t("features.warehouses.form.address")}</Label>
+          <Input id="address" placeholder={t("features.warehouses.form.addressPh")} {...register("address")} />
           {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
         </div>
 
@@ -136,16 +138,16 @@ export function WarehouseFormModal({ isOpen, onClose, onSuccess, businessUnits, 
             {...register("isDefault")}
           />
           <Label htmlFor="isDefault" className="font-normal cursor-pointer">
-            Set as default warehouse
+            {t("features.warehouses.form.setDefault")}
           </Label>
         </div>
 
         <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : initialData ? "Update Warehouse" : "Create Warehouse"}
+            {isSubmitting ? t("common.actions.saving") : initialData ? t("common.actions.saveChanges") : t("common.actions.create")}
           </Button>
         </div>
       </form>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { customerReturnsApi } from "../../../../../features/customer-returns/api";
 import { salesOrderApi } from "../../../../../features/sales-orders/api";
+import { customerApi } from "../../../../../features/customers/api";
 import { CustomerReturnType, CreateCustomerReturnRequest } from "../../../../../features/customer-returns/types";
 import { useAuthStore } from "../../../../../store/auth-store";
 import { extractErrorMessage } from "../../../../../lib/error";
@@ -13,7 +14,7 @@ import { PageHeader } from "../../../../../components/ui/page-header";
 import { AsyncSearchableSelect } from "../../../../../components/ui/async-searchable-select";
 import { warehouseApi } from "../../../../../features/warehouses/api";
 import { productApi } from "../../../../../features/products/api";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, CheckCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 // Very simplified for now. In a real app we would fetch a specific SO 
@@ -22,7 +23,20 @@ import toast from "react-hot-toast";
 
 const loadSalesOrders = async (search: string) => {
   const res = await salesOrderApi.getSalesOrders({ search, limit: 30 });
-  return (res.data || []).map(so => ({ value: so.id, label: `${so.orderCode} - ${so.customerName || so.customer?.name || ''}` }));
+  return (res.data || []).map(so => ({ 
+    value: so.id, 
+    label: `${so.orderCode} - ${so.customerName || so.customer?.fullName || ''}`,
+    salesOrder: so 
+  }));
+};
+
+const loadCustomers = async (search: string) => {
+  const res = await customerApi.getCustomers({ search, limit: 30, status: "ACTIVE" });
+  return (res.data || []).map(c => ({
+    value: c.id,
+    label: `${c.fullName} ${c.customerCode ? `(${c.customerCode})` : ''}`,
+    customer: c
+  }));
 };
 
 const loadWarehouses = async (search: string) => {
@@ -57,7 +71,10 @@ export default function CreateCustomerReturnPage() {
 
     setIsSubmitting(true);
     try {
-      const res = await customerReturnsApi.createCustomerReturn(formData as CreateCustomerReturnRequest);
+      // Strip out internal frontend-only state fields before sending payload to backend
+      const { _customerDetails, isCustomerLocked, ...payload } = formData as any;
+
+      const res = await customerReturnsApi.createCustomerReturn(payload as CreateCustomerReturnRequest);
       toast.success("Customer return created successfully");
       router.push(`/dashboard/customer-returns/${res.data?.id}`);
     } catch (error: any) {
@@ -138,7 +155,27 @@ export default function CreateCustomerReturnPage() {
                 required 
                 placeholder="Search Sales Order (Code or Name)"
                 value={formData.salesOrderId || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, salesOrderId: e.target.value }))}
+                onChange={(e: any) => {
+                  const so = e.option?.salesOrder;
+                  const customerId = so?.customerId || so?.customer?.id || "";
+                  const customerName = so?.customer?.fullName || so?.customerName || "";
+                  const customerPhone = so?.customer?.phone || so?.customerPhone || "";
+                  
+                  setFormData(prev => ({ 
+                    ...prev, 
+                    salesOrderId: e.target.value,
+                    customerId,
+                    customerName,
+                    customerPhone,
+                    isCustomerLocked: !!customerId,
+                    _customerDetails: so?.customer ? {
+                      fullName: so.customer.fullName,
+                      customerCode: so.customer.customerCode,
+                      customerType: so.customer.customerType || (so.customer as any).type,
+                      status: so.customer.status
+                    } : null
+                  }));
+                }}
                 loadOptions={loadSalesOrders}
                 defaultOptions={true}
               />
@@ -189,21 +226,90 @@ export default function CreateCustomerReturnPage() {
               />
             </div>
 
-            <div>
-              <Label className="mb-2 block text-slate-700">Customer Name</Label>
-              <Input 
-                value={formData.customerName || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, customerName: e.target.value }))}
-              />
-            </div>
-            
-            <div>
-              <Label className="mb-2 block text-slate-700">Customer Phone</Label>
-              <Input 
-                value={formData.customerPhone || ""}
-                onChange={(e) => setFormData(prev => ({ ...prev, customerPhone: e.target.value }))}
-              />
-            </div>
+            {/* Optional Customer Manual Link if SO is not locked */}
+            {!(formData as any).isCustomerLocked && formData.salesOrderId && (
+              <div className="md:col-span-2">
+                <Label className="mb-2 block text-slate-700">Link Customer Master (Optional)</Label>
+                <p className="text-xs text-slate-500 mb-2">Since the selected Sales Order is not linked to a Master Customer, you may optionally link one here for this return.</p>
+                <AsyncSearchableSelect 
+                  placeholder="Search Master Customer"
+                  value={formData.customerId || ""}
+                  onChange={(e: any) => {
+                    const c = e.option?.customer;
+                    if (c) {
+                      setFormData(prev => ({
+                        ...prev,
+                        customerId: c.id,
+                        _customerDetails: {
+                          fullName: c.fullName,
+                          customerCode: c.customerCode,
+                          customerType: c.customerType || c.type,
+                          status: c.status
+                        }
+                      }));
+                    } else {
+                      setFormData(prev => ({
+                        ...prev,
+                        customerId: "",
+                        _customerDetails: null
+                      }));
+                    }
+                  }}
+                  loadOptions={loadCustomers}
+                  defaultOptions={true}
+                />
+              </div>
+            )}
+
+            {/* Customer Details Display */}
+            {(formData as any)._customerDetails ? (
+              <div className="md:col-span-2 p-4 bg-slate-50 border border-slate-200 rounded-xl mt-2">
+                <div className="flex items-center gap-2 mb-4">
+                  <CheckCircle className="w-4 h-4 text-indigo-600" />
+                  <span className="font-bold text-slate-800">Linked Customer Master</span>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Name</p>
+                    <p className="font-medium text-slate-800">{(formData as any)._customerDetails.fullName}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Code</p>
+                    <p className="font-medium text-slate-800">{(formData as any)._customerDetails.customerCode}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Type</p>
+                    <p className="font-medium text-slate-800">{(formData as any)._customerDetails.customerType || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Status</p>
+                    <p className="font-medium text-slate-800">{(formData as any)._customerDetails.status}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Label className="mb-2 block text-slate-700">Customer Name (Snapshot)</Label>
+                  <Input 
+                    readOnly
+                    className="bg-slate-50 text-slate-500 cursor-not-allowed"
+                    value={formData.customerName || ""}
+                    placeholder="Auto-filled from Sales Order"
+                  />
+                </div>
+                
+                <div>
+                  <Label className="mb-2 block text-slate-700">Customer Phone (Snapshot)</Label>
+                  <Input 
+                    readOnly
+                    className="bg-slate-50 text-slate-500 cursor-not-allowed"
+                    value={formData.customerPhone || ""}
+                    placeholder="Auto-filled from Sales Order"
+                  />
+                </div>
+              </>
+            )}
             
             <div>
               <Label className="mb-2 block text-slate-700">Tracking Number (Inbound)</Label>

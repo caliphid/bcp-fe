@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/card";
 import { useRecentTransactions } from "../hooks/use-dashboard-widgets";
 import { DataTable } from "../../../components/ui/data-table";
+import { useTranslation } from "../../../hooks/use-translation";
 
 export function DashboardRecentTransactions() {
+  const { t } = useTranslation();
   const { data, loading } = useRecentTransactions();
 
   if (loading) {
@@ -12,9 +14,9 @@ export function DashboardRecentTransactions() {
   if (!data || data.length === 0) {
     return (
       <Card>
-        <CardHeader><CardTitle>Recent Transactions</CardTitle></CardHeader>
+        <CardHeader><CardTitle>{t("features.dashboard.recentTx.title")}</CardTitle></CardHeader>
         <CardContent className="h-[200px] flex items-center justify-center text-sm text-slate-500">
-          No recent transactions
+          {t("features.dashboard.recentTx.noData")}
         </CardContent>
       </Card>
     );
@@ -25,20 +27,20 @@ export function DashboardRecentTransactions() {
   };
 
   const columns = [
-    { 
-      header: "Code", 
+    {
+      header: t("features.dashboard.recentTx.colCode"),
       cell: (item: any) => <span className="font-mono text-xs">{item.transactionCode}</span>
     },
-    { 
-      header: "Date", 
+    {
+      header: t("features.dashboard.recentTx.colDate"),
       cell: (item: any) => new Date(item.transactionDate).toLocaleDateString()
     },
-    { 
-      header: "Description", 
-      cell: (item: any) => item.description || "-" 
+    {
+      header: t("features.dashboard.recentTx.colDescription"),
+      cell: (item: any) => item.description || "-"
     },
     {
-      header: "Type",
+      header: t("features.dashboard.recentTx.colType"),
       cell: (item: any) => (
         <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${
           item.type === "IN" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"
@@ -47,8 +49,8 @@ export function DashboardRecentTransactions() {
         </span>
       )
     },
-    { 
-      header: "Amount", 
+    {
+      header: t("features.dashboard.recentTx.colAmount"),
       className: "text-right font-medium",
       cell: (item: any) => (
         <span className={item.type === "IN" ? "text-emerald-600" : "text-red-600"}>
@@ -56,21 +58,21 @@ export function DashboardRecentTransactions() {
         </span>
       )
     },
-    { 
-      header: "Account", 
-      cell: (item: any) => item.account?.name || "-" 
+    {
+      header: t("features.dashboard.recentTx.colAccount"),
+      cell: (item: any) => item.account?.name || "-"
     },
-    { 
-      header: "Category", 
-      cell: (item: any) => item.category?.name || "-" 
+    {
+      header: t("features.dashboard.recentTx.colCategory"),
+      cell: (item: any) => item.category?.name || "-"
     }
   ];
 
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle>Recent Transactions</CardTitle>
-        <CardDescription>Latest posted transactions</CardDescription>
+        <CardTitle>{t("features.dashboard.recentTx.title")}</CardTitle>
+        <CardDescription>{t("features.dashboard.recentTx.subtitle")}</CardDescription>
       </CardHeader>
       <CardContent className="p-0 border-t border-slate-100">
         <DataTable

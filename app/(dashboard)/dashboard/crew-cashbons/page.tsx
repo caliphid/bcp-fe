@@ -12,8 +12,10 @@ import { CrewCashbonItem, CreateCrewCashbonPayload } from "../../../../types/cre
 import { CashbonTable } from "../../../../features/crew-cashbons/components/cashbon-table";
 import { CashbonFilterBar } from "../../../../features/crew-cashbons/components/cashbon-filter-bar";
 import { CashbonFormModal } from "../../../../features/crew-cashbons/components/cashbon-form-modal";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function CrewCashbonsPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { data, meta, loading, refetch } = useCrewCashbons();
@@ -49,8 +51,8 @@ export default function CrewCashbonsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Crew Cashbons"
-        description="Kelola cashbon dan advance pembayaran untuk crew."
+        title={t("pages.crewCashbons.title")}
+        description={t("pages.crewCashbons.subtitle")}
       >
         <div className="flex gap-2">
           {canViewSummary && (
@@ -59,7 +61,7 @@ export default function CrewCashbonsPage() {
               onClick={() => router.push("/dashboard/crew-cashbons/summary")}
             >
               <BarChart3 className="mr-2 h-4 w-4" />
-              Summary & Analytics
+              {t("pages.crewCashbons.summaryAnalytics")}
             </Button>
           )}
           {canCreate && (
@@ -68,7 +70,7 @@ export default function CrewCashbonsPage() {
               setIsFormOpen(true);
             }}>
               <Plus className="mr-2 h-4 w-4" />
-              Buat Cashbon Baru
+              {t("pages.crewCashbons.createCashbon")}
             </Button>
           )}
         </div>

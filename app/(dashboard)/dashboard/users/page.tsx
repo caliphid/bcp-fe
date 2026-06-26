@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "../../../../store/auth-store";
 import { usersApi } from "../../../../features/users/api";
 import { User } from "../../../../types/auth";
@@ -14,6 +15,7 @@ import { CreateUserForm } from "../../../../components/forms/create-user-form";
 import { UpdateUserForm } from "../../../../components/forms/update-user-form";
 
 export default function UsersPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
@@ -27,7 +29,7 @@ export default function UsersPage() {
       const res = await usersApi.getUsers();
       setUsers(res.data);
     } catch (err) {
-      setError("Failed to fetch users");
+      setError(t("pages.users.fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -50,7 +52,7 @@ export default function UsersPage() {
       }
       fetchUsers(); // Refresh
     } catch (err) {
-      setError("Failed to update status");
+      setError(t("common.messages.errorOccurred"));
     }
   };
 
@@ -60,12 +62,12 @@ export default function UsersPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Users</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage your team members and their roles.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.users.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.users.subtitle")}</p>
         </div>
         {user.role === "OWNER" && (
           <Button className="w-full sm:w-auto shadow-primary-500/30 shadow-md" onClick={() => setIsCreateModalOpen(true)}>
-            <PlusCircle className="mr-2 h-4 w-4" /> Add User
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.users.addUser")}
           </Button>
         )}
       </div>
@@ -78,19 +80,19 @@ export default function UsersPage() {
 
       <Card className="border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <CardHeader className="border-b border-slate-100/80 bg-slate-50/50">
-          <CardTitle>Team Directory</CardTitle>
-          <CardDescription>A list of all users active in your BCP system.</CardDescription>
+          <CardTitle>{t("pages.users.teamDirectory")}</CardTitle>
+          <CardDescription>{t("pages.users.teamDesc")}</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-600">
               <thead className="bg-slate-50/50 text-xs uppercase text-slate-400 font-semibold tracking-wider">
                 <tr>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Email</th>
-                  <th className="px-6 py-4">Role</th>
-                  <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                  <th className="px-6 py-4">{t("common.labels.name")}</th>
+                  <th className="px-6 py-4">{t("common.labels.email")}</th>
+                  <th className="px-6 py-4">{t("common.labels.role")}</th>
+                  <th className="px-6 py-4">{t("common.labels.status")}</th>
+                  <th className="px-6 py-4 text-right">{t("common.labels.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -136,8 +138,8 @@ export default function UsersPage() {
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center">
-                        <p className="text-base font-medium text-slate-900">No users found</p>
-                        <p className="text-sm">Get started by adding a new team member.</p>
+                        <p className="text-base font-medium text-slate-900">{t("pages.users.noUsersFound")}</p>
+                        <p className="text-sm">{t("pages.users.emptyStateDesc")}</p>
                       </div>
                     </td>
                   </tr>
@@ -148,7 +150,7 @@ export default function UsersPage() {
         </CardContent>
       </Card>
 
-      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title="Create New User" className="max-w-2xl">
+      <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} title={t("pages.users.createUser")} className="max-w-2xl">
         <CreateUserForm 
           onSuccess={() => {
             setIsCreateModalOpen(false);
@@ -158,7 +160,7 @@ export default function UsersPage() {
         />
       </Modal>
 
-      <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title="Edit User" className="max-w-2xl">
+      <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} title={t("pages.users.editUser")} className="max-w-2xl">
         {editingUser && (
           <UpdateUserForm 
             user={editingUser}

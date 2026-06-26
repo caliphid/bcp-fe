@@ -12,11 +12,13 @@ import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { extractErrorMessage } from "../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
 import { useAccounts } from "../../../../features/accounts/hooks/use-accounts";
+import { useTranslation } from "@/hooks/use-translation";
 import { AccountFilterBar } from "../../../../features/accounts/components/account-filter-bar";
 import { AccountTable } from "../../../../features/accounts/components/account-table";
 
 export default function AccountsPage() {
   const user = useAuthStore((state) => state.user);
+  const { t } = useTranslation();
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
   const {
@@ -49,10 +51,10 @@ export default function AccountsPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Account" : "Deactivate Account",
+      title: isActivating ? t("pages.accounts.activateAccount") : t("pages.accounts.deactivateAccount"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}?`,
+        ? t("pages.accounts.confirmActivate").replace("{name}", item.name)
+        : t("pages.accounts.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -74,8 +76,8 @@ export default function AccountsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Accounts</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage cash, bank, and e-wallet master data.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.accounts.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.accounts.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -85,7 +87,7 @@ export default function AccountsPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Account
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.accounts.createAccount")}
           </Button>
         )}
       </div>
@@ -116,7 +118,7 @@ export default function AccountsPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Account" : "Create Account"}
+        title={editingItem ? t("pages.accounts.editAccount") : t("pages.accounts.createAccount")}
         className="max-w-2xl"
       >
         <AccountForm

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCustomerReturn } from "../../../../../features/customer-returns/hooks/use-customer-returns";
 import { customerReturnsApi } from "../../../../../features/customer-returns/api";
-import { CustomerReturnStatus, CustomerReturnType, ReturnShipmentStatus, RefundStatus } from "../../../../../features/customer-returns/types";
+import { CustomerReturnStatus, CustomerReturnType, ReturnShipmentStatus, RefundStatus, ReturnResolutionType } from "../../../../../features/customer-returns/types";
 import { useAuthStore } from "../../../../../store/auth-store";
 import { extractErrorMessage } from "../../../../../lib/error";
 import { Button } from "../../../../../components/ui/button";
@@ -70,6 +70,11 @@ export default function CustomerReturnDetailPage({ params }: PageProps) {
     });
   };
 
+  const [isApproveOpen, setIsApproveOpen] = useState(false);
+  const [isRejectOpen, setIsRejectOpen] = useState(false);
+  const [isReceiveOpen, setIsReceiveOpen] = useState(false);
+  const [isInspectOpen, setIsInspectOpen] = useState(false);
+
   if (isLoading) return <div className="p-8 text-center text-slate-500">Loading customer return...</div>;
   if (error || !ret) {
     return (
@@ -84,11 +89,6 @@ export default function CustomerReturnDetailPage({ params }: PageProps) {
   const isItemReceived = ret.status === CustomerReturnStatus.ITEM_RECEIVED;
   const isInspected = ret.status === CustomerReturnStatus.INSPECTED;
   const isRefundPending = ret.status === CustomerReturnStatus.REFUND_PENDING;
-
-  const [isApproveOpen, setIsApproveOpen] = useState(false);
-  const [isRejectOpen, setIsRejectOpen] = useState(false);
-  const [isReceiveOpen, setIsReceiveOpen] = useState(false);
-  const [isInspectOpen, setIsInspectOpen] = useState(false);
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -203,14 +203,39 @@ export default function CustomerReturnDetailPage({ params }: PageProps) {
                 <p className="font-medium text-slate-800">{ret.warehouse?.name || "-"}</p>
               </div>
 
-              <div>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Name</p>
-                <p className="font-medium text-slate-800">{ret.customerName || ret.salesOrder?.customer?.name || "-"}</p>
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Phone</p>
-                <p className="font-medium text-slate-800">{ret.customerPhone || ret.salesOrder?.customer?.phone || "-"}</p>
-              </div>
+              {ret.customer ? (
+                <div className="col-span-2 sm:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-6 pt-2 border-t border-slate-100 mt-2">
+                  <div className="col-span-full">
+                    <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">Linked Customer Master</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Master Name</p>
+                    <Link href={`/dashboard/customers/${ret.customer.id}`} className="font-semibold text-primary-600 hover:underline">
+                      {ret.customer.fullName}
+                    </Link>
+                    <div className="text-xs text-slate-500 mt-0.5 font-mono">{ret.customer.customerCode}</div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Snapshot Name (Return)</p>
+                    <p className="font-medium text-slate-800">{ret.customerName || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Snapshot Phone (Return)</p>
+                    <p className="font-medium text-slate-800">{ret.customerPhone || "-"}</p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Name</p>
+                    <p className="font-medium text-slate-800">{ret.customerName || ret.salesOrder?.customer?.name || "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Phone</p>
+                    <p className="font-medium text-slate-800">{ret.customerPhone || ret.salesOrder?.customer?.phone || "-"}</p>
+                  </div>
+                </>
+              )}
               <div>
                 <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Shipment Status</p>
                 <div><ShipmentStatusBadge status={ret.returnShipmentStatus} /></div>
@@ -316,7 +341,16 @@ export default function CustomerReturnDetailPage({ params }: PageProps) {
              <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-slate-800">Refunds</h2>
                 {canMutate && ret.resolutionType === ReturnResolutionType.REFUND && (
-                   <Button size="sm" variant="outline">Create Refund</Button>
+                   <Button 
+                     size="sm" 
+                     variant="outline"
+                     onClick={() => handleAction("Create Refund", "Proceed to create a refund for this return?", async () => {
+                       // Note: In real app this would open a modal to select account, amount, etc.
+                       return Promise.resolve();
+                     })}
+                   >
+                     Create Refund
+                   </Button>
                 )}
              </div>
              

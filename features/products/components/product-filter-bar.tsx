@@ -5,12 +5,14 @@ import { useProductStore } from "../store/product-store";
 import { BusinessUnit } from "../../../types/business-unit";
 import { ProductType } from "../../../types/enums";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface FilterBarProps {
   businessUnits: BusinessUnit[];
 }
 
 export function ProductFilterBar({ businessUnits }: FilterBarProps) {
+  const { t } = useTranslation();
   const { filters, setFilter } = useProductStore();
 
   const handleSearch = (e: React.FormEvent) => {
@@ -23,7 +25,7 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
       <form onSubmit={handleSearch} className="flex gap-2">
         <Input
-          placeholder="Search..."
+          placeholder={t("features.products.filterBar.searchPh")}
           value={filters.searchInput}
           onChange={(e) => setFilter("searchInput", e.target.value)}
         />
@@ -39,9 +41,9 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
           setFilter("page", 1);
         }}
       >
-        <option value="">All Status</option>
-        <option value="ACTIVE">Active</option>
-        <option value="INACTIVE">Inactive</option>
+        <option value="">{t("features.products.filterBar.allStatus")}</option>
+        <option value="ACTIVE">{t("features.products.filterBar.statusActive")}</option>
+        <option value="INACTIVE">{t("features.products.filterBar.statusInactive")}</option>
       </SearchableSelect>
       <SearchableSelect
         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
@@ -51,7 +53,7 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
           setFilter("page", 1);
         }}
       >
-        <option value="">All Types</option>
+        <option value="">{t("features.products.filterBar.allTypes")}</option>
         {Object.values(ProductType).map((t) => (
           <option key={t} value={t}>{t}</option>
         ))}
@@ -64,7 +66,7 @@ export function ProductFilterBar({ businessUnits }: FilterBarProps) {
           setFilter("page", 1);
         }}
       >
-        <option value="">All Business Units</option>
+        <option value="">{t("features.products.filterBar.allBusinessUnits")}</option>
         {businessUnits.map((bu) => (
           <option key={bu.id} value={bu.id}>{bu.name}</option>
         ))}

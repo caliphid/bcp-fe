@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "@/store/auth-store";
 import { PageHeader } from "@/components/ui/page-header";
 import { FinanceFilterBar } from "@/features/finance/components/finance-filter-bar";
@@ -11,6 +12,7 @@ import { useFinanceStore } from "@/features/finance/store/finance-store";
 import { useMonthlyOverview } from "@/features/finance/hooks/use-finance-analytics";
 
 export default function FinanceOverviewPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { filters } = useFinanceStore();
   
@@ -31,7 +33,7 @@ export default function FinanceOverviewPage() {
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm">
         <p className="text-slate-500">
-          Anda tidak memiliki akses ke halaman ini.
+          {t("pages.financeOverview.noAccess")}
         </p>
       </div>
     );
@@ -40,8 +42,8 @@ export default function FinanceOverviewPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <PageHeader
-        title="Monthly Financial Overview"
-        description="Ringkasan posisi keuangan, profitabilitas, dan aliran kas bulanan"
+        title={t("pages.financeOverview.title")}
+        description={t("pages.financeOverview.subtitle")}
       />
 
       <FinanceFilterBar />

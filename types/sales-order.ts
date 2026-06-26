@@ -66,6 +66,8 @@ export interface SalesOrder {
   businessUnitId?: string;
   businessUnit?: BusinessUnit;
   warehouseId?: string;
+  customerId?: string;
+  customer?: import('./customer').Customer;
   customerName: string;
   customerPhone?: string;
   customerAddress?: string;
@@ -103,6 +105,7 @@ export interface CreateSalesOrderRequest {
   businessUnitId?: string;
   warehouseId?: string;
   customerName: string;
+  customerId?: string;
   customerPhone?: string;
   customerAddress?: string;
   salesChannel: string;

@@ -15,6 +15,7 @@ import { Warehouse } from "../../../types/warehouse";
 import { productApi } from "@/features/products/api";
 import { ProductVariant } from "../../../types/product";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { useTranslation } from "../../../hooks/use-translation";
 
 const itemSchema = z.object({
   productVariantId: z.string().min(1, "Variant is required"),
@@ -42,16 +43,17 @@ interface StockAdjustmentModalProps {
   initialVariantLabel?: string;
 }
 
-export function StockAdjustmentModal({ 
-  isOpen, 
-  onClose, 
-  onSuccess, 
-  warehouses, 
+export function StockAdjustmentModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  warehouses,
   variants,
   initialWarehouseId,
   initialVariantId,
   initialVariantLabel
 }: StockAdjustmentModalProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -104,7 +106,7 @@ export function StockAdjustmentModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Stock Adjustment"
+      title={t("features.inventory.stockAdjustment.title")}
       className="max-w-3xl"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
@@ -116,7 +118,7 @@ export function StockAdjustmentModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="warehouseId">Warehouse <span className="text-red-500">*</span></Label>
+            <Label htmlFor="warehouseId">{t("common.labels.warehouse")} <span className="text-red-500">*</span></Label>
             <Controller
               control={control}
               name="warehouseId"
@@ -127,7 +129,7 @@ export function StockAdjustmentModal({
                   {...field}
                   onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
                 >
-                  <option value="">-- Select Warehouse --</option>
+                  <option value="">{t("features.inventory.stockAdjustment.selectWarehouse")}</option>
                   {warehouses.map((w) => (
                     <option key={w.id} value={w.id}>{w.name}</option>
                   ))}
@@ -138,7 +140,7 @@ export function StockAdjustmentModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="movementDate">Date <span className="text-red-500">*</span></Label>
+            <Label htmlFor="movementDate">{t("common.labels.date")} <span className="text-red-500">*</span></Label>
             <Input type="date" id="movementDate" {...register("movementDate")} />
             {errors.movementDate && <p className="text-sm text-red-500">{errors.movementDate.message}</p>}
           </div>
@@ -146,7 +148,7 @@ export function StockAdjustmentModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="type">Adjustment Type <span className="text-red-500">*</span></Label>
+            <Label htmlFor="type">{t("features.inventory.stockAdjustment.adjType")} <span className="text-red-500">*</span></Label>
             <Controller
               control={control}
               name="type"
@@ -157,9 +159,9 @@ export function StockAdjustmentModal({
                   {...field}
                   onChange={(e: any) => field.onChange(e?.target?.value ?? e)}
                 >
-                  <option value="STOCK_ADJUSTMENT_IN">Adjustment In (+)</option>
-                  <option value="STOCK_ADJUSTMENT_OUT">Adjustment Out (-)</option>
-                  <option value="DAMAGED">Damaged Goods (-)</option>
+                  <option value="STOCK_ADJUSTMENT_IN">{t("features.inventory.stockAdjustment.adjIn")}</option>
+                  <option value="STOCK_ADJUSTMENT_OUT">{t("features.inventory.stockAdjustment.adjOut")}</option>
+                  <option value="DAMAGED">{t("features.inventory.stockAdjustment.damaged")}</option>
                 </SearchableSelect>
               )}
             />
@@ -167,15 +169,15 @@ export function StockAdjustmentModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="reason">Reason <span className="text-red-500">*</span></Label>
-            <Input id="reason" placeholder="e.g. Stock opname difference" {...register("reason")} />
+            <Label htmlFor="reason">{t("features.inventory.stockAdjustment.reason")} <span className="text-red-500">*</span></Label>
+            <Input id="reason" placeholder={t("features.inventory.stockAdjustment.reasonPh")} {...register("reason")} />
             {errors.reason && <p className="text-sm text-red-500">{errors.reason.message}</p>}
           </div>
         </div>
 
         <div className="mt-6 border border-slate-200 rounded-xl overflow-hidden">
           <div className="bg-slate-50 p-4 border-b border-slate-200 flex justify-between items-center">
-            <h4 className="font-semibold text-slate-800">Items</h4>
+            <h4 className="font-semibold text-slate-800">{t("common.labels.items")}</h4>
             <Button
               type="button"
               variant="outline"
@@ -183,7 +185,7 @@ export function StockAdjustmentModal({
               onClick={() => append({ productVariantId: "", quantity: 1 })}
               className="h-8"
             >
-              <PlusCircle className="w-4 h-4 mr-2" /> Add Item
+              <PlusCircle className="w-4 h-4 mr-2" /> {t("features.inventory.stockAdjustment.addItem")}
             </Button>
           </div>
           
@@ -198,7 +200,7 @@ export function StockAdjustmentModal({
                       <AsyncSearchableSelect
                         {...field}
                         className="flex w-full"
-                        placeholder="Search Product Variant..."
+                        placeholder={t("features.inventory.stockAdjustment.searchVariant")}
                         loadOptions={loadVariantOptions}
                         defaultOptions={
                           initialVariantId && initialVariantLabel && index === 0
@@ -218,7 +220,7 @@ export function StockAdjustmentModal({
                     type="number" 
                     min="1" 
                     {...register(`items.${index}.quantity`, { valueAsNumber: true })} 
-                    placeholder="Qty"
+                    placeholder={t("common.labels.qty")}
                   />
                   {errors.items?.[index]?.quantity && (
                     <p className="text-xs text-red-500">{errors.items[index]?.quantity?.message}</p>
@@ -243,10 +245,10 @@ export function StockAdjustmentModal({
 
         <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Adjustment"}
+            {isSubmitting ? t("common.actions.submitting") : t("features.inventory.stockAdjustment.submitBtn")}
           </Button>
         </div>
       </form>

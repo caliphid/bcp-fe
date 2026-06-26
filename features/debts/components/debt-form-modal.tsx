@@ -6,6 +6,7 @@ import { Button } from "../../../components/ui/button";
 import { DebtItem, CreateDebtPayload, DebtType } from "../../../types/debt";
 import { useBusinessUnits } from "../../business-units/hooks/use-business-units";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface DebtFormModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export function DebtFormModal({
   initialData,
 }: DebtFormModalProps) {
   const isEdit = !!initialData;
+  const { t } = useTranslation();
   const { data: businessUnits } = useBusinessUnits();
 
   const [formData, setFormData] = useState<Partial<CreateDebtPayload>>({
@@ -119,7 +121,7 @@ export function DebtFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEdit ? "Edit Hutang" : "Tambah Hutang Baru"}
+      title={isEdit ? t("features.debts.formModal.editTitle") : t("features.debts.formModal.createTitle")}
       className="max-w-3xl"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -131,7 +133,7 @@ export function DebtFormModal({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>Nama Hutang *</Label>
+            <Label>{t("features.debts.formModal.debtName")} *</Label>
             <Input
               required
               disabled={isPaidOff}
@@ -139,12 +141,12 @@ export function DebtFormModal({
               onChange={(e) =>
                 setFormData({ ...formData, debtName: e.target.value })
               }
-              placeholder="Cth. KUR Mandiri"
+              placeholder={t("features.debts.formModal.debtNamePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Pemberi Pinjaman (Kreditur) *</Label>
+            <Label>{t("features.debts.formModal.lenderName")} *</Label>
             <Input
               required
               disabled={isPaidOff}
@@ -152,12 +154,12 @@ export function DebtFormModal({
               onChange={(e) =>
                 setFormData({ ...formData, lenderName: e.target.value })
               }
-              placeholder="Cth. Bank Mandiri"
+              placeholder={t("features.debts.formModal.lenderNamePlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Tipe Hutang *</Label>
+            <Label>{t("features.debts.formModal.debtType")} *</Label>
             <SearchableSelect
               required
               disabled={isPaidOff}
@@ -167,18 +169,18 @@ export function DebtFormModal({
                 setFormData({ ...formData, type: e.target.value as DebtType })
               }
             >
-              <option value="BANK_LOAN">Pinjaman Bank</option>
-              <option value="PERSONAL_LOAN">Pinjaman Pribadi</option>
-              <option value="BUSINESS_CAPITAL">Modal Usaha</option>
-              <option value="ASSET_PURCHASE">Pembelian Aset</option>
-              <option value="CREDIT_CARD">Kartu Kredit</option>
-              <option value="PAYABLE">Hutang Usaha (Payable)</option>
-              <option value="OTHER">Lainnya</option>
+              <option value="BANK_LOAN">{t("features.debts.formModal.typeBankLoan")}</option>
+              <option value="PERSONAL_LOAN">{t("features.debts.formModal.typePersonalLoan")}</option>
+              <option value="BUSINESS_CAPITAL">{t("features.debts.formModal.typeBusinessCapital")}</option>
+              <option value="ASSET_PURCHASE">{t("features.debts.formModal.typeAssetPurchase")}</option>
+              <option value="CREDIT_CARD">{t("features.debts.formModal.typeCreditCard")}</option>
+              <option value="PAYABLE">{t("features.debts.formModal.typePayable")}</option>
+              <option value="OTHER">{t("features.debts.formModal.typeOther")}</option>
             </SearchableSelect>
           </div>
 
           <div className="space-y-2">
-            <Label>Unit Bisnis</Label>
+            <Label>{t("features.debts.formModal.businessUnit")}</Label>
             <SearchableSelect
               disabled={isPaidOff}
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
@@ -187,7 +189,7 @@ export function DebtFormModal({
                 setFormData({ ...formData, businessUnitId: e.target.value })
               }
             >
-              <option value="">Semua / Global</option>
+              <option value="">{t("features.debts.formModal.businessUnitAll")}</option>
               {businessUnits?.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name}
@@ -197,7 +199,7 @@ export function DebtFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Nominal Pokok (IDR) *</Label>
+            <Label>{t("features.debts.formModal.principalAmount")} *</Label>
             <Input
               required
               type="text"
@@ -212,17 +214,17 @@ export function DebtFormModal({
                   principalAmount: val ? parseFloat(val) : 0,
                 });
               }}
-              placeholder="Cth. 10.000.000"
+              placeholder={t("features.debts.formModal.principalAmountPlaceholder")}
             />
             {hasPayments && (
               <p className="text-xs text-amber-600">
-                Pokok hutang tidak bisa diubah setelah ada cicilan
+                {t("features.debts.formModal.principalLockedWarning")}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>Cicilan Bulanan (IDR) Estimasi</Label>
+            <Label>{t("features.debts.formModal.monthlyInstallment")}</Label>
             <Input
               type="text"
               inputMode="numeric"
@@ -236,12 +238,12 @@ export function DebtFormModal({
                   monthlyInstallment: val ? parseFloat(val) : 0,
                 });
               }}
-              placeholder="Cth. 1.000.000"
+              placeholder={t("features.debts.formModal.monthlyInstallmentPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Tanggal Mulai *</Label>
+            <Label>{t("features.debts.formModal.startDate")} *</Label>
             <Input
               required
               type="date"
@@ -254,7 +256,7 @@ export function DebtFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Jatuh Tempo (Opsional)</Label>
+            <Label>{t("features.debts.formModal.dueDate")}</Label>
             <Input
               type="date"
               disabled={isPaidOff}
@@ -266,7 +268,7 @@ export function DebtFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label>Suku Bunga / Interest (%)</Label>
+            <Label>{t("features.debts.formModal.interestRate")}</Label>
             <Input
               type="number"
               step="0.01"
@@ -284,13 +286,13 @@ export function DebtFormModal({
         </div>
 
         <div className="space-y-2">
-          <Label>Catatan</Label>
+          <Label>{t("features.debts.formModal.notes")}</Label>
           <Input
             value={formData.notes || ""}
             onChange={(e) =>
               setFormData({ ...formData, notes: e.target.value })
             }
-            placeholder="Catatan tambahan"
+            placeholder={t("features.debts.formModal.notesPlaceholder")}
           />
         </div>
 
@@ -301,10 +303,10 @@ export function DebtFormModal({
             onClick={onClose}
             disabled={loading}
           >
-            Batal
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "Menyimpan..." : "Simpan Hutang"}
+            {loading ? t("common.actions.saving") : t("common.actions.save")}
           </Button>
         </div>
       </form>

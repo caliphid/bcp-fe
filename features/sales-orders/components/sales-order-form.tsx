@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { SalesOrder, CreateSalesOrderRequest } from "../../../types/sales-order";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -7,6 +7,10 @@ import { Save, Loader2, Lock } from "lucide-react";
 import dayjs from "dayjs";
 import { useBusinessUnits } from "../../business-units/hooks/use-business-units";
 import { useWarehouses } from "../../warehouses/hooks/use-warehouses";
+import { customerApi } from "../../customers/api";
+import { AsyncSearchableSelect } from "../../../components/ui/async-searchable-select";
+import { CustomerCreateModal } from "../../customers/components/customer-create-modal";
+import { Customer } from "../../../types/customer";
 
 interface SalesOrderFormProps {
   initialData?: SalesOrder;
@@ -49,7 +53,74 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
     platformFeeRate: initialData?.platformFeeRate || "0",
     businessUnitId: initialData?.businessUnitId || initialData?.businessUnit?.id || "",
     warehouseId: initialData?.warehouseId || (initialData as any)?.warehouse?.id || "",
+    customerId: initialData?.customerId || "",
   });
+
+  const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const loadCustomers = async (inputValue: string) => {
+    return new Promise<{value: string, label: string, customer: any}[]>((resolve) => {
+      if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
+      debounceTimeout.current = setTimeout(async () => {
+        try {
+          const res = await customerApi.getCustomers({ 
+            search: inputValue || undefined, 
+            limit: 10,
+            page: 1,
+            status: 'ACTIVE',
+            sortBy: 'fullName',
+            sortOrder: 'asc'
+          });
+          const customers = res.data || [];
+          resolve(customers.map((c: any) => ({
+            value: c.id,
+            label: `${c.fullName} (${c.customerCode}) ${c.phone ? `- ${c.phone}` : ''}`,
+            customer: c
+          })));
+        } catch (err) {
+          console.error('Failed to load customers', err);
+          resolve([]);
+        }
+      }, 300);
+    });
+  };
+
+  const handleCustomerSelect = (option: any) => {
+    if (!option || !option.customer) {
+      handleChange('customerId', '');
+      return;
+    }
+    const c: Customer = option.customer;
+    
+    // Find active addresses
+    const activeAddresses = c.addresses?.filter(a => a.isActive) || [];
+    const defaultShipping = activeAddresses.find(a => a.isDefaultShipping);
+    const selectedAddress = defaultShipping?.addressLine1 || activeAddresses[0]?.addressLine1 || "";
+
+    setFormData(prev => ({
+      ...prev,
+      customerId: c.id,
+      customerName: c.fullName,
+      customerPhone: c.phone || prev.customerPhone,
+      customerAddress: selectedAddress || prev.customerAddress,
+    }));
+  };
+
+  const handleCustomerCreated = (c: Customer) => {
+    const activeAddresses = c.addresses?.filter(a => a.isActive) || [];
+    const defaultShipping = activeAddresses.find(a => a.isDefaultShipping);
+    const selectedAddress = defaultShipping?.addressLine1 || activeAddresses[0]?.addressLine1 || "";
+
+    setFormData(prev => ({
+      ...prev,
+      customerId: c.id,
+      customerName: c.fullName,
+      customerPhone: c.phone || prev.customerPhone,
+      customerAddress: selectedAddress || prev.customerAddress,
+    }));
+    setIsCustomerModalOpen(false);
+  };
 
   const handleChange = (field: keyof CreateSalesOrderRequest, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -75,6 +146,7 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
       {isReadOnly && (
         <div className="bg-amber-50 text-amber-800 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
@@ -101,15 +173,40 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
             />
           </div>
 
-          <div>
-            <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Customer Name <span className="text-red-500">*</span></label>
-            <Input 
-              required 
-              placeholder="Nama Customer"
-              disabled={isReadOnly}
-              value={formData.customerName} 
-              onChange={e => handleChange('customerName', e.target.value)} 
-            />
+          <div className="space-y-4">
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label className="text-sm font-semibold text-slate-700">Pilih Customer (Opsional)</label>
+                {!isReadOnly && (
+                  <button 
+                    type="button" 
+                    onClick={() => setIsCustomerModalOpen(true)}
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700"
+                  >
+                    + Buat Baru
+                  </button>
+                )}
+              </div>
+              <AsyncSearchableSelect
+                disabled={isReadOnly}
+                value={formData.customerId}
+                loadOptions={loadCustomers}
+                placeholder="Cari nama atau kode customer..."
+                onChange={(e: any) => handleCustomerSelect(e.option)}
+              />
+              <p className="text-[10px] text-slate-500 mt-1">Memilih customer akan mengisi otomatis Nama, Telepon, dan Alamat.</p>
+            </div>
+
+            <div>
+              <label className="text-sm font-semibold text-slate-700 mb-1.5 block">Customer Name <span className="text-red-500">*</span></label>
+              <Input 
+                required 
+                placeholder="Nama Customer"
+                disabled={isReadOnly}
+                value={formData.customerName} 
+                onChange={e => handleChange('customerName', e.target.value)} 
+              />
+            </div>
           </div>
 
           <div>
@@ -262,5 +359,14 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
         </div>
       )}
     </form>
+
+    {isCustomerModalOpen && (
+      <CustomerCreateModal
+        isOpen={isCustomerModalOpen}
+        onClose={() => setIsCustomerModalOpen(false)}
+        onSuccess={handleCustomerCreated}
+      />
+    )}
+    </>
   );
 }

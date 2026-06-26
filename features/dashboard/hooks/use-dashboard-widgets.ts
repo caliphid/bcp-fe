@@ -87,10 +87,19 @@ export const useDailyTrend = createDashboardHook(dashboardApi.getDailyTrend);
 export const useCategoryBreakdown = createDashboardHook(dashboardApi.getCategoryBreakdown);
 export const useTopExpenses = createDashboardHook(dashboardApi.getTopExpenses);
 export const useTopIncomeSources = createDashboardHook(dashboardApi.getTopIncomeSources);
-export const useAccountBalances = createDashboardHook(dashboardApi.getAccountBalances);
+export const useAccountBalances = createDashboardHook((params: any) => {
+  const { month, year, ...rest } = params || {};
+  return dashboardApi.getAccountBalances(rest);
+});
 export const useBusinessUnitPerformance = createDashboardHook(dashboardApi.getBusinessUnitPerformance);
-export const useYearlySummary = createDashboardHook(dashboardApi.getYearlySummary);
-export const useRecentTransactions = createDashboardHook(dashboardApi.getRecentTransactions, false); // STAFF_INPUT can access
+export const useYearlySummary = createDashboardHook((params: any) => {
+  const { month, ...rest } = params || {};
+  return dashboardApi.getYearlySummary(rest);
+});
+export const useRecentTransactions = createDashboardHook((params: any) => {
+  const { month, year, ...rest } = params || {};
+  return dashboardApi.getRecentTransactions(rest);
+}, false);
 export const useFinanceHealth = createDashboardHook(dashboardApi.getFinanceHealth);
 
 export function useMonthComparison() {

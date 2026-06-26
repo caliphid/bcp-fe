@@ -18,8 +18,10 @@ import { DataTable } from "../../../../components/ui/data-table";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function WarehousesPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -68,10 +70,10 @@ export default function WarehousesPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Warehouse" : "Deactivate Warehouse",
+      title: isActivating ? t("pages.warehouses.activateWarehouse") : t("pages.warehouses.deactivateWarehouse"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}?`,
+        ? t("pages.warehouses.confirmActivate").replace("{name}", item.name)
+        : t("pages.warehouses.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -81,7 +83,7 @@ export default function WarehousesPage() {
           }
           fetchData();
           setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
-          toast.success(`Warehouse ${isActivating ? 'activated' : 'deactivated'}`);
+          toast.success(isActivating ? t("pages.warehouses.activated") : t("pages.warehouses.deactivated"));
         } catch (err) {
           toast.error(extractErrorMessage(err));
           setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
@@ -149,8 +151,8 @@ export default function WarehousesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Warehouses</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage your warehouse locations and details.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.warehouses.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.warehouses.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -160,7 +162,7 @@ export default function WarehousesPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Warehouse
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.warehouses.createWarehouse")}
           </Button>
         )}
       </div>
@@ -175,7 +177,7 @@ export default function WarehousesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
-            placeholder="Search warehouses..."
+            placeholder={t("pages.warehouses.searchPlaceholder")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />

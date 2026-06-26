@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { Eye, Edit, Clock, CheckCircle2, Loader2, Ban, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "../../../store/auth-store";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface SalesOrdersTableProps {
   data?: SalesOrder[];
@@ -14,6 +15,7 @@ interface SalesOrdersTableProps {
 }
 
 export function SalesOrdersTable({ data, meta, loading, onPageChange }: SalesOrdersTableProps) {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const canEdit = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -54,7 +56,7 @@ export function SalesOrdersTable({ data, meta, loading, onPageChange }: SalesOrd
   if (!data || data.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-12 text-center">
-        <p className="text-slate-500">Tidak ada data Sales Order ditemukan.</p>
+        <p className="text-slate-500">{t("features.salesOrders.table.noData")}</p>
       </div>
     );
   }
@@ -65,12 +67,12 @@ export function SalesOrdersTable({ data, meta, loading, onPageChange }: SalesOrd
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-semibold">
             <tr>
-              <th className="px-6 py-4">Order Info</th>
-              <th className="px-6 py-4">Customer</th>
-              <th className="px-6 py-4">Status & Payment</th>
-              <th className="px-6 py-4 text-center">Items</th>
-              <th className="px-6 py-4 text-right">Grand Total</th>
-              <th className="px-6 py-4 text-center">Aksi</th>
+              <th className="px-6 py-4">{t("features.salesOrders.table.colOrderInfo")}</th>
+              <th className="px-6 py-4">{t("features.salesOrders.table.colCustomer")}</th>
+              <th className="px-6 py-4">{t("features.salesOrders.table.colStatusPayment")}</th>
+              <th className="px-6 py-4 text-center">{t("features.salesOrders.table.colItems")}</th>
+              <th className="px-6 py-4 text-right">{t("features.salesOrders.table.colGrandTotal")}</th>
+              <th className="px-6 py-4 text-center">{t("features.salesOrders.table.colActions")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -108,7 +110,7 @@ export function SalesOrdersTable({ data, meta, loading, onPageChange }: SalesOrd
                     <Link 
                       href={`/dashboard/sales-orders/${row.id}`}
                       className="p-1.5 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-                      title="Lihat Detail"
+                      title={t("features.salesOrders.table.viewDetail")}
                     >
                       <Eye className="w-4 h-4" />
                     </Link>
@@ -116,7 +118,7 @@ export function SalesOrdersTable({ data, meta, loading, onPageChange }: SalesOrd
                       <Link 
                         href={`/dashboard/sales-orders/${row.id}/edit`}
                         className="p-1.5 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-                        title="Edit Draft"
+                        title={t("features.salesOrders.table.editDraft")}
                       >
                         <Edit className="w-4 h-4" />
                       </Link>

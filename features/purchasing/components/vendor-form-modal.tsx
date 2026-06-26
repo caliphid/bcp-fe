@@ -11,6 +11,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Modal } from "../../../components/ui/modal";
 import { Vendor } from "../types";
 import { purchasingApi } from "../api";
+import { useTranslation } from "../../../hooks/use-translation";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -38,6 +39,7 @@ export function VendorFormModal({
   onSuccess,
   initialData,
 }: VendorFormModalProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -113,7 +115,7 @@ export function VendorFormModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialData ? "Edit Vendor" : "Create Vendor"}
+      title={initialData ? t("features.purchasing.vendorForm.editTitle") : t("features.purchasing.vendorForm.createTitle")}
       className="max-w-2xl"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -126,11 +128,11 @@ export function VendorFormModal({
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="name">
-              Vendor Name <span className="text-red-500">*</span>
+              {t("features.purchasing.vendorForm.name")}
             </Label>
             <Input
               id="name"
-              placeholder="e.g. PT Supplier ABC"
+              placeholder={t("features.purchasing.vendorForm.namePh")}
               {...register("name")}
             />
             {errors.name && (
@@ -139,10 +141,10 @@ export function VendorFormModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="contactPerson">Contact Person</Label>
+            <Label htmlFor="contactPerson">{t("features.purchasing.vendorForm.contactPerson")}</Label>
             <Input
               id="contactPerson"
-              placeholder="e.g. John Doe"
+              placeholder={t("features.purchasing.vendorForm.contactPh")}
               {...register("contactPerson")}
             />
           </div>
@@ -153,7 +155,7 @@ export function VendorFormModal({
             <Label htmlFor="phone">Phone</Label>
             <Input
               id="phone"
-              placeholder="e.g. 08123456789"
+              placeholder={t("features.purchasing.vendorForm.phonePh")}
               {...register("phone")}
             />
           </div>
@@ -163,7 +165,7 @@ export function VendorFormModal({
             <Input
               id="email"
               type="email"
-              placeholder="e.g. vendor@abc.com"
+              placeholder={t("features.purchasing.vendorForm.emailPh")}
               {...register("email")}
             />
             {errors.email && (
@@ -174,16 +176,16 @@ export function VendorFormModal({
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="taxNumber">Tax Number (NPWP)</Label>
+            <Label htmlFor="taxNumber">{t("features.purchasing.vendorForm.taxNumber")}</Label>
             <Input
               id="taxNumber"
-              placeholder="e.g. 123456789"
+              placeholder={t("features.purchasing.vendorForm.taxPh")}
               {...register("taxNumber")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="paymentTermDays">Payment Term (Days)</Label>
+            <Label htmlFor="paymentTermDays">{t("features.purchasing.vendorForm.paymentTermDays")}</Label>
             <Input
               id="paymentTermDays"
               type="number"
@@ -203,7 +205,7 @@ export function VendorFormModal({
           <Textarea
             id="address"
             rows={2}
-            placeholder="Vendor address"
+            placeholder={t("features.purchasing.vendorForm.addressPh")}
             {...register("address")}
           />
         </div>
@@ -213,21 +215,21 @@ export function VendorFormModal({
           <Textarea
             id="notes"
             rows={2}
-            placeholder="Any notes"
+            placeholder={t("features.purchasing.vendorForm.notesPh")}
             {...register("notes")}
           />
         </div>
 
         <div className="flex justify-end space-x-3 pt-4">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting
-              ? "Saving..."
+              ? t("common.actions.saving")
               : initialData
-                ? "Update Vendor"
-                : "Create Vendor"}
+                ? t("features.purchasing.vendorForm.updateBtn")
+                : t("features.purchasing.vendorForm.createBtn")}
           </Button>
         </div>
       </form>

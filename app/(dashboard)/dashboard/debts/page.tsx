@@ -19,8 +19,10 @@ import { DebtLenderSummary } from "../../../../features/debts/components/debt-le
 import { DebtUnitSummary } from "../../../../features/debts/components/debt-unit-summary";
 import { Button } from "../../../../components/ui/button";
 import { Plus } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function DebtsPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((s) => s.user);
   
   const { data: debts, meta, loading: debtsLoading, refetch: refetchDebts } = useDebts();
@@ -92,21 +94,21 @@ export default function DebtsPage() {
   };
 
   const handleActivate = async () => {
-    if (detailId && confirm("Apakah Anda yakin ingin mengaktifkan hutang ini?")) {
+    if (detailId && confirm(t("pages.debts.confirmActivate"))) {
       await debtsApi.activateDebt(detailId);
       refreshAll();
     }
   };
 
   const handleDeactivate = async () => {
-    if (detailId && confirm("Apakah Anda yakin ingin menonaktifkan hutang ini?")) {
+    if (detailId && confirm(t("pages.debts.confirmDeactivate"))) {
       await debtsApi.deactivateDebt(detailId);
       refreshAll();
     }
   };
 
   const handleCloseDebt = async () => {
-    if (detailId && confirm("Apakah Anda yakin ingin menutup hutang ini secara permanen?")) {
+    if (detailId && confirm(t("pages.debts.confirmClose"))) {
       await debtsApi.closeDebt(detailId);
       refreshAll();
     }
@@ -119,13 +121,13 @@ export default function DebtsPage() {
       <div className="flex-none p-6 pb-0">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900">Manajemen Hutang</h1>
-            <p className="text-sm text-slate-500 mt-1">Kelola pinjaman bisnis, kartu kredit, dan hutang usaha</p>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900">{t("pages.debts.title")}</h1>
+            <p className="text-sm text-slate-500 mt-1">{t("pages.debts.subtitle")}</p>
           </div>
           {canMutate && (
             <Button onClick={handleOpenCreate} className="gap-2 shadow-sm">
               <Plus className="h-4 w-4" />
-              Tambah Hutang
+              {t("pages.debts.addDebt")}
             </Button>
           )}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { Search } from "lucide-react";
 import { Input } from "../../../../../components/ui/input";
 import { Button } from "../../../../../components/ui/button";
@@ -56,6 +57,7 @@ const formatMovementType = (type: string) => {
 };
 
 export default function MovementsPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -96,7 +98,7 @@ export default function MovementsPage() {
 
   const columns = [
     {
-      header: "Date",
+      header: t("common.labels.date"),
       cell: (item: InventoryMovement) => (
         <div>
           <div className="font-medium text-slate-900">
@@ -112,11 +114,11 @@ export default function MovementsPage() {
       ),
     },
     {
-      header: "Warehouse",
+      header: t("common.labels.warehouse"),
       cell: (item: InventoryMovement) => item.warehouse?.name || "-",
     },
     {
-      header: "Product / Variant",
+      header: t("common.labels.productVariant"),
       cell: (item: InventoryMovement) => {
         const variant = item.productVariant || item.variant;
         const product = item.product || variant?.product;
@@ -146,7 +148,7 @@ export default function MovementsPage() {
       },
     },
     {
-      header: "Type",
+      header: t("common.labels.type"),
       cell: (item: InventoryMovement) => (
         <span
           className={`inline-flex px-2 py-1 rounded-md text-[11px] font-bold uppercase tracking-wider ${getMovementColor(item.movementType)}`}
@@ -156,7 +158,7 @@ export default function MovementsPage() {
       ),
     },
     {
-      header: "Qty",
+      header: t("common.labels.qty"),
       className: "text-right font-bold text-slate-900",
       cell: (item: InventoryMovement) => {
         const isPositive = [
@@ -178,7 +180,7 @@ export default function MovementsPage() {
       },
     },
     {
-      header: "Reference",
+      header: t("common.labels.reference"),
       cell: (item: InventoryMovement) => (
         <div>
           <div className="text-sm font-medium text-slate-700">
@@ -191,7 +193,7 @@ export default function MovementsPage() {
       ),
     },
     {
-      header: "User",
+      header: t("common.labels.user"),
       cell: (item: InventoryMovement) => {
         const creator =
           item.createdBy ||
@@ -206,10 +208,10 @@ export default function MovementsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-            Movement Log
+            {t("pages.movementsLog.title")}
           </h2>
           <p className="mt-1 text-sm text-slate-500">
-            View history of inventory movements and adjustments.
+            {t("pages.movementsLog.subtitle")}
           </p>
         </div>
       </div>
@@ -224,7 +226,7 @@ export default function MovementsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
-            placeholder="Search Reference..."
+            placeholder={t("pages.movementsLog.searchPlaceholder")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -240,7 +242,7 @@ export default function MovementsPage() {
             setPage(1);
           }}
         >
-          <option value="">All Warehouses</option>
+          <option value="">{t("common.labels.allWarehouses")}</option>
           {warehouses.map((w: Warehouse) => (
             <option key={w.id} value={w.id}>
               {w.name}
@@ -255,7 +257,7 @@ export default function MovementsPage() {
             setPage(1);
           }}
         >
-          <option value="">All Movement Types</option>
+          <option value="">{t("pages.movementsLog.allMovementTypes")}</option>
           {Object.values(InventoryMovementType).map(
             (t: InventoryMovementType) => (
               <option key={t} value={t}>

@@ -5,6 +5,7 @@ import { X, Plus, Ban, Eye, FileText } from "lucide-react";
 import { formatCurrency, formatDate, getDebtStatusColor, getDebtStatusLabel, getPaymentStatusColor, getPaymentStatusLabel, getDebtTypeLabel } from "../utils/formatters";
 import { Button } from "../../../components/ui/button";
 import { DataTable } from "../../../components/ui/data-table";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface DebtDetailDrawerProps {
   isOpen: boolean;
@@ -30,7 +31,8 @@ export function DebtDetailDrawer({
   onCloseDebt
 }: DebtDetailDrawerProps) {
   const user = useAuthStore(s => s.user);
-  
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -44,7 +46,7 @@ export function DebtDetailDrawer({
       {/* Drawer */}
       <div className="relative w-full max-w-2xl h-full bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-          <h2 className="text-lg font-bold text-slate-800">Detail Hutang</h2>
+          <h2 className="text-lg font-bold text-slate-800">{t("features.debts.detailDrawer.title")}</h2>
           <button onClick={onClose} className="p-2 text-slate-400 hover:bg-slate-100 rounded-full">
             <X className="h-5 w-5" />
           </button>
@@ -72,19 +74,19 @@ export function DebtDetailDrawer({
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-50">
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Pokok Hutang</p>
+                    <p className="text-xs text-slate-500 mb-1">{t("features.debts.detailDrawer.principalAmount")}</p>
                     <p className="font-semibold text-slate-800">{formatCurrency(debt.principalAmount)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Sisa Hutang</p>
+                    <p className="text-xs text-slate-500 mb-1">{t("features.debts.detailDrawer.remainingBalance")}</p>
                     <p className="font-bold text-rose-600">{formatCurrency(debt.currentBalance)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Total Dibayar</p>
+                    <p className="text-xs text-slate-500 mb-1">{t("features.debts.detailDrawer.totalPaid")}</p>
                     <p className="font-semibold text-emerald-600">{formatCurrency(debt.totalPaid)}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Progress</p>
+                    <p className="text-xs text-slate-500 mb-1">{t("features.debts.detailDrawer.progress")}</p>
                     <p className="font-semibold text-slate-800">{debt.progressPercentage}%</p>
                   </div>
                 </div>
@@ -103,22 +105,22 @@ export function DebtDetailDrawer({
                 <div className="flex flex-wrap gap-2">
                   {debt.status === "ACTIVE" && (
                     <Button onClick={onAddPayment} size="sm" className="bg-indigo-600 hover:bg-indigo-700">
-                      <Plus className="w-4 h-4 mr-2" /> Buat Pembayaran
+                      <Plus className="w-4 h-4 mr-2" /> {t("features.debts.detailDrawer.addPayment")}
                     </Button>
                   )}
                   {user?.role === "OWNER" && debt.status === "INACTIVE" && (
                     <Button onClick={onActivate} size="sm" variant="outline" className="text-indigo-600 border-indigo-200">
-                      Aktifkan
+                      {t("features.debts.detailDrawer.activate")}
                     </Button>
                   )}
                   {user?.role === "OWNER" && debt.status === "ACTIVE" && debt.paymentCount === 0 && (
                     <Button onClick={onDeactivate} size="sm" variant="outline" className="text-slate-600">
-                      Nonaktifkan
+                      {t("features.debts.detailDrawer.deactivate")}
                     </Button>
                   )}
                   {(user?.role === "OWNER" || user?.role === "ADMIN_FINANCE") && debt.status === "ACTIVE" && parseFloat(debt.currentBalance) === 0 && (
                     <Button onClick={onCloseDebt} size="sm" className="bg-emerald-600 hover:bg-emerald-700">
-                      Tutup Hutang
+                      {t("features.debts.detailDrawer.closeDebt")}
                     </Button>
                   )}
                 </div>
@@ -127,45 +129,45 @@ export function DebtDetailDrawer({
               {/* Information Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                  <h4 className="font-semibold text-slate-800 mb-4 text-sm">Informasi Hutang</h4>
+                  <h4 className="font-semibold text-slate-800 mb-4 text-sm">{t("features.debts.detailDrawer.debtInfo")}</h4>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Unit Bisnis</span>
-                      <span className="font-medium">{debt.businessUnit?.name || "Global"}</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.businessUnit")}</span>
+                      <span className="font-medium">{debt.businessUnit?.name || t("features.debts.detailDrawer.global")}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Tipe Hutang</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.debtType")}</span>
                       <span className="font-medium">{getDebtTypeLabel(debt.type)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Suku Bunga</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.interestRate")}</span>
                       <span className="font-medium">{debt.interestRate || "0"}%</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Cicilan Bulanan</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.monthlyInstallment")}</span>
                       <span className="font-medium">{formatCurrency(debt.monthlyInstallment)}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                  <h4 className="font-semibold text-slate-800 mb-4 text-sm">Linimasa</h4>
+                  <h4 className="font-semibold text-slate-800 mb-4 text-sm">{t("features.debts.detailDrawer.timeline")}</h4>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Tanggal Mulai</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.startDate")}</span>
                       <span className="font-medium">{formatDate(debt.startDate)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Jatuh Tempo</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.dueDate")}</span>
                       <span className="font-medium">{formatDate(debt.dueDate)}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Dibuat Pada</span>
+                      <span className="text-slate-500">{t("features.debts.detailDrawer.createdAt")}</span>
                       <span className="font-medium">{formatDate(debt.createdAt)}</span>
                     </div>
                     {debt.closedAt && (
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Ditutup Pada</span>
+                        <span className="text-slate-500">{t("features.debts.detailDrawer.closedAt")}</span>
                         <span className="font-medium text-emerald-600">{formatDate(debt.closedAt)}</span>
                       </div>
                     )}
@@ -175,7 +177,7 @@ export function DebtDetailDrawer({
 
               {debt.notes && (
                 <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
-                  <h4 className="font-semibold text-slate-800 mb-2 text-sm">Catatan</h4>
+                  <h4 className="font-semibold text-slate-800 mb-2 text-sm">{t("features.debts.detailDrawer.notes")}</h4>
                   <p className="text-sm text-slate-600 whitespace-pre-wrap">{debt.notes}</p>
                 </div>
               )}
@@ -183,24 +185,24 @@ export function DebtDetailDrawer({
               {/* Payment History */}
               <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden mt-6">
                 <div className="px-5 py-4 border-b border-slate-100">
-                  <h4 className="font-semibold text-slate-800">Riwayat Pembayaran</h4>
+                  <h4 className="font-semibold text-slate-800">{t("features.debts.detailDrawer.paymentHistory")}</h4>
                 </div>
                 
                 {debt.payments.length === 0 ? (
                   <div className="p-8 text-center text-slate-500 text-sm">
-                    Belum ada riwayat pembayaran.
+                    {t("features.debts.detailDrawer.noPayments")}
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                       <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-100">
                         <tr>
-                          <th className="px-4 py-3">Tanggal</th>
-                          <th className="px-4 py-3">Kode</th>
-                          <th className="px-4 py-3">Nominal</th>
-                          <th className="px-4 py-3">Akun</th>
-                          <th className="px-4 py-3">Status</th>
-                          {user?.role !== "STAFF_INPUT" && <th className="px-4 py-3 text-right">Aksi</th>}
+                          <th className="px-4 py-3">{t("features.debts.detailDrawer.colDate")}</th>
+                          <th className="px-4 py-3">{t("features.debts.detailDrawer.colCode")}</th>
+                          <th className="px-4 py-3">{t("features.debts.detailDrawer.colAmount")}</th>
+                          <th className="px-4 py-3">{t("features.debts.detailDrawer.colAccount")}</th>
+                          <th className="px-4 py-3">{t("features.debts.detailDrawer.colStatus")}</th>
+                          {user?.role !== "STAFF_INPUT" && <th className="px-4 py-3 text-right">{t("features.debts.detailDrawer.colActions")}</th>}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-50">
@@ -221,7 +223,7 @@ export function DebtDetailDrawer({
                                   <button
                                     onClick={() => onVoidPayment(p)}
                                     className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                                    title="Batalkan Pembayaran (Void)"
+                                    title={t("features.debts.detailDrawer.voidPayment")}
                                   >
                                     <Ban className="w-4 h-4" />
                                   </button>

@@ -14,8 +14,10 @@ import { Alert, AlertDescription } from "../../../../components/ui/alert";
 import { useCategories } from "../../../../features/categories/hooks/use-categories";
 import { CategoryFilterBar } from "../../../../features/categories/components/category-filter-bar";
 import { CategoryTable } from "../../../../features/categories/components/category-table";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function CategoriesPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -50,10 +52,10 @@ export default function CategoriesPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Category" : "Deactivate Category",
+      title: isActivating ? t("pages.categories.activateCategory") : t("pages.categories.deactivateCategory"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}? This will fail if it has active child categories.`,
+        ? t("pages.categories.confirmActivate").replace("{name}", item.name)
+        : t("pages.categories.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -76,8 +78,8 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Categories</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage transaction category hierarchy.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.categories.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.categories.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -87,7 +89,7 @@ export default function CategoriesPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Category
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.categories.createCategory")}
           </Button>
         )}
       </div>
@@ -119,7 +121,7 @@ export default function CategoriesPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Category" : "Create Category"}
+        title={editingItem ? t("pages.categories.editCategory") : t("pages.categories.createCategory")}
         className="max-w-2xl"
       >
         <CategoryForm

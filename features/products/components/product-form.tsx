@@ -25,6 +25,7 @@ import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { useTranslation } from "../../../hooks/use-translation";
 
 const variantSchema = z.object({
   id: z.string().optional(),
@@ -82,6 +83,7 @@ export function ProductForm({
   initialData,
 }: ProductFormProps) {
   const router = useRouter();
+  const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
 
   // Variant generator state
@@ -348,48 +350,48 @@ export function ProductForm({
       {/* SECTION 1: Product Master Detail */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <h2 className="text-lg font-bold text-slate-800 mb-6">
-          1. Product Detail
+          {t("features.products.form.sectionProductDetail")}
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>
-              Product Name <span className="text-rose-500">*</span>
+              {t("features.products.form.productName")} <span className="text-rose-500">*</span>
             </Label>
-            <Input placeholder="e.g. T-Shirt Basic" {...register("name")} />
+            <Input placeholder={t("features.products.form.productNamePlaceholder")} {...register("name")} />
             {errors.name && (
               <p className="text-sm text-red-500">{errors.name.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label>Article Name</Label>
+            <Label>{t("features.products.form.articleName")}</Label>
             <Input
-              placeholder="e.g. Basic Edition"
+              placeholder={t("features.products.form.articleNamePlaceholder")}
               {...register("articleName")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Product Code (Opt)</Label>
-            <Input placeholder="e.g. PRD-001" {...register("productCode")} />
+            <Label>{t("features.products.form.productCode")}</Label>
+            <Input placeholder={t("features.products.form.productCodePlaceholder")} {...register("productCode")} />
             <p className="text-xs text-slate-500">
-              Leave blank to auto-generate
+              {t("features.products.form.productCodeHint")}
             </p>
           </div>
 
           <div className="space-y-2">
             <Label>
-              Product Type <span className="text-rose-500">*</span>
+              {t("features.products.form.productType")} <span className="text-rose-500">*</span>
             </Label>
             <select
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
               {...register("type")}
             >
-              <option value="PHYSICAL_PRODUCT">Physical Product</option>
-              <option value="SERVICE">Service</option>
-              <option value="RAW_MATERIAL">Raw Material</option>
-              <option value="OTHER">Other</option>
+              <option value="PHYSICAL_PRODUCT">{t("features.products.form.typePhysical")}</option>
+              <option value="SERVICE">{t("features.products.form.typeService")}</option>
+              <option value="RAW_MATERIAL">{t("features.products.form.typeRawMaterial")}</option>
+              <option value="OTHER">{t("features.products.form.typeOther")}</option>
             </select>
             {errors.type && (
               <p className="text-sm text-red-500">{errors.type.message}</p>
@@ -397,7 +399,7 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Business Unit (Opt)</Label>
+            <Label>{t("features.products.form.businessUnit")}</Label>
             <Controller
               control={control}
               name="businessUnitId"
@@ -407,7 +409,7 @@ export function ProductForm({
                   {...field}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
-                  <option value="">-- No Business Unit --</option>
+                  <option value="">{t("features.products.form.noBusinessUnit")}</option>
                   {businessUnits.map((bu) => (
                     <option key={bu.id} value={bu.id}>
                       {bu.name}
@@ -419,7 +421,7 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2">
-            <Label>Category (Opt)</Label>
+            <Label>{t("features.products.form.category")}</Label>
             <Controller
               control={control}
               name="categoryId"
@@ -429,7 +431,7 @@ export function ProductForm({
                   {...field}
                   onChange={(e) => field.onChange(e.target.value)}
                 >
-                  <option value="">-- No Category --</option>
+                  <option value="">{t("features.products.form.noCategory")}</option>
                   {productCategories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
@@ -441,10 +443,10 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2 md:col-span-2">
-            <Label>Description</Label>
+            <Label>{t("features.products.form.description")}</Label>
             <Textarea
               rows={3}
-              placeholder="Product description..."
+              placeholder={t("features.products.form.descriptionPlaceholder")}
               {...register("description")}
             />
           </div>
@@ -456,11 +458,10 @@ export function ProductForm({
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-800">
-              2. Pricing & Variants
+              {t("features.products.form.sectionPricingVariants")}
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              Configure product pricing. Enable variants if this product has
-              multiple sizes, colors, or options.
+              {t("features.products.form.sectionPricingVariantsHint")}
             </p>
           </div>
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg">
@@ -474,7 +475,7 @@ export function ProductForm({
               htmlFor="hasVariants"
               className="font-semibold cursor-pointer"
             >
-              Product has variants
+              {t("features.products.form.hasVariants")}
             </Label>
           </div>
         </div>
@@ -483,11 +484,11 @@ export function ProductForm({
         {!hasVariants && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
             <div className="space-y-2">
-              <Label>Base SKU (Opt)</Label>
+              <Label>{t("features.products.form.baseSku")}</Label>
               <Input placeholder="SKU-XXX" {...register("sku")} />
             </div>
             <div className="space-y-2">
-              <Label>Default HPP (Base Cost)</Label>
+              <Label>{t("features.products.form.defaultHpp")}</Label>
               <Input
                 placeholder="Rp 0"
                 {...register("defaultHpp")}
@@ -497,7 +498,7 @@ export function ProductForm({
               />
             </div>
             <div className="space-y-2">
-              <Label>Default Selling Price</Label>
+              <Label>{t("features.products.form.defaultSellingPrice")}</Label>
               <Input
                 placeholder="Rp 0"
                 {...register("defaultPrice")}
@@ -515,15 +516,15 @@ export function ProductForm({
             {/* VARIANT GENERATOR */}
             <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
               <h3 className="text-sm font-semibold text-indigo-900 mb-3">
-                Auto-Generate Variant Combinations
+                {t("features.products.form.autoGenerateVariants")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label className="text-xs text-indigo-700">
-                    Colors (comma separated)
+                    {t("features.products.form.colorsLabel")}
                   </Label>
                   <Input
-                    placeholder="e.g. Red, Blue, Black"
+                    placeholder={t("features.products.form.colorsPlaceholder")}
                     value={colorsInput}
                     onChange={(e) => setColorsInput(e.target.value)}
                     className="bg-white border-indigo-200 focus-visible:ring-indigo-500 text-sm"
@@ -531,10 +532,10 @@ export function ProductForm({
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs text-indigo-700">
-                    Sizes (comma separated)
+                    {t("features.products.form.sizesLabel")}
                   </Label>
                   <Input
-                    placeholder="e.g. S, M, L, XL"
+                    placeholder={t("features.products.form.sizesPlaceholder")}
                     value={sizesInput}
                     onChange={(e) => setSizesInput(e.target.value)}
                     className="bg-white border-indigo-200 focus-visible:ring-indigo-500 text-sm"
@@ -547,7 +548,7 @@ export function ProductForm({
                   onClick={handleGenerateVariants}
                   className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                 >
-                  Generate Combinations
+                  {t("features.products.form.generateCombinations")}
                 </Button>
               </div>
             </div>
@@ -557,15 +558,15 @@ export function ProductForm({
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-slate-800">
-                    Bulk Apply to All Variants
+                    {t("features.products.form.bulkApplyTitle")}
                   </h3>
                   <span className="text-xs text-slate-500">
-                    Apply specific pricing or stock to all generated rows below
+                    {t("features.products.form.bulkApplyHint")}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                   <div className="space-y-1">
-                    <Label className="text-xs">Unit Cost (HPP)</Label>
+                    <Label className="text-xs">{t("features.products.form.unitCost")}</Label>
                     <Input
                       placeholder="Rp 50.000"
                       value={bulkUnitCost}
@@ -576,7 +577,7 @@ export function ProductForm({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Selling Price</Label>
+                    <Label className="text-xs">{t("features.products.form.sellingPrice")}</Label>
                     <Input
                       placeholder="Rp 100.000"
                       value={bulkSellingPrice}
@@ -587,7 +588,7 @@ export function ProductForm({
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Min Stock</Label>
+                    <Label className="text-xs">{t("features.products.form.minStock")}</Label>
                     <Input
                       type="number"
                       min="0"
@@ -608,7 +609,7 @@ export function ProductForm({
                       onClick={handleBulkApply}
                       className="w-full h-9 border-slate-300"
                     >
-                      Apply to All
+                      {t("features.products.form.applyToAll")}
                     </Button>
                   </div>
                 </div>
@@ -756,7 +757,7 @@ export function ProductForm({
                 })
               }
             >
-              <Plus className="h-5 w-5 mr-2" /> Add Variant Option
+              <Plus className="h-5 w-5 mr-2" /> {t("features.products.form.addVariant")}
             </Button>
           </div>
         )}

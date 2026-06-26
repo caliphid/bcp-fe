@@ -8,6 +8,7 @@ import { useAccounts } from "../../accounts/hooks/use-accounts";
 import { useCategories } from "../../categories/hooks/use-categories";
 import { formatCurrency } from "../utils/formatters";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface DebtPaymentFormModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface DebtPaymentFormModalProps {
 }
 
 export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPaymentFormModalProps) {
+  const { t } = useTranslation();
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
 
@@ -86,7 +88,7 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
   if (!debt) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Buat Pembayaran Hutang" className="max-w-lg">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("features.debts.paymentFormModal.title")} className="max-w-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
           <div className="p-3 text-sm bg-rose-50 text-rose-600 rounded-lg">
@@ -97,14 +99,14 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
         <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg mb-4">
           <p className="text-sm font-medium text-indigo-900">{debt.debtName}</p>
           <div className="flex justify-between mt-1 text-sm text-indigo-700">
-            <span>Sisa Hutang:</span>
+            <span>{t("features.debts.paymentFormModal.remainingBalance")}:</span>
             <span className="font-bold">{formatCurrency(debt.currentBalance)}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4">
           <div className="space-y-2">
-            <Label>Tanggal Pembayaran *</Label>
+            <Label>{t("features.debts.paymentFormModal.paymentDate")} *</Label>
             <Input
               required
               type="date"
@@ -112,9 +114,9 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
               onChange={(e) => setFormData({ ...formData, paymentDate: e.target.value })}
             />
           </div>
-          
+
           <div className="space-y-2">
-            <Label>Nominal Pembayaran (IDR) *</Label>
+            <Label>{t("features.debts.paymentFormModal.amount")} *</Label>
             <Input
               required
               type="text"
@@ -128,19 +130,19 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
                   amount: val ? parseFloat(val) : 0,
                 });
               }}
-              placeholder="Cth. 500.000"
+              placeholder={t("features.debts.paymentFormModal.amountPlaceholder")}
             />
           </div>
 
           <div className="space-y-2">
-            <Label>Akun Sumber Dana *</Label>
+            <Label>{t("features.debts.paymentFormModal.sourceAccount")} *</Label>
             <SearchableSelect
               required
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               value={formData.accountId || ""}
               onChange={(e) => setFormData({ ...formData, accountId: e.target.value })}
             >
-              <option value="" disabled>Pilih Akun</option>
+              <option value="" disabled>{t("features.debts.paymentFormModal.selectAccount")}</option>
               {accounts?.filter(a => a.status === "ACTIVE").map(a => (
                 <option key={a.id} value={a.id}>{a.name}</option>
               ))}
@@ -148,13 +150,13 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
           </div>
 
           <div className="space-y-2">
-            <Label>Kategori (Opsional)</Label>
+            <Label>{t("features.debts.paymentFormModal.category")}</Label>
             <SearchableSelect
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
               value={formData.categoryId || ""}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
             >
-              <option value="">Kategori Pembayaran Hutang Default</option>
+              <option value="">{t("features.debts.paymentFormModal.defaultCategory")}</option>
               {categories?.filter(c => c.status === "ACTIVE").map(c => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -162,21 +164,21 @@ export function DebtPaymentFormModal({ isOpen, onClose, onSubmit, debt }: DebtPa
           </div>
 
           <div className="space-y-2">
-            <Label>Deskripsi</Label>
+            <Label>{t("features.debts.paymentFormModal.description")}</Label>
             <Input
               value={formData.description || ""}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Deskripsi singkat"
+              placeholder={t("features.debts.paymentFormModal.descriptionPlaceholder")}
             />
           </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
           <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-            Batal
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "Menyimpan..." : "Simpan Pembayaran"}
+            {loading ? t("common.actions.saving") : t("common.actions.save")}
           </Button>
         </div>
       </form>

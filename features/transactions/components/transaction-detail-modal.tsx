@@ -4,6 +4,7 @@ import { StatusBadge } from "../../../components/ui/status-badge";
 import { env } from "../../../lib/env";
 import { useState } from "react";
 import { AttachmentViewerModal } from "../../../components/ui/attachment-viewer-modal";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface Props {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) {
+  const { t } = useTranslation();
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   if (!transaction) return null;
@@ -44,26 +46,26 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) 
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Transaction Details" className="max-w-2xl">
+    <Modal isOpen={isOpen} onClose={onClose} title={t("features.transactions.detailModal.title")} className="max-w-2xl">
       <div className="space-y-1">
-        <DetailRow label="Trx Code" value={transaction.transactionCode} />
-        <DetailRow label="Date" value={formatDate(transaction.transactionDate)} />
-        <DetailRow label="Status" value={
+        <DetailRow label={t("features.transactions.detailModal.trxCode")} value={transaction.transactionCode} />
+        <DetailRow label={t("features.transactions.detailModal.date")} value={formatDate(transaction.transactionDate)} />
+        <DetailRow label={t("features.transactions.detailModal.status")} value={
           <StatusBadge status={transaction.status} />
         } />
         
         {transaction.status === 'VOID' && (
           <div className="bg-red-50 p-3 rounded-lg border border-red-100 my-2">
-            <p className="text-xs text-red-600 font-semibold mb-1">Void Information</p>
-            <p className="text-sm text-red-800"><span className="font-medium">Reason:</span> {transaction.voidReason || '-'}</p>
-            <p className="text-sm text-red-800"><span className="font-medium">Voided At:</span> {formatDateTime(transaction.voidedAt)}</p>
+            <p className="text-xs text-red-600 font-semibold mb-1">{t("features.transactions.detailModal.voidInfo")}</p>
+            <p className="text-sm text-red-800"><span className="font-medium">{t("features.transactions.detailModal.voidReason")}</span> {transaction.voidReason || '-'}</p>
+            <p className="text-sm text-red-800"><span className="font-medium">{t("features.transactions.detailModal.voidedAt")}</span> {formatDateTime(transaction.voidedAt)}</p>
             {transaction.voidedBy && (
-              <p className="text-sm text-red-800"><span className="font-medium">Voided By:</span> {transaction.voidedBy.name}</p>
+              <p className="text-sm text-red-800"><span className="font-medium">{t("features.transactions.detailModal.voidedBy")}</span> {transaction.voidedBy.name}</p>
             )}
           </div>
         )}
 
-        <DetailRow label="Type" value={
+        <DetailRow label={t("features.transactions.detailModal.type")} value={
           <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${
             transaction.type === 'IN' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
           }`}>
@@ -71,35 +73,35 @@ export function TransactionDetailModal({ isOpen, onClose, transaction }: Props) 
           </span>
         } />
         
-        <DetailRow label="Amount" className="text-lg" value={
+        <DetailRow label={t("features.transactions.detailModal.amount")} className="text-lg" value={
           <span className={transaction.type === 'IN' ? 'text-emerald-600' : 'text-red-600'}>
             {formatCurrency(transaction.amount)}
           </span>
         } />
 
-        <DetailRow label="Account" value={transaction.account?.name || '-'} />
-        <DetailRow label="Category" value={transaction.category?.name || '-'} />
-        <DetailRow label="Business Unit" value={transaction.businessUnit?.name || '-'} />
-        
-        <DetailRow label="Description" value={transaction.description || '-'} />
-        <DetailRow label="Notes" value={transaction.notes || '-'} />
+        <DetailRow label={t("features.transactions.detailModal.account")} value={transaction.account?.name || '-'} />
+        <DetailRow label={t("features.transactions.detailModal.category")} value={transaction.category?.name || '-'} />
+        <DetailRow label={t("features.transactions.detailModal.businessUnit")} value={transaction.businessUnit?.name || '-'} />
+
+        <DetailRow label={t("features.transactions.detailModal.description")} value={transaction.description || '-'} />
+        <DetailRow label={t("features.transactions.detailModal.notes")} value={transaction.notes || '-'} />
         
         {transaction.attachmentUrl && (
           <DetailRow label="Attachment" value={
-            <button 
+            <button
               type="button"
               onClick={() => setIsViewerOpen(true)}
               className="text-indigo-600 hover:underline text-sm font-medium"
             >
-              View Attachment
+              {t("features.transactions.detailModal.viewAttachment")}
             </button>
           } />
         )}
 
         <div className="mt-6 pt-4 border-t border-slate-200">
-          <DetailRow label="Created By" value={transaction.createdBy?.name || '-'} />
-          <DetailRow label="Created At" value={formatDateTime(transaction.createdAt)} />
-          <DetailRow label="Updated At" value={formatDateTime(transaction.updatedAt)} />
+          <DetailRow label={t("features.transactions.detailModal.createdBy")} value={transaction.createdBy?.name || '-'} />
+          <DetailRow label={t("features.transactions.detailModal.createdAt")} value={formatDateTime(transaction.createdAt)} />
+          <DetailRow label={t("features.transactions.detailModal.updatedAt")} value={formatDateTime(transaction.updatedAt)} />
         </div>
       </div>
 

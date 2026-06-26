@@ -1,6 +1,7 @@
 import { TransactionSummary } from "../../../types/transaction";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { ArrowDownRight, ArrowUpRight, Wallet, Activity } from "lucide-react";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface Props {
   summary: TransactionSummary | null | undefined;
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function TransactionSummaryCards({ summary, isLoading }: Props) {
+  const { t } = useTranslation();
   const formatCurrency = (val: string | undefined) => {
     if (!val) return "Rp 0";
     const num = Number(val);
@@ -36,7 +38,7 @@ export function TransactionSummaryCards({ summary, isLoading }: Props) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Net Cashflow</CardTitle>
+          <CardTitle className="text-sm font-medium text-slate-600">{t("features.transactions.summaryCards.netCashflow")}</CardTitle>
           <Wallet className="h-4 w-4 text-slate-500" />
         </CardHeader>
         <CardContent>
@@ -44,46 +46,46 @@ export function TransactionSummaryCards({ summary, isLoading }: Props) {
             {formatCurrency(summary.netCashflow)}
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Total In - Total Out
+            {t("features.transactions.summaryCards.netDesc")}
           </p>
         </CardContent>
       </Card>
       
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Total In</CardTitle>
+          <CardTitle className="text-sm font-medium text-slate-600">{t("features.transactions.summaryCards.totalIn")}</CardTitle>
           <ArrowUpRight className="h-4 w-4 text-emerald-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-emerald-600">{formatCurrency(summary.totalIn)}</div>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.inCount} transactions
+            {summary.inCount} {t("features.transactions.summaryCards.transactions")}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Total Out</CardTitle>
+          <CardTitle className="text-sm font-medium text-slate-600">{t("features.transactions.summaryCards.totalOut")}</CardTitle>
           <ArrowDownRight className="h-4 w-4 text-red-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-600">{formatCurrency(summary.totalOut)}</div>
           <p className="text-xs text-slate-500 mt-1">
-            {summary.outCount} transactions
+            {summary.outCount} {t("features.transactions.summaryCards.transactions")}
           </p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Total Transactions</CardTitle>
+          <CardTitle className="text-sm font-medium text-slate-600">{t("features.transactions.summaryCards.totalTransactions")}</CardTitle>
           <Activity className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-slate-800">{summary.transactionCount}</div>
           <p className="text-xs text-slate-500 mt-1">
-            Posted transactions
+            {t("features.transactions.summaryCards.postedTransactions")}
           </p>
         </CardContent>
       </Card>

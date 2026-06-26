@@ -13,8 +13,10 @@ import { ReceivablesTable } from "../../../../features/external-money/components
 import { ReceivableFormModal } from "../../../../features/external-money/components/receivables/receivable-form-modal";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function ReceivablesPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const isReadonly = user?.role === "STAFF_INPUT";
 
@@ -30,14 +32,14 @@ export default function ReceivablesPage() {
   const handleCreate = async (payload: CreateReceivablePayload) => {
     try {
       await externalMoneyApi.createReceivable(payload);
-      toast.success("Data berhasil ditambahkan");
+      toast.success(t("pages.receivables.addDataSuccess"));
       refetch();
     } catch (err) {
       if (isAxiosError(err)) {
         const msg = err.response?.data?.message;
-        toast.error(Array.isArray(msg) ? msg[0] : msg || "Gagal menambahkan data");
+        toast.error(Array.isArray(msg) ? msg[0] : msg || t("pages.receivables.addDataFailed"));
       } else {
-        toast.error("Gagal menambahkan data");
+        toast.error(t("pages.receivables.addDataFailed"));
       }
       throw err;
     }
@@ -46,8 +48,8 @@ export default function ReceivablesPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <PageHeader
-        title="Piutang & Pinjaman"
-        description="Kelola tagihan pelanggan, uang muka, pinjaman pribadi, dan uang eksternal lainnya"
+        title={t("pages.receivables.title")}
+        description={t("pages.receivables.subtitle")}
       />
 
       <ReceivablesFilterBar />
@@ -60,7 +62,7 @@ export default function ReceivablesPage() {
         headerActions={
           !isReadonly && (
             <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
-              <Plus className="mr-2 h-4 w-4" /> Tambah Data
+              <Plus className="mr-2 h-4 w-4" /> {t("pages.receivables.addData")}
             </Button>
           )
         }

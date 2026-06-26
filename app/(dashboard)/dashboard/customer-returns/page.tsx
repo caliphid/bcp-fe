@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/use-translation";
 import { useCustomerReturns } from "../../../../features/customer-returns/hooks/use-customer-returns";
 import { CustomerReturn, CustomerReturnStatus, CustomerReturnType } from "../../../../features/customer-returns/types";
 import { DataTable } from "../../../../components/ui/data-table";
@@ -14,6 +15,7 @@ import { formatDate } from "../../../../lib/utils";
 import { useDebounce } from "../../../../hooks/use-debounce";
 
 export default function CustomerReturnsPage() {
+  const { t } = useTranslation();
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
@@ -34,7 +36,7 @@ export default function CustomerReturnsPage() {
 
   const columns = [
     {
-      header: "Return Code",
+      header: t("pages.customerReturns.columns.returnCode"),
       cell: (row: CustomerReturn) => (
         <div>
           <Link href={`/dashboard/customer-returns/${row.id}`} className="font-semibold text-primary-600 hover:underline">
@@ -45,7 +47,7 @@ export default function CustomerReturnsPage() {
       ),
     },
     {
-      header: "Sales Order",
+      header: t("pages.customerReturns.columns.salesOrder"),
       cell: (row: CustomerReturn) => (
         row.salesOrder ? (
           <Link href={`/dashboard/sales-orders/${row.salesOrder.id}`} className="font-medium text-slate-700 hover:underline">
@@ -55,23 +57,38 @@ export default function CustomerReturnsPage() {
       ),
     },
     {
-      header: "Customer",
-      cell: (row: CustomerReturn) => (
-        <div>
-          <div className="font-medium text-slate-800">{row.customerName || row.salesOrder?.customer?.name || "-"}</div>
-        </div>
-      ),
+      header: t("pages.customerReturns.columns.customer"),
+      cell: (row: CustomerReturn) => {
+        const hasCustomer = !!row.customer;
+        const name = row.customer?.fullName || row.customerName || row.salesOrder?.customer?.name || "-";
+        
+        return (
+          <div>
+            <div className="font-medium text-slate-800 flex items-center gap-1.5">
+              {name}
+              {hasCustomer && (
+                <span className="text-[9px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded border border-indigo-100 font-bold" title="Linked to Master Customer">
+                  LINKED
+                </span>
+              )}
+            </div>
+            {row.customer?.customerCode && (
+              <div className="text-xs text-slate-500 mt-0.5 font-mono">{row.customer.customerCode}</div>
+            )}
+          </div>
+        );
+      },
     },
     {
-      header: "Type",
+      header: t("pages.customerReturns.columns.type"),
       cell: (row: CustomerReturn) => <ReturnTypeBadge type={row.returnType} />,
     },
     {
-      header: "Status",
+      header: t("pages.customerReturns.columns.status"),
       cell: (row: CustomerReturn) => <ReturnStatusBadge status={row.status} />,
     },
     {
-      header: "Warehouse",
+      header: t("pages.customerReturns.columns.warehouse"),
       cell: (row: CustomerReturn) => <span className="text-sm text-slate-600">{row.warehouse?.name || "-"}</span>,
     }
   ];
@@ -80,11 +97,11 @@ export default function CustomerReturnsPage() {
     <div className="space-y-6 pb-12 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <PageHeader 
-          title="Customer Returns" 
-          description="Manage customer returns, exchanges, and refunds"
+          title={t("pages.customerReturns.title")}
+          description={t("pages.customerReturns.subtitle")}
         />
         <Button onClick={() => router.push("/dashboard/customer-returns/create")} className="shadow-sm">
-          <Plus className="w-4 h-4 mr-2" /> New Return
+          <Plus className="w-4 h-4 mr-2" /> {t("pages.customerReturns.newReturn")}
         </Button>
       </div>
 
@@ -92,7 +109,7 @@ export default function CustomerReturnsPage() {
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
           <Input 
-            placeholder="Search return code..." 
+            placeholder={t("pages.customerReturns.searchPlaceholder")}
             className="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -104,7 +121,7 @@ export default function CustomerReturnsPage() {
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
-            <option value="">All Statuses</option>
+            <option value="">{t("pages.customerReturns.allStatuses")}</option>
             {Object.values(CustomerReturnStatus).map(s => (
               <option key={s} value={s}>{s.replace(/_/g, " ")}</option>
             ))}
@@ -115,7 +132,7 @@ export default function CustomerReturnsPage() {
             value={returnType}
             onChange={(e) => setReturnType(e.target.value)}
           >
-            <option value="">All Types</option>
+            <option value="">{t("pages.customerReturns.allTypes")}</option>
             {Object.values(CustomerReturnType).map(t => (
               <option key={t} value={t}>{t.replace(/_/g, " ")}</option>
             ))}

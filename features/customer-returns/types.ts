@@ -2,6 +2,7 @@ import { Warehouse } from "../warehouses/types";
 import { User } from "../auth/types";
 import { ProductVariant } from "../products/types";
 import { SalesOrder } from "../sales-orders/types";
+import { Customer } from "../customers/types";
 
 // ENUMS
 export enum CustomerReturnType {
@@ -58,6 +59,7 @@ export interface CustomerReturn {
   returnCode: string;
   salesOrder?: SalesOrder;
   warehouse?: Warehouse;
+  customer?: Customer;
   returnDate: string;
   returnType: CustomerReturnType;
   status: CustomerReturnStatus;
@@ -113,6 +115,7 @@ export interface CustomerRefund {
 // REQUEST DTOs
 export interface CreateCustomerReturnRequest {
   salesOrderId: string;
+  customerId?: string;
   returnDate: string;
   returnType: CustomerReturnType;
   warehouseId?: string;
@@ -131,6 +134,7 @@ export interface CreateCustomerReturnRequest {
 }
 
 export interface UpdateCustomerReturnRequest {
+  customerId?: string;
   returnDate?: string;
   reason?: string;
   customerName?: string;

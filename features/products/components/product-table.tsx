@@ -5,6 +5,7 @@ import { StatusBadge } from "../../../components/ui/status-badge";
 import { Pencil } from "lucide-react";
 import { useProductStore } from "../store/product-store";
 import Link from "next/link";
+import { useTranslation } from "../../../hooks/use-translation";
 
 interface ProductTableProps {
   data: Product[];
@@ -23,6 +24,7 @@ export function ProductTable({
   onEdit,
   onToggleStatus,
 }: ProductTableProps) {
+  const { t } = useTranslation();
   const { setFilter } = useProductStore();
 
   const formatCurrency = (val: string) => {
@@ -31,8 +33,8 @@ export function ProductTable({
   };
 
   const columns = [
-    { 
-      header: "Name", 
+    {
+      header: t("features.products.table.colName"),
       accessorKey: "name" as keyof Product,
       cell: (item: Product) => (
         <Link href={`/dashboard/products/${item.id}`} className="font-semibold text-indigo-600 hover:underline">
@@ -40,25 +42,25 @@ export function ProductTable({
         </Link>
       )
     },
-    { header: "SKU", cell: (item: Product) => item.sku || "-" },
-    { 
-      header: "Business Unit", 
-      cell: (item: Product) => item.businessUnit?.name || "-" 
+    { header: t("features.products.table.colSku"), cell: (item: Product) => item.sku || "-" },
+    {
+      header: t("features.products.table.colBusinessUnit"),
+      cell: (item: Product) => item.businessUnit?.name || "-"
     },
-    { 
-      header: "Type", 
+    {
+      header: t("features.products.table.colType"),
       cell: (item: Product) => (
         <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-800">
           {item.type.replace('_', ' ')}
         </span>
       )
     },
-    { 
-      header: "Price", 
+    {
+      header: t("features.products.table.colPrice"),
       cell: (item: Product) => formatCurrency(item.defaultPrice)
     },
     {
-      header: "Status",
+      header: t("features.products.table.colStatus"),
       cell: (item: Product) => (
         <StatusBadge
           status={item.status}
@@ -68,7 +70,7 @@ export function ProductTable({
       ),
     },
     {
-      header: "Actions",
+      header: t("features.products.table.colActions"),
       className: "text-right",
       cell: (item: Product) => (
         <div className="flex justify-end gap-2">

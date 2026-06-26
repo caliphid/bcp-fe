@@ -2,6 +2,7 @@
 import { toast } from "react-hot-toast";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { Plus } from "lucide-react";
 import { Button } from "../../../../components/ui/button";
 import { PageHeader } from "../../../../components/ui/page-header";
@@ -15,6 +16,7 @@ import { adPlatformsApi } from "../../../../features/ad-platforms/api";
 import { AdPlatformItem } from "../../../../types/ads";
 
 export default function AdPlatformsPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { params } = useAdPlatformStore();
   const { data, meta, isLoading, mutate } = useAdPlatforms(params);
@@ -46,7 +48,7 @@ export default function AdPlatformsPage() {
       mutate();
     } catch (error) {
       console.error("Failed to toggle status:", error);
-      toast.error("Gagal mengubah status. Pastikan tidak ada campaign aktif yang menggunakan platform ini.");
+      toast.error(t("pages.adPlatforms.failedStatus"));
     }
   };
 
@@ -62,13 +64,13 @@ export default function AdPlatformsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ad Platforms"
-        description="Kelola platform periklanan (Meta, TikTok, Google, dll)"
+        title={t("pages.adPlatforms.title")}
+        description={t("pages.adPlatforms.subtitle")}
       >
         {canMutate && (
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            Tambah Platform
+            {t("pages.adPlatforms.addPlatform")}
           </Button>
         )}
       </PageHeader>

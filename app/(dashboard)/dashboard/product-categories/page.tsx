@@ -13,8 +13,10 @@ import { Alert, AlertDescription } from "../../../../components/ui/alert";
 import { useProductCategories } from "../../../../features/product-categories/hooks/use-product-categories";
 import { ProductCategoryFilterBar } from "../../../../features/product-categories/components/product-category-filter-bar";
 import { ProductCategoryTable } from "../../../../features/product-categories/components/product-category-table";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function ProductCategoriesPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -32,8 +34,8 @@ export default function ProductCategoriesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Product Categories</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage categories for your products.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.productCategories.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.productCategories.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -43,7 +45,7 @@ export default function ProductCategoriesPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Create Category
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.productCategories.createCategory")}
           </Button>
         )}
       </div>
@@ -69,7 +71,7 @@ export default function ProductCategoriesPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Product Category" : "Create Product Category"}
+        title={editingItem ? t("pages.productCategories.editCategory") : t("pages.productCategories.createModal")}
         className="max-w-xl"
       >
         <ProductCategoryForm

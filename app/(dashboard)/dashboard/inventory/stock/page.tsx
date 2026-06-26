@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "../../../../../store/auth-store";
 import { Button } from "../../../../../components/ui/button";
 import { PlusCircle, Search, AlertTriangle, SlidersHorizontal } from "lucide-react";
@@ -17,6 +18,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { InventoryStock } from "../../../../../types/inventory";
 
 export default function StockPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
@@ -66,12 +68,12 @@ export default function StockPage() {
   };
 
   const columns = [
-    { 
-      header: "Warehouse", 
-      cell: (item: InventoryStock) => item.warehouse?.name || "-" 
+    {
+      header: t("common.labels.warehouse"),
+      cell: (item: InventoryStock) => item.warehouse?.name || "-"
     },
-    { 
-      header: "Product", 
+    {
+      header: t("common.labels.product"),
       cell: (item: InventoryStock) => (
         <div>
           <div className="font-semibold text-slate-900">{item.product?.name}</div>
@@ -79,22 +81,22 @@ export default function StockPage() {
         </div>
       )
     },
-    { 
-      header: "Variant", 
+    {
+      header: t("common.labels.variant"),
       cell: (item: InventoryStock) => `${item.color} - ${item.size}`
     },
-    { 
-      header: "On Hand", 
+    {
+      header: t("common.labels.onHand"),
       className: "text-right font-medium text-slate-900",
       accessorKey: "onHand" as keyof InventoryStock
     },
-    { 
-      header: "Reserved", 
+    {
+      header: t("common.labels.reserved"),
       className: "text-right font-medium text-amber-600",
       accessorKey: "reserved" as keyof InventoryStock
     },
-    { 
-      header: "Available", 
+    {
+      header: t("common.labels.available"),
       className: "text-right font-bold text-emerald-600",
       cell: (item: InventoryStock) => (
         <div className="flex items-center justify-end gap-2">
@@ -106,7 +108,7 @@ export default function StockPage() {
       )
     },
     {
-      header: "Actions",
+      header: t("common.labels.actions"),
       className: "text-right",
       cell: (item: InventoryStock) => (
         canMutate ? (
@@ -115,7 +117,7 @@ export default function StockPage() {
               variant="ghost"
               size="sm"
               onClick={() => handleAdjustRow(item)}
-              title="Adjust Stock"
+              title={t("pages.inventoryStock.adjustStock")}
               className="text-slate-500 hover:text-primary-600"
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -130,8 +132,8 @@ export default function StockPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Inventory Stock</h2>
-          <p className="mt-1 text-sm text-slate-500">Monitor and manage your product stock levels.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.inventoryStock.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.inventoryStock.subtitle")}</p>
         </div>
         {canMutate && (
           <div className="flex gap-2 w-full sm:w-auto">
@@ -140,13 +142,13 @@ export default function StockPage() {
               className="shadow-sm"
               onClick={() => setIsAdjustmentOpen(true)}
             >
-              <PlusCircle className="mr-2 h-4 w-4" /> Stock Adjustment
+              <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.inventoryStock.stockAdjustment")}
             </Button>
             <Button
               className="shadow-primary-500/30 shadow-md"
               onClick={() => setIsOpeningStockOpen(true)}
             >
-              <PlusCircle className="mr-2 h-4 w-4" /> Opening Stock
+              <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.inventoryStock.openingStock")}
             </Button>
           </div>
         )}
@@ -162,7 +164,7 @@ export default function StockPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <form onSubmit={handleSearch} className="flex gap-2 col-span-2 sm:col-span-1 lg:col-span-2">
           <Input
-            placeholder="Search SKU or product..."
+            placeholder={t("pages.inventoryStock.searchPlaceholder")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -178,7 +180,7 @@ export default function StockPage() {
             setPage(1);
           }}
         >
-          <option value="">All Warehouses</option>
+          <option value="">{t("common.labels.allWarehouses")}</option>
           {warehouses.map((w: any) => (
             <option key={w.id} value={w.id}>{w.name}</option>
           ))}

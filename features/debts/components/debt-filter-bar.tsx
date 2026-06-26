@@ -7,8 +7,10 @@ import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { FilterX } from "lucide-react";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { useTranslation } from "../../../hooks/use-translation";
 
 export function DebtFilterBar() {
+  const { t } = useTranslation();
   const { filters, setFilter, resetFilters } = useDebtStore();
   const user = useAuthStore((s) => s.user);
   
@@ -49,9 +51,9 @@ export function DebtFilterBar() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 flex-1 w-full">
             
             <div className="space-y-1.5 lg:col-span-2">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Cari</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.searchLabel")}</Label>
               <Input
-                placeholder="Cari hutang..."
+                placeholder={t("features.debts.filterBar.searchPh")}
                 className="h-9"
                 value={filters.search}
                 onChange={(e) => setFilter("search", e.target.value)}
@@ -59,50 +61,50 @@ export function DebtFilterBar() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Status</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.statusLabel")}</Label>
               <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.status || ""}
                 onChange={(e) => setFilter("status", e.target.value as any)}
               >
-                <option value="">Semua Status</option>
-                <option value="ACTIVE">Aktif</option>
-                <option value="PAID_OFF">Lunas</option>
+                <option value="">{t("features.debts.filterBar.allStatus")}</option>
+                <option value="ACTIVE">{t("features.debts.filterBar.statusActive")}</option>
+                <option value="PAID_OFF">{t("features.debts.filterBar.statusPaidOff")}</option>
                 {user?.role !== "STAFF_INPUT" && (
                   <>
-                    <option value="INACTIVE">Nonaktif</option>
-                    <option value="DEFAULTED">Macet (Defaulted)</option>
+                    <option value="INACTIVE">{t("features.debts.filterBar.statusInactive")}</option>
+                    <option value="DEFAULTED">{t("features.debts.filterBar.statusDefaulted")}</option>
                   </>
                 )}
               </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Tipe</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.typeLabel")}</Label>
               <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.type || ""}
                 onChange={(e) => setFilter("type", e.target.value as any)}
               >
-                <option value="">Semua Tipe</option>
-                <option value="BANK_LOAN">Pinjaman Bank</option>
-                <option value="PERSONAL_LOAN">Pinjaman Pribadi</option>
-                <option value="BUSINESS_CAPITAL">Modal Usaha</option>
-                <option value="ASSET_PURCHASE">Pembelian Aset</option>
-                <option value="CREDIT_CARD">Kartu Kredit</option>
-                <option value="PAYABLE">Hutang Usaha</option>
-                <option value="OTHER">Lainnya</option>
+                <option value="">{t("features.debts.filterBar.allTypes")}</option>
+                <option value="BANK_LOAN">{t("features.debts.filterBar.typeBankLoan")}</option>
+                <option value="PERSONAL_LOAN">{t("features.debts.filterBar.typePersonalLoan")}</option>
+                <option value="BUSINESS_CAPITAL">{t("features.debts.filterBar.typeBusinessCapital")}</option>
+                <option value="ASSET_PURCHASE">{t("features.debts.filterBar.typeAssetPurchase")}</option>
+                <option value="CREDIT_CARD">{t("features.debts.filterBar.typeCreditCard")}</option>
+                <option value="PAYABLE">{t("features.debts.filterBar.typePayable")}</option>
+                <option value="OTHER">{t("features.debts.filterBar.typeOther")}</option>
               </SearchableSelect>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Unit Bisnis</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.businessUnitLabel")}</Label>
               <SearchableSelect
                 className="w-full h-9 rounded-md border border-slate-200 bg-white px-3 py-1 text-sm outline-none focus:ring-2 focus:ring-indigo-500"
                 value={filters.businessUnitId}
                 onChange={(e) => setFilter("businessUnitId", e.target.value)}
               >
-                <option value="">Semua Unit</option>
+                <option value="">{t("features.debts.filterBar.allBusinessUnits")}</option>
                 {businessUnits?.map(b => (
                   <option key={b.id} value={b.id}>{b.name}</option>
                 ))}
@@ -110,9 +112,9 @@ export function DebtFilterBar() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Nama Pemberi Pinjaman</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.lenderNameLabel")}</Label>
               <Input
-                placeholder="Pemberi pinjaman..."
+                placeholder={t("features.debts.filterBar.lenderNamePh")}
                 className="h-9"
                 value={filters.lenderName}
                 onChange={(e) => setFilter("lenderName", e.target.value)}
@@ -120,7 +122,7 @@ export function DebtFilterBar() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Dari Tanggal</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.dateFromLabel")}</Label>
               <div className="relative">
                 <Input
                   type="date"
@@ -132,7 +134,7 @@ export function DebtFilterBar() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500 mb-1.5 block">Sampai Tanggal</Label>
+              <Label className="text-xs text-slate-500 mb-1.5 block">{t("features.debts.filterBar.dateToLabel")}</Label>
               <div className="relative">
                 <Input
                   type="date"
@@ -149,7 +151,7 @@ export function DebtFilterBar() {
             variant="ghost" 
             onClick={handleReset}
             className="h-9 px-3 text-slate-500 hover:text-red-600 hover:bg-red-50 shrink-0"
-            title="Reset Filters"
+            title={t("features.debts.filterBar.resetFilter")}
           >
             <FilterX className="h-4 w-4 mr-2" />
             Reset

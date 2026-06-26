@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslation } from "@/hooks/use-translation";
 import { useGoodsReceipts } from "../../../../../features/purchasing/hooks/use-purchasing";
 import { GoodsReceipt, GoodsReceiptStatus } from "../../../../../features/purchasing/types";
 import { useAuthStore } from "../../../../../store/auth-store";
@@ -13,6 +14,7 @@ import { formatCurrency } from "../../../../../features/debts/utils/formatters";
 import { formatDate } from "../../../../../lib/utils";
 
 export default function GoodsReceiptsPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const isStaff = user?.role === "STAFF_INPUT";
 
@@ -29,7 +31,7 @@ export default function GoodsReceiptsPage() {
 
   const columns = [
     {
-      header: "GR Number & Date",
+      header: t("pages.goodsReceipts.columns.grNumberDate"),
       cell: (item: GoodsReceipt) => (
         <div>
           <Link href={`/dashboard/purchasing/goods-receipts/${item.id}`} className="font-semibold text-primary-600 hover:underline">
@@ -40,30 +42,30 @@ export default function GoodsReceiptsPage() {
       ),
     },
     {
-      header: "Purchase Order",
+      header: t("pages.goodsReceipts.columns.purchaseOrder"),
       cell: (item: GoodsReceipt) => (
         <div>
           <Link href={`/dashboard/purchasing/purchase-orders/${item.purchaseOrderId}`} className="font-medium text-slate-700 hover:underline hover:text-primary-600">
             {item.purchaseOrder?.purchaseOrderCode || "-"}
           </Link>
-          {item.vendorDeliveryNumber && <div className="text-xs text-slate-500 mt-1">Delivery #: {item.vendorDeliveryNumber}</div>}
+          {item.vendorDeliveryNumber && <div className="text-xs text-slate-500 mt-1">{t("pages.goodsReceipts.deliveryLabel")} {item.vendorDeliveryNumber}</div>}
         </div>
       ),
     },
     {
-      header: "Vendor",
+      header: t("pages.goodsReceipts.columns.vendor"),
       cell: (item: GoodsReceipt) => (
         <span className="font-medium text-slate-700">{item.vendor?.name || "-"}</span>
       ),
     },
     {
-      header: "Total Qty",
+      header: t("pages.goodsReceipts.columns.totalQty"),
       cell: (item: GoodsReceipt) => (
         <span className="font-medium text-slate-900">{item.totalQuantity} items</span>
       ),
     },
     {
-      header: "Status",
+      header: t("pages.goodsReceipts.columns.status"),
       cell: (item: GoodsReceipt) => {
         let bg = "bg-slate-100 text-slate-800";
         switch (item.status) {
@@ -82,7 +84,7 @@ export default function GoodsReceiptsPage() {
 
   if (!isStaff) {
     columns.push({
-      header: "Total Value",
+      header: t("pages.goodsReceipts.columns.totalValue"),
       cell: (item: GoodsReceipt) => (
         <span className="font-medium text-slate-900">{formatCurrency(Number(item.totalCost || 0))}</span>
       ),
@@ -90,7 +92,7 @@ export default function GoodsReceiptsPage() {
   }
 
   columns.push({
-    header: "Actions",
+    header: t("pages.goodsReceipts.columns.actions"),
     cell: (item: GoodsReceipt) => (
       <Link href={`/dashboard/purchasing/goods-receipts/${item.id}`}>
         <Button variant="outline" size="sm">
@@ -104,14 +106,14 @@ export default function GoodsReceiptsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Goods Receipts</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage incoming items from vendors.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.goodsReceipts.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.goodsReceipts.subtitle")}</p>
         </div>
         {/* We do not show "Create GR" here directly because it must be created FROM a PO */}
         {/* But we can have a link to POs page to instruct them */}
         <Link href="/dashboard/purchasing/purchase-orders">
           <Button variant="outline" className="w-full sm:w-auto shadow-sm">
-            <PlusCircle className="mr-2 h-4 w-4" /> Create from PO
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.goodsReceipts.createFromPO")}
           </Button>
         </Link>
       </div>
@@ -128,7 +130,7 @@ export default function GoodsReceiptsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Search GR number..."
+            placeholder={t("pages.goodsReceipts.searchPlaceholder")}
             className="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             value={search}
             onChange={(e) => {
@@ -146,7 +148,7 @@ export default function GoodsReceiptsPage() {
               setPage(1);
             }}
           >
-            <option value="">All Statuses</option>
+            <option value="">{t("pages.goodsReceipts.allStatuses")}</option>
             {Object.values(GoodsReceiptStatus).map(s => (
               <option key={s} value={s}>{s}</option>
             ))}
@@ -158,7 +160,7 @@ export default function GoodsReceiptsPage() {
         columns={columns}
         data={data || []}
         isLoading={isLoading}
-        emptyMessage="No goods receipts found"
+        emptyMessage={t("pages.goodsReceipts.noGRsFound")}
       />
 
       {/* Pagination */}
@@ -170,24 +172,24 @@ export default function GoodsReceiptsPage() {
               disabled={page === 1}
               variant="outline"
             >
-              Previous
+              {t("common.actions.previous")}
             </Button>
             <Button
               onClick={() => setPage(page + 1)}
               disabled={page * meta.limit >= meta.total}
               variant="outline"
             >
-              Next
+              {t("common.actions.next")}
             </Button>
           </div>
           <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
             <div>
               <p className="text-sm text-slate-700">
-                Showing <span className="font-medium">{(page - 1) * meta.limit + 1}</span> to{" "}
+                {t("common.labels.showing")} <span className="font-medium">{(page - 1) * meta.limit + 1}</span> {t("common.labels.to")}{" "}
                 <span className="font-medium">
                   {Math.min(page * meta.limit, meta.total)}
                 </span>{" "}
-                of <span className="font-medium">{meta.total}</span> results
+                {t("common.labels.of")} <span className="font-medium">{meta.total}</span> {t("common.labels.results")}
               </p>
             </div>
             <div>
@@ -198,7 +200,7 @@ export default function GoodsReceiptsPage() {
                   onClick={() => setPage(page - 1)}
                   disabled={page === 1}
                 >
-                  Previous
+                  {t("common.actions.previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -206,7 +208,7 @@ export default function GoodsReceiptsPage() {
                   onClick={() => setPage(page + 1)}
                   disabled={page * meta.limit >= meta.total}
                 >
-                  Next
+                  {t("common.actions.next")}
                 </Button>
               </nav>
             </div>

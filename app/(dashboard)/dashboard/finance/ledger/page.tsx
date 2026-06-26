@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/hooks/use-translation";
 import { useAuthStore } from "@/store/auth-store";
 import { PageHeader } from "@/components/ui/page-header";
 import { FinanceFilterBar } from "@/features/finance/components/finance-filter-bar";
@@ -8,6 +9,7 @@ import { useFinanceStore } from "@/features/finance/store/finance-store";
 import { useAccountLedger } from "@/features/finance/hooks/use-finance-analytics";
 
 export default function AccountLedgerPage() {
+  const { t } = useTranslation();
   const { user } = useAuthStore();
   const { filters, setFilter } = useFinanceStore();
 
@@ -25,7 +27,7 @@ export default function AccountLedgerPage() {
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm">
         <p className="text-slate-500">
-          Anda tidak memiliki akses ke halaman ini.
+          {t("pages.accountLedger.noAccess")}
         </p>
       </div>
     );
@@ -34,8 +36,8 @@ export default function AccountLedgerPage() {
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <PageHeader
-        title="Account Ledger"
-        description="Buku besar / riwayat transaksi spesifik untuk satu rekening bank"
+        title={t("pages.accountLedger.title")}
+        description={t("pages.accountLedger.subtitle")}
       />
 
       {/* Note: In a real app we might want a specific ledger filter bar that focuses on accountId and dates instead of months, but we can reuse the FinanceFilterBar if it covers it. However, the user needs to select an account to see anything. */}
@@ -43,7 +45,7 @@ export default function AccountLedgerPage() {
 
       {!filters.accountId ? (
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center">
-          <div className="text-slate-500 font-medium">Pilih salah satu rekening pada filter di atas untuk melihat buku besar.</div>
+          <div className="text-slate-500 font-medium">{t("pages.accountLedger.selectAccount")}</div>
         </div>
       ) : (
         <AccountLedgerTable 

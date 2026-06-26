@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "@/hooks/use-translation";
 import { crewApi } from "../../../../features/crew/api";
 import { Crew } from "../../../../types/crew";
 import { PaginationMeta } from "../../../../types/common";
@@ -18,6 +19,7 @@ import { Alert, AlertDescription } from "../../../../components/ui/alert";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 
 export default function CrewPage() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const [data, setData] = useState<Crew[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | undefined>();
@@ -59,7 +61,7 @@ export default function CrewPage() {
       setMeta(res.meta);
       setGlobalError(null);
     } catch (err) {
-      setGlobalError("Failed to fetch crew members");
+      setGlobalError(t("pages.crew.fetchFailed"));
     } finally {
       setLoading(false);
     }
@@ -79,10 +81,10 @@ export default function CrewPage() {
     const isActivating = item.status === "INACTIVE";
     setConfirmDialog({
       isOpen: true,
-      title: isActivating ? "Activate Crew" : "Deactivate Crew",
+      title: isActivating ? t("pages.crew.activateCrew") : t("pages.crew.deactivateCrew"),
       message: isActivating
-        ? `Are you sure you want to activate ${item.name}?`
-        : `Are you sure you want to deactivate ${item.name}?`,
+        ? t("pages.crew.confirmActivate").replace("{name}", item.name)
+        : t("pages.crew.confirmDeactivate").replace("{name}", item.name),
       action: async () => {
         try {
           if (isActivating) {
@@ -103,15 +105,15 @@ export default function CrewPage() {
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
   const columns = [
-    { header: "Name", accessorKey: "name" as keyof Crew },
-    { header: "Position", cell: (item: Crew) => item.position || "-" },
-    { header: "Phone", cell: (item: Crew) => item.phone || "-" },
-    { 
-      header: "Joined At", 
+    { header: t("common.labels.name"), accessorKey: "name" as keyof Crew },
+    { header: t("common.labels.position"), cell: (item: Crew) => item.position || "-" },
+    { header: t("common.labels.phone"), cell: (item: Crew) => item.phone || "-" },
+    {
+      header: t("common.labels.joinedAt"),
       cell: (item: Crew) => item.joinedAt ? new Date(item.joinedAt).toLocaleDateString() : "-"
     },
     {
-      header: "Status",
+      header: t("common.labels.status"),
       cell: (item: Crew) => (
         <StatusBadge
           status={item.status}
@@ -121,7 +123,7 @@ export default function CrewPage() {
       ),
     },
     {
-      header: "Actions",
+      header: t("common.labels.actions"),
       className: "text-right",
       cell: (item: Crew) => (
         <div className="flex justify-end gap-2">
@@ -145,8 +147,8 @@ export default function CrewPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">Crew / Staff</h2>
-          <p className="mt-1 text-sm text-slate-500">Manage your production and operation crew.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900">{t("pages.crew.title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("pages.crew.subtitle")}</p>
         </div>
         {canMutate && (
           <Button
@@ -156,7 +158,7 @@ export default function CrewPage() {
               setIsFormOpen(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Crew
+            <PlusCircle className="mr-2 h-4 w-4" /> {t("pages.crew.addCrew")}
           </Button>
         )}
       </div>
@@ -171,7 +173,7 @@ export default function CrewPage() {
       <div className="flex flex-col sm:flex-row gap-4 mb-4">
         <form onSubmit={handleSearch} className="flex-1 max-w-sm flex gap-2">
           <Input
-            placeholder="Search name, position..."
+            placeholder={t("pages.crew.searchPlaceholder")}
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -187,9 +189,9 @@ export default function CrewPage() {
             setPage(1);
           }}
         >
-          <option value="">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
+          <option value="">{t("common.labels.allStatus")}</option>
+          <option value="ACTIVE">{t("common.status.active")}</option>
+          <option value="INACTIVE">{t("common.status.inactive")}</option>
         </SearchableSelect>
       </div>
 
@@ -205,7 +207,7 @@ export default function CrewPage() {
       <Modal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        title={editingItem ? "Edit Crew Member" : "Add Crew Member"}
+        title={editingItem ? t("pages.crew.editCrew") : t("pages.crew.createCrew")}
         className="max-w-2xl"
       >
         <CrewForm

@@ -21,8 +21,8 @@ interface DashboardStore {
 const defaultFilters: DashboardFilters = {
   dateFrom: "",
   dateTo: "",
-  month: "",
-  year: "",
+  month: String(new Date().getMonth() + 1),
+  year: String(new Date().getFullYear()),
   businessUnitId: "",
   accountId: "",
   categoryId: "",
