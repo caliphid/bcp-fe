@@ -342,6 +342,7 @@ export function ProductForm({
   };
 
   return (
+    <>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {error && (
         <Alert variant="destructive">
