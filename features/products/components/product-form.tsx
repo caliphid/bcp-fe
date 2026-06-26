@@ -354,10 +354,10 @@ export function ProductForm({
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-lg font-bold text-slate-800">
-            {t("features.products.form.sectionProductDetail")}
+            {t("features.products.form.section1")}
           </h2>
           <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
-            <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Produk & Varian
+            <HelpCircle className="w-4 h-4 mr-1.5" /> {t("features.products.form.tutorial")}
           </Button>
         </div>
 
@@ -366,7 +366,7 @@ export function ProductForm({
             <Label>
               {t("features.products.form.productName")} <span className="text-rose-500">*</span>
             </Label>
-            <Input placeholder={t("features.products.form.productNamePlaceholder")} {...register("name")} />
+            <Input placeholder={t("features.products.form.productNamePh")} {...register("name")} />
             {errors.name && (
               <p className="text-sm text-red-500">{errors.name.message}</p>
             )}
@@ -375,16 +375,16 @@ export function ProductForm({
           <div className="space-y-2">
             <Label>{t("features.products.form.articleName")}</Label>
             <Input
-              placeholder={t("features.products.form.articleNamePlaceholder")}
+              placeholder={t("features.products.form.articleNamePh")}
               {...register("articleName")}
             />
           </div>
 
           <div className="space-y-2">
             <Label>{t("features.products.form.productCode")}</Label>
-            <Input placeholder={t("features.products.form.productCodePlaceholder")} {...register("productCode")} />
+            <Input placeholder={t("features.products.form.productCodePh")} {...register("productCode")} />
             <p className="text-xs text-slate-500">
-              {t("features.products.form.productCodeHint")}
+              {t("features.products.form.productCodeNote")}
             </p>
           </div>
 
@@ -396,10 +396,10 @@ export function ProductForm({
               className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary-500"
               {...register("type")}
             >
-              <option value="PHYSICAL_PRODUCT">{t("features.products.form.typePhysical")}</option>
-              <option value="SERVICE">{t("features.products.form.typeService")}</option>
-              <option value="RAW_MATERIAL">{t("features.products.form.typeRawMaterial")}</option>
-              <option value="OTHER">{t("features.products.form.typeOther")}</option>
+              <option value="PHYSICAL_PRODUCT">{t("features.products.form.physicalProduct")}</option>
+              <option value="SERVICE">{t("features.products.form.service")}</option>
+              <option value="RAW_MATERIAL">{t("features.products.form.rawMaterial")}</option>
+              <option value="OTHER">{t("features.products.form.other")}</option>
             </select>
             {errors.type && (
               <p className="text-sm text-red-500">{errors.type.message}</p>
@@ -454,7 +454,7 @@ export function ProductForm({
             <Label>{t("features.products.form.description")}</Label>
             <Textarea
               rows={3}
-              placeholder={t("features.products.form.descriptionPlaceholder")}
+              placeholder={t("features.products.form.descriptionPh")}
               {...register("description")}
             />
           </div>
@@ -466,10 +466,10 @@ export function ProductForm({
         <div className="flex items-start justify-between mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-800">
-              {t("features.products.form.sectionPricingVariants")}
+              {t("features.products.form.section2")}
             </h2>
             <p className="text-sm text-slate-500 mt-1">
-              {t("features.products.form.sectionPricingVariantsHint")}
+              {t("features.products.form.section2Desc")}
             </p>
           </div>
           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-lg">
@@ -506,7 +506,7 @@ export function ProductForm({
               />
             </div>
             <div className="space-y-2">
-              <Label>{t("features.products.form.defaultSellingPrice")}</Label>
+              <Label>{t("features.products.form.defaultPrice")}</Label>
               <Input
                 placeholder="Rp 0"
                 {...register("defaultPrice")}
@@ -524,15 +524,15 @@ export function ProductForm({
             {/* VARIANT GENERATOR */}
             <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
               <h3 className="text-sm font-semibold text-indigo-900 mb-3">
-                {t("features.products.form.autoGenerateVariants")}
+                {t("features.products.form.autoGenerate")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label className="text-xs text-indigo-700">
-                    {t("features.products.form.colorsLabel")}
+                    {t("features.products.form.colors")}
                   </Label>
                   <Input
-                    placeholder={t("features.products.form.colorsPlaceholder")}
+                    placeholder={t("features.products.form.colorsPh")}
                     value={colorsInput}
                     onChange={(e) => setColorsInput(e.target.value)}
                     className="bg-white border-indigo-200 focus-visible:ring-indigo-500 text-sm"
@@ -540,10 +540,10 @@ export function ProductForm({
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs text-indigo-700">
-                    {t("features.products.form.sizesLabel")}
+                    {t("features.products.form.sizes")}
                   </Label>
                   <Input
-                    placeholder={t("features.products.form.sizesPlaceholder")}
+                    placeholder={t("features.products.form.sizesPh")}
                     value={sizesInput}
                     onChange={(e) => setSizesInput(e.target.value)}
                     className="bg-white border-indigo-200 focus-visible:ring-indigo-500 text-sm"
@@ -566,10 +566,10 @@ export function ProductForm({
               <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-semibold text-slate-800">
-                    {t("features.products.form.bulkApplyTitle")}
+                    {t("features.products.form.bulkApply")}
                   </h3>
                   <span className="text-xs text-slate-500">
-                    {t("features.products.form.bulkApplyHint")}
+                    {t("features.products.form.bulkApplyDesc")}
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">

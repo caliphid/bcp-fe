@@ -924,7 +924,9 @@
         "fillBulkField": "Isi minimal satu kolom untuk diterapkan.",
         "appliedToAll": "Berhasil diterapkan ke semua varian!",
         "saveSuccess": "Produk berhasil {action}!",
-        "saveFailed": "Gagal {action} produk. Periksa log."
+        "saveFailed": "Gagal {action} produk. Periksa log.",
+        "applyToAll": "Terapkan ke Semua",
+        "tutorial": "Panduan Produk & Varian"
       }
     },
     "warehouses": {

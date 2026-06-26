@@ -470,12 +470,6 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
         </div>
       )}
 
-      <div className="bg-slate-900 rounded-2xl shadow-sm border border-slate-800 p-6 overflow-hidden">
-        <h3 className="font-semibold text-white border-b border-slate-700 pb-3 mb-4">Raw Data</h3>
-        <pre className="text-xs text-slate-300 overflow-x-auto">
-          {JSON.stringify(order, null, 2)}
-        </pre>
-      </div>
 
       <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Panduan Lengkap Sales Order" className="max-w-5xl">
         <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">

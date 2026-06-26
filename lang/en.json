@@ -924,7 +924,9 @@
         "fillBulkField": "Please fill at least one bulk field to apply.",
         "appliedToAll": "Applied to all variants!",
         "saveSuccess": "Product successfully {action}!",
-        "saveFailed": "Failed to {action} product completely. Check logs."
+        "saveFailed": "Failed to {action} product completely. Check logs.",
+        "applyToAll": "Apply to All",
+        "tutorial": "Product & Variant Guide"
       }
     },
     "warehouses": {
