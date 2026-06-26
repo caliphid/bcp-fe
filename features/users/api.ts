@@ -2,8 +2,8 @@ import api from '../../lib/axios';
 import { UserResponse, UsersResponse } from '../../types/user';
 
 export const usersApi = {
-  getUsers: async () => {
-    const res = await api.get<UsersResponse>('/users');
+  getUsers: async (params?: Record<string, any>) => {
+    const res = await api.get<UsersResponse>('/users', { params });
     return res.data;
   },
   createUser: async (data: any) => {

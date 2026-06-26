@@ -37,6 +37,7 @@ import {
   Box,
   BadgeDollarSign,
   FileText,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 
@@ -176,6 +177,12 @@ export function Sidebar() {
           titleKey: "sidebar.items.returnReports",
           href: "/dashboard/return-reports",
           icon: <FileText className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
+          titleKey: "sidebar.items.stockOpnames",
+          href: "/dashboard/stock-opnames",
+          icon: <ListChecks className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
       ],
