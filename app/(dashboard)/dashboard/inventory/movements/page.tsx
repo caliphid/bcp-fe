@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslation } from "@/hooks/use-translation";
-import { Search } from "lucide-react";
+import { Search, HelpCircle } from "lucide-react";
 import { Input } from "../../../../../components/ui/input";
 import { Button } from "../../../../../components/ui/button";
 import { extractErrorMessage } from "../../../../../lib/error";
@@ -20,6 +20,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { usersApi } from "@/features/users/api";
 import { Warehouse } from "@/types/warehouse";
+import { Modal } from "@/components/ui/modal";
 
 const getMovementColor = (type: InventoryMovementType | string) => {
   switch (type) {
@@ -63,6 +64,7 @@ export default function MovementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [warehouseFilter, setWarehouseFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const { data: warehousesData } = useWarehouses({
     limit: 100,
@@ -207,9 +209,14 @@ export default function MovementsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900">
-            {t("pages.movementsLog.title")}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+              {t("pages.movementsLog.title")}
+            </h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+              <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Log Stok
+            </Button>
+          </div>
           <p className="mt-1 text-sm text-slate-500">
             {t("pages.movementsLog.subtitle")}
           </p>
@@ -276,6 +283,56 @@ export default function MovementsPage() {
         onPageChange={setPage}
         isLoading={isLoading}
       />
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Log Pergerakan Stok" className="max-w-3xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2">Halaman <strong>Log Pergerakan</strong> (Inventory Movements) adalah pusat audit stok barang Anda. Semua penambahan atau pengurangan stok dicatat secara ketat di sini dan <strong>tidak bisa dihapus</strong> untuk mencegah kecurangan (fraud).</p>
+          
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Konsep Mutasi Stok</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p className="text-xs text-slate-600 mb-2">Jika stok tiba-tiba tidak sesuai dengan fisik, halaman inilah yang harus Anda cek pertama kali. Setiap baris mewakili 1 kejadian (transaksi).</p>
+              <ul className="list-disc pl-4 text-xs text-slate-600 space-y-1">
+                <li>Kolom <strong>Qty Before</strong>: Sisa stok sebelum transaksi terjadi.</li>
+                <li>Kolom <strong>Qty Change</strong>: Jumlah barang yang masuk (angka positif hijau) atau keluar (angka negatif merah).</li>
+                <li>Kolom <strong>Qty After</strong>: Sisa stok akhir setelah transaksi tersebut.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">2. Membaca Tipe Pergerakan (Movement Type)</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+                <span className="font-semibold text-emerald-800 block mb-1">Pemasukan Stok (+)</span>
+                <ul className="list-disc pl-4 text-xs text-emerald-700 space-y-1">
+                  <li><strong>Vendor Receipt:</strong> Terima barang dari Supplier.</li>
+                  <li><strong>Customer Return:</strong> Pembeli mengembalikan barang (retur).</li>
+                  <li><strong>Stock Adjustment In:</strong> Hasil penyesuaian stok opname manual.</li>
+                </ul>
+              </div>
+              
+              <div className="bg-rose-50/50 p-3 rounded-lg border border-rose-100">
+                <span className="font-semibold text-rose-800 block mb-1">Pengeluaran Stok (-)</span>
+                <ul className="list-disc pl-4 text-xs text-rose-700 space-y-1">
+                  <li><strong>Sale Fulfillment:</strong> Barang dikirim ke pembeli (Sales Order).</li>
+                  <li><strong>Damaged:</strong> Barang dilaporkan rusak/cacat.</li>
+                  <li><strong>Stock Adjustment Out:</strong> Penyesuaian stok turun (hilang/selisih).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 mt-6">
+            <span className="font-semibold text-amber-800 block mb-1">Catatan Keamanan (Security)</span>
+            <p className="text-xs text-amber-700">Untuk menjaga keabsahan data akuntansi, setiap pergerakan yang memengaruhi HPP (seperti penerimaan atau penjualan) akan secara otomatis men-jurnal ke buku besar (General Ledger). Anda dapat melihat siapa yang memicu pergerakan tersebut di kolom <strong>User</strong>.</p>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

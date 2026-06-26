@@ -3,7 +3,7 @@ import { SalesOrder, CreateSalesOrderRequest } from "../../../types/sales-order"
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { CurrencyInput } from "../../../components/ui/currency-input";
-import { Save, Loader2, Lock } from "lucide-react";
+import { Save, Loader2, Lock, HelpCircle } from "lucide-react";
 import dayjs from "dayjs";
 import { useBusinessUnits } from "../../business-units/hooks/use-business-units";
 import { useWarehouses } from "../../warehouses/hooks/use-warehouses";
@@ -11,6 +11,7 @@ import { customerApi } from "../../customers/api";
 import { AsyncSearchableSelect } from "../../../components/ui/async-searchable-select";
 import { CustomerCreateModal } from "../../customers/components/customer-create-modal";
 import { Customer } from "../../../types/customer";
+import { Modal } from "../../../components/ui/modal";
 
 interface SalesOrderFormProps {
   initialData?: SalesOrder;
@@ -57,6 +58,7 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
   });
 
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const loadCustomers = async (inputValue: string) => {
@@ -148,6 +150,22 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
   return (
     <>
     <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-6">
+      <div className="flex justify-between items-center pb-4 border-b border-slate-100 mb-6">
+        <h2 className="text-xl font-bold text-slate-800">
+          {initialData ? 'Form Sales Order' : 'Buat Sales Order Baru'}
+        </h2>
+        <Button 
+          type="button" 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setShowTutorial(true)} 
+          className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200"
+        >
+          <HelpCircle className="w-4 h-4 mr-2" />
+          Cara Pengisian Form
+        </Button>
+      </div>
+
       {isReadOnly && (
         <div className="bg-amber-50 text-amber-800 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
           <Lock className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
@@ -367,6 +385,64 @@ export function SalesOrderForm({ initialData, onSubmit, isLoading }: SalesOrderF
         onSuccess={handleCustomerCreated}
       />
     )}
+
+    <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Form Sales Order" className="max-w-4xl">
+      <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <p className="mb-2">Formulir ini digunakan untuk merekam data pesanan penjualan (Sales Order). Berikut panduan pengisiannya:</p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-bold text-slate-900 mb-3 text-base">Informasi Utama:</h4>
+            <div className="space-y-3">
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Pilih Customer</span>
+                <p className="text-xs text-slate-600">Pilih dari *database* (ketik nama/kode). Sistem otomatis mengisi alamat dan kontak. Jika pelanggan baru, klik <strong>+ Buat Baru</strong>.</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Data Penerima (Manual)</span>
+                <p className="text-xs text-slate-600">Anda juga dapat mengetik bebas Nama, Telepon, dan Alamat pembeli tanpa menyimpannya ke database.</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h4 className="font-bold text-slate-900 mb-3 text-base">Operasional & Logistik:</h4>
+            <div className="space-y-3">
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Business Unit & Warehouse</span>
+                <p className="text-xs text-slate-600"><strong>Penting:</strong> Menentukan cabang/unit bisnis mana yang mencatat penjualan ini, dan gudang mana stok barang akan dipotong saat pengiriman (Fulfillment).</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Sales Channel & Tipe Order</span>
+                <p className="text-xs text-slate-600">Kategorisasi pesanan (misal: Online/Marketplace, Preorder/Regular). Berguna untuk filter laporan penjualan.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 pt-4 mt-4">
+          <h4 className="font-bold text-slate-900 mb-3 text-base">Biaya, Pajak, dan Diskon (Bagian Bawah Form)</h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-amber-50 p-3 rounded-lg border border-amber-100">
+              <span className="font-semibold text-amber-800 block mb-1">Diskon Order</span>
+              <p className="text-xs text-amber-700">Potongan harga tunai (Rp) yang mengurangi total nilai keseluruhan (Grand Total).</p>
+            </div>
+            <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+              <span className="font-semibold text-indigo-800 block mb-1">Biaya Pengiriman</span>
+              <p className="text-xs text-indigo-700">Ongkos kirim yang ditanggung pembeli, akan menambah nilai Total Tagihan.</p>
+            </div>
+            <div className="bg-rose-50 p-3 rounded-lg border border-rose-100">
+              <span className="font-semibold text-rose-800 block mb-1">Pajak (Tax)</span>
+              <p className="text-xs text-rose-700">Pajak (PPN) total yang ditambahkan ke keseluruhan pesanan.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+          <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+        </div>
+      </div>
+    </Modal>
     </>
   );
 }

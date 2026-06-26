@@ -37,7 +37,7 @@ export default function CreateSalesOrderPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full">
       <PageHeader
         title="Buat Draft Sales Order"
         description="Masukkan informasi utama pemesanan pelanggan. Item pesanan dapat ditambahkan di langkah berikutnya."

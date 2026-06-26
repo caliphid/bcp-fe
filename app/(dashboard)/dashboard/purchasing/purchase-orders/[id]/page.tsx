@@ -19,11 +19,13 @@ import {
   FileText,
   XCircle,
   DollarSign,
+  HelpCircle,
 } from "lucide-react";
 import { formatCurrency } from "../../../../../../features/debts/utils/formatters";
 import { formatDate } from "../../../../../../lib/utils";
 import toast from "react-hot-toast";
 import { VendorPaymentModal } from "../../../../../../features/purchasing/components/vendor-payment-modal";
+import { Modal } from "../../../../../../components/ui/modal";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -39,6 +41,7 @@ export default function PurchaseOrderDetailPage({ params }: PageProps) {
   const { data: po, isLoading, error, mutate } = usePurchaseOrder(id);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -164,10 +167,15 @@ export default function PurchaseOrderDetailPage({ params }: PageProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <PageHeader
-            title={po.purchaseOrderCode}
-            description={`Purchase Order Details`}
-          />
+          <div className="flex items-center gap-3">
+            <PageHeader
+              title={`Purchase Order ${po.purchaseOrderCode}`}
+              description={`Vendor: ${po.vendor?.name} | Created: ${formatDate(po.createdAt)}`}
+            />
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+              <HelpCircle className="w-4 h-4 mr-1.5" /> Siklus Pembelian
+            </Button>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -539,6 +547,63 @@ export default function PurchaseOrderDetailPage({ params }: PageProps) {
           }}
         />
       )}
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Siklus Dokumen Pembelian (Purchase Order)" className="max-w-4xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2">Siklus Pembelian dimulai dari memesan barang (PO) hingga menerima barang (GR) dan melunasi hutang (Payment). Berikut adalah status dan langkah yang harus Anda ambil:</p>
+          
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Alur Status Pesanan (PO Status)</h4>
+            
+            <div className="flex flex-col gap-3">
+              <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div className="mt-0.5 bg-slate-200 text-slate-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">1. DRAFT</div>
+                <div>
+                  <p className="text-xs text-slate-600">PO baru dibuat dan belum sah. Masih bisa diedit bebas. <br/><strong>Aksi:</strong> Klik <strong>Submit Order</strong> untuk mengesahkan dan mengirimkannya ke vendor.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                <div className="mt-0.5 bg-blue-100 text-blue-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">2. SUBMITTED</div>
+                <div>
+                  <p className="text-xs text-slate-600">PO sudah disetujui (sah). Anda sedang menunggu vendor mengirim barang. <br/><strong>Aksi:</strong> Jika barang sudah sampai di gudang, klik <strong>Receive Goods (GR)</strong> untuk mencatat penerimaan.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                <div className="mt-0.5 bg-amber-100 text-amber-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">3. PARTIALLY RECEIVED</div>
+                <div>
+                  <p className="text-xs text-slate-600">Vendor baru mengirim sebagian barang (belum lengkap). <br/><strong>Aksi:</strong> Anda bisa membuat GR lagi (Receive Goods) saat sisa barangnya datang.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+                <div className="mt-0.5 bg-emerald-100 text-emerald-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">4. FULLY RECEIVED</div>
+                <div>
+                  <p className="text-xs text-slate-600">Semua barang yang dipesan sudah diterima di gudang (Stok bertambah). <br/><strong>Catatan:</strong> Jika tagihan belum lunas, status pembayarannya (Payment Status) akan tetap UNPAID.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6 pt-4 border-t border-slate-100">
+            <h4 className="font-bold text-slate-900 text-base">2. Alur Pembayaran & Hutang</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <span className="font-semibold text-slate-800 block mb-1">Make Payment (Bayar Vendor)</span>
+              <p className="text-xs text-slate-600 mb-2">Anda bisa mencicil (termin) atau membayar lunas tagihan PO. Setiap pembayaran akan mengurangi <strong>Saldo Kas/Bank</strong> Anda dan mengurangi saldo <strong>Hutang Usaha</strong>.</p>
+              <ul className="list-disc pl-4 text-xs text-slate-600 space-y-1">
+                <li><strong>UNPAID:</strong> Belum ada pembayaran.</li>
+                <li><strong>PARTIAL:</strong> Sudah dicicil sebagian.</li>
+                <li><strong>PAID:</strong> Hutang untuk PO ini sudah lunas 100%.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

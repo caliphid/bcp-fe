@@ -11,6 +11,8 @@ import { Alert, AlertDescription } from "../ui/alert";
 import { Category } from "../../types/category";
 import { CategoryType } from "../../types/enums";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Modal } from "../ui/modal";
+import { HelpCircle } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -30,6 +32,7 @@ interface CategoryFormProps {
 
 export function CategoryForm({ initialData, categories, onSuccess, onCancel }: CategoryFormProps) {
   const [error, setError] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const {
     register,
@@ -70,7 +73,15 @@ export function CategoryForm({ initialData, categories, onSuccess, onCancel }: C
   const validParents = categories.filter((c) => c.id !== initialData?.id);
 
   return (
+    <>
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-sm font-medium text-slate-500">Form Pengisian Kategori</span>
+        <Button type="button" variant="ghost" size="sm" onClick={() => setShowTutorial(true)} className="text-indigo-600 hover:text-indigo-700 h-8 px-2">
+          <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan COA
+        </Button>
+      </div>
+
       {error && (
         <Alert variant="destructive">
           <AlertDescription>{error}</AlertDescription>
@@ -141,5 +152,34 @@ export function CategoryForm({ initialData, categories, onSuccess, onCancel }: C
         </Button>
       </div>
     </form>
+
+    <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Kategori Produk & Chart of Accounts (COA)" className="max-w-2xl">
+      <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <p className="mb-2">Kategori di sistem ini tidak hanya berfungsi untuk mengelompokkan barang di katalog, tetapi juga bertindak sebagai <strong>Akun Akuntansi (Chart of Accounts)</strong> saat menjurnal transaksi otomatis.</p>
+        
+        <h4 className="font-bold text-slate-900 mb-3 text-base">Tipe Kategori (Transaction Type):</h4>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <span className="font-semibold text-slate-800 block mb-1">IN (Pemasukan / Pendapatan)</span>
+            <p className="text-xs text-slate-600">Gunakan tipe ini untuk kategori Penjualan Barang, Pendapatan Jasa, atau Diskon yang didapat. Saldo akun ini normalnya bertambah saat Anda melakukan penjualan.</p>
+          </div>
+          
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <span className="font-semibold text-slate-800 block mb-1">OUT (Pengeluaran / Beban / HPP)</span>
+            <p className="text-xs text-slate-600">Gunakan tipe ini untuk Harga Pokok Penjualan (HPP), Biaya Operasional, Ongkos Kirim yang ditanggung, atau Biaya Admin Marketplace. Jangan sampai terbalik dengan IN, karena akan merusak Laba/Rugi Anda.</p>
+          </div>
+        </div>
+
+        <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 mt-4">
+          <span className="font-semibold text-amber-800 block mb-1">Parent Category (Kategori Induk)</span>
+          <p className="text-xs text-amber-700">Berfungsi membuat sub-kategori. Misalnya Parent: `Beban Operasional` ➔ Sub: `Beban Listrik`. Hal ini berguna agar laporan keuangan Anda bisa digrup (dikonsolidasi) dengan rapi.</p>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+          <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }

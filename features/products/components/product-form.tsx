@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Trash2, Plus, Info, Loader2 } from "lucide-react";
+import { Trash2, Plus, Info, Loader2, HelpCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { productApi } from "../api";
@@ -25,6 +25,7 @@ import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { Modal } from "../../../components/ui/modal";
 import { useTranslation } from "../../../hooks/use-translation";
 
 const variantSchema = z.object({
@@ -85,6 +86,7 @@ export function ProductForm({
   const router = useRouter();
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // Variant generator state
   const [colorsInput, setColorsInput] = useState("");
@@ -349,9 +351,14 @@ export function ProductForm({
 
       {/* SECTION 1: Product Master Detail */}
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-800 mb-6">
-          {t("features.products.form.sectionProductDetail")}
-        </h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-lg font-bold text-slate-800">
+            {t("features.products.form.sectionProductDetail")}
+          </h2>
+          <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+            <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Produk & Varian
+          </Button>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -783,8 +790,67 @@ export function ProductForm({
               "Create Product"
             )}
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setShowTutorial(true)}
+            className="text-slate-400 hover:text-indigo-600"
+          >
+            <HelpCircle className="w-5 h-5" />
+          </Button>
         </div>
       </div>
     </form>
+    
+    <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Membuat Produk & Varian" className="max-w-3xl">
+      <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <p className="mb-2">Produk di dalam sistem ini bisa berupa produk <strong>Tunggal</strong> (tanpa varian) atau produk yang memiliki <strong>Varian</strong> (seperti Warna dan Ukuran).</p>
+        
+        <div className="space-y-4 mt-4">
+          <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Master Produk (Induk)</h4>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <p className="text-xs text-slate-600 mb-2">Ini adalah payung utama dari barang yang Anda jual. <br/>Misalnya: <strong>T-Shirt Polos Cotton Combed</strong>.</p>
+            <ul className="list-disc pl-4 text-xs text-slate-600 space-y-1">
+              <li><strong>Type:</strong> Pilih <i>INVENTORY</i> jika barang ini ada wujud fisiknya dan stoknya dikelola. Pilih <i>SERVICE</i> untuk jasa.</li>
+              <li><strong>Category:</strong> Pilih kategori produk (Misal: Pakaian Pria). Ini menentukan akun COA mana yang akan dijurnal saat barang terjual.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="space-y-4 mt-6">
+          <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">2. Single vs Multi-Variant</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+              <span className="font-semibold text-blue-800 block mb-1">Produk Tunggal (Tanpa Varian)</span>
+              <p className="text-xs text-blue-700">Biarkan <i>checkbox</i> "This product has multiple options" tidak dicentang. Anda cukup mengisi SKU, HPP (Harga Modal), dan Harga Jual (Selling Price) di bagian <i>Default Pricing</i>.</p>
+            </div>
+            
+            <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+              <span className="font-semibold text-indigo-800 block mb-1">Produk dengan Varian</span>
+              <p className="text-xs text-indigo-700">Centang "This product has multiple options". Bagian bawah akan berubah menampilkan opsi <i>Variant Generator</i>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4 mt-6">
+          <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">3. Membuat Varian secara Otomatis</h4>
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <ol className="list-decimal pl-4 text-xs text-slate-600 space-y-2">
+              <li>Ketikkan <strong>Colors</strong> dipisah koma (Misal: <i>Black, White</i>)</li>
+              <li>Ketikkan <strong>Sizes</strong> dipisah koma (Misal: <i>S, M, L</i>)</li>
+              <li>Klik tombol <strong>Generate Combinations</strong>. Sistem akan otomatis membuatkan tabel baris varian (Misal: Black S, Black M, dst).</li>
+              <li>Anda bisa menggunakan fitur <strong>Bulk Edit</strong> untuk menyamakan Harga Modal dan Harga Jual semua varian sekaligus, lalu klik Apply.</li>
+            </ol>
+            <p className="text-xs mt-3 text-rose-600 bg-rose-50 p-2 rounded"><strong>Catatan Penting:</strong> Stok barang tidak bisa diisi di form ini. Stok hanya bisa ditambah melalui menu <strong>Penerimaan Barang (Purchase)</strong> atau <strong>Penyesuaian Stok (Stock Adjustment)</strong> agar riwayatnya tercatat rapi di jurnal.</p>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+          <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }

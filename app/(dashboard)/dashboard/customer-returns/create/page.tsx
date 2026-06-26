@@ -14,7 +14,8 @@ import { PageHeader } from "../../../../../components/ui/page-header";
 import { AsyncSearchableSelect } from "../../../../../components/ui/async-searchable-select";
 import { warehouseApi } from "../../../../../features/warehouses/api";
 import { productApi } from "../../../../../features/products/api";
-import { ArrowLeft, Plus, Trash2, CheckCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, CheckCircle, HelpCircle } from "lucide-react";
+import { Modal } from "../../../../../components/ui/modal";
 import toast from "react-hot-toast";
 
 // Very simplified for now. In a real app we would fetch a specific SO 
@@ -55,6 +56,7 @@ const loadVariants = async (search: string) => {
 export default function CreateCustomerReturnPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   
   const [formData, setFormData] = useState<Partial<CreateCustomerReturnRequest>>({
     returnDate: new Date().toISOString().split("T")[0],
@@ -137,11 +139,16 @@ export default function CreateCustomerReturnPage() {
 
   return (
     <div className="space-y-6 pb-12 max-w-4xl mx-auto">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="w-5 h-5" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <PageHeader title="Create Customer Return" description="Initiate a return, exchange, or refund request" />
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+          <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Retur
         </Button>
-        <PageHeader title="Create Customer Return" description="Initiate a return, exchange, or refund request" />
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -394,6 +401,34 @@ export default function CreateCustomerReturnPage() {
           </Button>
         </div>
       </form>
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Retur Pelanggan (Customer Return)" className="max-w-2xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2">Gunakan form ini ketika pembeli mengembalikan barang karena rusak, salah ukuran, atau pesanan dibatalkan sebagian/seluruhnya setelah barang terkirim.</p>
+          
+          <h4 className="font-bold text-slate-900 mb-3 text-base">Jenis Retur (Return Type):</h4>
+          <div className="grid grid-cols-1 gap-4">
+            <div className="bg-blue-50 p-3 rounded-lg border border-blue-100">
+              <span className="font-semibold text-blue-800 block mb-1">REFUND (Kembali Uang)</span>
+              <p className="text-xs text-blue-700">Pilih ini jika pembeli meminta uangnya dikembalikan. Aksi ini akan membuat <strong>Hutang Refund</strong> (Payable) kepada customer, dan bisa dicatat pembayarannya nanti. Stok barang retur bisa dimasukkan kembali ke Gudang (Restock) atau dicatat rusak (Damaged).</p>
+            </div>
+            
+            <div className="bg-purple-50 p-3 rounded-lg border border-purple-100">
+              <span className="font-semibold text-purple-800 block mb-1">EXCHANGE (Tukar Barang)</span>
+              <p className="text-xs text-purple-700">Pilih ini jika pembeli ingin menukar ukuran/warna. Uang tidak akan dikembalikan, tetapi sistem akan mencatat barang masuk (dari retur) dan barang keluar (untuk pengiriman pengganti).</p>
+            </div>
+
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+              <span className="font-semibold text-slate-800 block mb-1">STORE CREDIT (Saldo Toko)</span>
+              <p className="text-xs text-slate-600">Mirip dengan Refund, tapi uangnya tidak dikembalikan ke rekening pembeli, melainkan disimpan sebagai saldo deposit (Store Credit) yang bisa ia pakai untuk belanja berikutnya.</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

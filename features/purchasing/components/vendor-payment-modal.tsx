@@ -16,7 +16,7 @@ import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { AsyncSearchableSelect } from "../../../components/ui/async-searchable-select";
 import { formatInputMoney, unformatMoney, formatCurrency } from "../../debts/utils/formatters";
 import toast from "react-hot-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, HelpCircle } from "lucide-react";
 
 interface VendorPaymentModalProps {
   isOpen: boolean;
@@ -59,6 +59,7 @@ export function VendorPaymentModal({
   onSuccess,
 }: VendorPaymentModalProps) {
   const [error, setError] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const { data: accounts } = useAccounts();
 
@@ -154,6 +155,7 @@ export function VendorPaymentModal({
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -275,15 +277,54 @@ export function VendorPaymentModal({
           <Textarea rows={3} {...register("notes")} placeholder="Optional notes about this payment..." />
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4">
-          <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+        <div className="flex justify-between items-center pt-4">
+          <Button type="button" variant="ghost" size="sm" onClick={() => setShowTutorial(true)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2 h-8">
+            <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Pembayaran
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
-            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Record Payment"}
-          </Button>
+          <div className="flex space-x-3">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
+              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "Record Payment"}
+            </Button>
+          </div>
         </div>
       </form>
     </Modal>
+
+    <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Record Vendor Payment" className="max-w-2xl">
+      <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <p className="mb-2">Formulir ini digunakan untuk melunasi tagihan (Hutang) atas Purchase Order (PO) yang sudah berstatus <strong>FULLY RECEIVED</strong> atau yang sudah dibuatkan Debt-nya. Setiap pembayaran di sini akan mengurangi saldo <strong>Cash/Bank Account</strong> yang Anda pilih.</p>
+        
+        <h4 className="font-bold text-slate-900 mb-3 text-base">Penjelasan Komponen Pembayaran:</h4>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+            <span className="font-semibold text-slate-800 block mb-1">Total Payment</span>
+            <p className="text-xs text-slate-600">Jumlah total uang yang Anda transfer/bayarkan ke Vendor. Angka ini wajib sama persis dengan mutasi bank Anda agar pembukuan tidak selisih (balance).</p>
+          </div>
+          
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <span className="font-semibold text-emerald-800 block mb-1">Principal (Hutang Pokok)</span>
+            <p className="text-xs text-emerald-700">Jumlah nilai yang dialokasikan murni untuk memotong sisa <strong>Outstanding Balance</strong> (Hutang Utama). Jika Anda tidak dikenakan biaya apapun oleh bank, angka <i>Total Payment</i> harusnya sama persis dengan angka <i>Principal</i>.</p>
+          </div>
+
+          <div className="bg-rose-50 p-3 rounded-lg border border-rose-100">
+            <span className="font-semibold text-rose-800 block mb-1">Interest (Bunga) & Fee (Biaya Admin)</span>
+            <p className="text-xs text-rose-700">Gunakan kolom ini jika saat mentransfer Anda terkena biaya tambahan (misalnya: Biaya transfer antar bank Rp 2.500, atau denda telat bayar). Sistem mewajibkan perhitungan: <br/><strong>Total Payment = Principal + Interest + Fee</strong>.</p>
+          </div>
+        </div>
+
+        <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 mt-4">
+          <span className="font-semibold text-amber-800 block mb-1">Category (COA Beban)</span>
+          <p className="text-xs text-amber-700">Jika Anda mengisi nilai <strong>Interest</strong> atau <strong>Fee</strong>, Anda bisa memilih akun kategori pengeluaran (misal: "Beban Administrasi Bank"). Ini bertujuan agar Rp 2.500 tadi ter-jurnal secara rapi ke Laporan Laba Rugi.</p>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+          <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }

@@ -14,7 +14,7 @@ import { AsyncSearchableSelect } from "@/components/ui/async-searchable-select";
 import { Warehouse } from "../../../types/warehouse";
 import { productApi } from "@/features/products/api";
 import { ProductVariant } from "../../../types/product";
-import { PlusCircle, Trash2 } from "lucide-react";
+import { PlusCircle, Trash2, HelpCircle } from "lucide-react";
 import { useTranslation } from "../../../hooks/use-translation";
 
 const itemSchema = z.object({
@@ -55,6 +55,7 @@ export function StockAdjustmentModal({
 }: StockAdjustmentModalProps) {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const {
     register,
@@ -103,6 +104,7 @@ export function StockAdjustmentModal({
   };
 
   return (
+    <>
     <Modal
       isOpen={isOpen}
       onClose={onClose}
@@ -243,15 +245,49 @@ export function StockAdjustmentModal({
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-          <Button type="button" variant="ghost" onClick={onClose}>
-            {t("common.actions.cancel")}
+        <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+          <Button type="button" variant="ghost" size="sm" onClick={() => setShowTutorial(true)} className="text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 px-2 h-8">
+            <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Fitur
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? t("common.actions.submitting") : t("features.inventory.stockAdjustment.submitBtn")}
-          </Button>
+          <div className="flex space-x-3">
+            <Button type="button" variant="ghost" onClick={onClose}>
+              {t("common.actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? t("common.actions.submitting") : t("features.inventory.stockAdjustment.submitBtn")}
+            </Button>
+          </div>
         </div>
       </form>
     </Modal>
+
+    <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Penyesuaian Stok (Stock Adjustment)" className="max-w-2xl">
+      <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+        <p className="mb-2">Fitur <strong>Stock Adjustment</strong> ini digunakan saat terjadi selisih stok (stok fisik tidak sama dengan stok di sistem). Setiap perubahan stok di sini akan tercatat abadi di <strong>Log Pergerakan</strong> (Inventory Movements).</p>
+        
+        <h4 className="font-bold text-slate-900 mb-3 text-base">Tipe Penyesuaian:</h4>
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-100">
+            <span className="font-semibold text-emerald-800 block mb-1">Stock Adjustment IN (Stok Bertambah)</span>
+            <p className="text-xs text-emerald-700">Pilih ini jika fisik barang ternyata lebih banyak daripada di sistem (kelebihan). Nilai HPP stok akan bertambah.</p>
+          </div>
+          
+          <div className="bg-rose-50 p-3 rounded-lg border border-rose-100">
+            <span className="font-semibold text-rose-800 block mb-1">Stock Adjustment OUT / DAMAGED (Stok Berkurang)</span>
+            <p className="text-xs text-rose-700">Pilih ini jika fisik barang lebih sedikit (kehilangan) atau ada barang yang rusak (Damaged). Aksi ini akan mencatat jurnal pemotongan persediaan dan membebankan biaya kerugian (Loss) pada laba/rugi perusahaan.</p>
+          </div>
+        </div>
+
+        <div className="bg-amber-50 p-3 rounded-lg border border-amber-200 mt-4">
+          <span className="font-semibold text-amber-800 block mb-1">Penting: Penjelasan (Reason)</span>
+          <p className="text-xs text-amber-700">Anda wajib mengisi kolom <strong>Reason</strong>. Jelaskan dengan detail alasan penyesuaian stok (Misalnya: "Stok opname akhir bulan", atau "Barang digigit tikus"). Ini penting untuk proses Audit Keuangan kelak.</p>
+        </div>
+
+        <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+          <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+        </div>
+      </div>
+    </Modal>
+    </>
   );
 }

@@ -231,6 +231,43 @@ export function MarketplaceSettlementDetailView({ data, onMutate }: MarketplaceS
             </div>
           </div>
 
+          <div className="border-t border-slate-100 pt-4 mt-6">
+            <h4 className="font-bold text-slate-900 mb-3 text-base">Alur Rekonsiliasi & Auto-Match:</h4>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="mt-0.5 bg-indigo-100 text-indigo-700 p-1.5 rounded text-xs font-bold w-6 h-6 flex items-center justify-center shrink-0">1</div>
+                <div>
+                  <span className="font-semibold text-slate-800 block mb-1">Add Lines (Tambah Baris)</span>
+                  <p className="text-xs text-slate-600">Langkah pertama adalah memasukkan data baris pencairan (pendapatan, potongan biaya, dll) dari laporan marketplace Anda.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start gap-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="mt-0.5 bg-indigo-100 text-indigo-700 p-1.5 rounded text-xs font-bold w-6 h-6 flex items-center justify-center shrink-0">2</div>
+                <div>
+                  <span className="font-semibold text-slate-800 block mb-1">Validate & Auto Match</span>
+                  <p className="text-xs text-slate-600">Sistem akan memvalidasi data dan mencoba mencocokkan setiap baris dengan data <strong className="text-indigo-600">Sales Order (Pesanan)</strong> di sistem berdasarkan <i>External Order ID</i>. Jika berhasil, status baris akan berubah menjadi <strong className="text-emerald-600">MATCHED</strong>.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="mt-0.5 bg-indigo-100 text-indigo-700 p-1.5 rounded text-xs font-bold w-6 h-6 flex items-center justify-center shrink-0">3</div>
+                <div>
+                  <span className="font-semibold text-slate-800 block mb-1">Mark Ready</span>
+                  <p className="text-xs text-slate-600">Jika semua baris penting sudah <i>Matched</i> dan selisihnya 0, Anda dapat menandai laporan ini sudah siap (Ready).</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="mt-0.5 bg-emerald-100 text-emerald-700 p-1.5 rounded text-xs font-bold w-6 h-6 flex items-center justify-center shrink-0">4</div>
+                <div>
+                  <span className="font-semibold text-slate-800 block mb-1">Post to Ledger</span>
+                  <p className="text-xs text-slate-600">Langkah terakhir. Laporan akan dikunci permanen, dan jurnal akuntansi otomatis dibuat memindahkan dana dari Piutang Marketplace ke Rekening Bank Settlement Anda.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
             <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
           </div>

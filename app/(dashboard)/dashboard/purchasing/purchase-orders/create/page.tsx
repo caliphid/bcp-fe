@@ -15,7 +15,8 @@ import { Textarea } from "../../../../../../components/ui/textarea";
 import { SearchableSelect } from "../../../../../../components/ui/searchable-select";
 import { AsyncSearchableSelect } from "../../../../../../components/ui/async-searchable-select";
 import { PageHeader } from "../../../../../../components/ui/page-header";
-import { ArrowLeft, Plus, Trash2, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Loader2, HelpCircle } from "lucide-react";
+import { Modal } from "../../../../../../components/ui/modal";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { useWarehouses } from "../../../../../../features/warehouses/hooks/use-warehouses";
@@ -48,6 +49,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function CreatePurchaseOrderPage() {
   const router = useRouter();
+  const [showTutorial, setShowTutorial] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   // Data for selects
@@ -151,17 +153,22 @@ export default function CreatePurchaseOrderPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
-      <div className="flex items-center gap-4">
-        <Link 
-          href="/dashboard/purchasing/purchase-orders" 
-          className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <PageHeader 
-          title="Create Purchase Order" 
-          description="Create a new draft purchase order for a vendor"
-        />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/dashboard/purchasing/purchase-orders" 
+            className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <PageHeader 
+            title="Create Purchase Order" 
+            description="Create a new draft purchase order for a vendor"
+          />
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+          <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan PO
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -382,6 +389,44 @@ export default function CreatePurchaseOrderPage() {
           </Button>
         </div>
       </form>
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Form Purchase Order" className="max-w-3xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2"><strong>Purchase Order (PO)</strong> adalah dokumen resmi yang diterbitkan kepada Vendor (Supplier) untuk memesan barang/jasa.</p>
+          
+          <div className="space-y-4 mt-4">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Informasi Vendor & Gudang</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <ul className="list-disc pl-4 text-xs text-slate-600 space-y-2">
+                <li><strong>Vendor:</strong> Pilih pihak yang akan memasok barang Anda.</li>
+                <li><strong>Warehouse:</strong> Tentukan di gudang mana barang ini direncanakan akan disimpan setelah tiba.</li>
+                <li><strong>Expected Delivery Date:</strong> Estimasi kapan vendor menyanggupi pengiriman.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">2. Item Pembelian & Harga Modal</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p className="text-xs text-slate-600 mb-2">Saat memilih produk, kolom <strong>Unit Cost</strong> (Harga Satuan) otomatis terisi sesuai harga modal standar barang. Namun, Anda dapat mengubahnya jika vendor memberikan harga spesial untuk PO ini.</p>
+              <div className="bg-amber-50 text-amber-700 p-2 rounded mt-2">
+                <strong>Penting:</strong> Unit Cost yang dicatat di sini kelak akan menjadi acuan dasar perhitungan nilai aset persediaan (Inventory Valuation) dan HPP (Harga Pokok Penjualan) perusahaan.
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">3. Biaya Tambahan (Landed Cost)</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p className="text-xs text-slate-600">Di bagian bawah, terdapat kolom Shipping (Ongkir), Pajak, dan Diskon Total. Khusus untuk biaya yang dibayar ke vendor pengirim, ini akan menambah <strong>Total Hutang (Payables)</strong> perusahaan Anda terhadap vendor tersebut.</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

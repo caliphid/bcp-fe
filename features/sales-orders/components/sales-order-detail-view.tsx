@@ -1,10 +1,12 @@
 import { SalesOrder } from "../../../types/sales-order";
 import { formatMoney } from "../../../lib/utils";
 import dayjs from "dayjs";
-import { Clock, CheckCircle2, Loader2, Ban, CreditCard, Receipt, Truck } from "lucide-react";
+import { Clock, CheckCircle2, Loader2, Ban, CreditCard, Receipt, Truck, HelpCircle, ArrowRightLeft } from "lucide-react";
 import { useProductVariant } from "../../products/hooks/use-products";
 import Link from "next/link";
 import { Button } from "../../../components/ui/button";
+import { Modal } from "../../../components/ui/modal";
+import { useState } from "react";
 
 function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string, color?: string, size?: string }) {
   const { data } = useProductVariant(initialName ? undefined : variantId);
@@ -34,6 +36,8 @@ interface SalesOrderDetailViewProps {
 }
 
 export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEdit }: SalesOrderDetailViewProps) {
+  const [showTutorial, setShowTutorial] = useState(false);
+
   const renderStatus = (status: string) => {
     switch (status) {
       case 'DRAFT': return <span className="inline-flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-1 rounded-md text-xs font-semibold"><Clock className="w-3 h-3"/> DRAFT</span>;
@@ -59,7 +63,19 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6 space-y-4">
-          <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-2">Informasi Pesanan</h3>
+          <div className="flex justify-between items-center border-b border-slate-100 pb-2">
+            <h3 className="font-bold text-slate-800">Informasi Pesanan</h3>
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowTutorial(true)} 
+              className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-7 text-xs px-2"
+            >
+              <HelpCircle className="w-3.5 h-3.5 mr-1.5" />
+              Siklus Dokumen
+            </Button>
+          </div>
           
           <div className="grid grid-cols-2 gap-y-3 text-sm">
             <span className="text-slate-500">Nomor Pesanan</span>
@@ -453,6 +469,107 @@ export function SalesOrderDetailView({ order, onVoidPayment, onVoidRefund, canEd
           </div>
         </div>
       )}
+
+      <div className="bg-slate-900 rounded-2xl shadow-sm border border-slate-800 p-6 overflow-hidden">
+        <h3 className="font-semibold text-white border-b border-slate-700 pb-3 mb-4">Raw Data</h3>
+        <pre className="text-xs text-slate-300 overflow-x-auto">
+          {JSON.stringify(order, null, 2)}
+        </pre>
+      </div>
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Panduan Lengkap Sales Order" className="max-w-5xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2">Halaman <strong>Sales Order Detail</strong> menampilkan seluruh informasi terkait suatu pesanan mulai dari rincian barang, status pengiriman, hingga riwayat pembayaran dan pembatalan (refund).</p>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div className="space-y-4">
+              <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Data Pesanan & Pelanggan</h4>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Informasi Pesanan</span>
+                <p className="text-xs text-slate-600">Berisi Nomor Referensi, Tanggal, Jalur Penjualan (Sales Channel), dan Tipe Pesanan. Menentukan asal muasal pesanan ini dibuat.</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Informasi Pelanggan & Unit Bisnis</span>
+                <p className="text-xs text-slate-600">Kontak pembeli (Alamat pengiriman) dan Cabang/Gudang (Business Unit & Warehouse) mana yang bertanggung jawab menyediakan stok untuk pesanan ini.</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">2. Item Pesanan & Total Tagihan</h4>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Daftar Barang (Item Pesanan)</span>
+                <p className="text-xs text-slate-600">Daftar produk yang dibeli beserta kuantitas dan harga satuannya. Anda hanya bisa mengubah ini saat pesanan masih DRAFT (melalui tombol Edit).</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1">Ringkasan Total (Summary)</span>
+                <p className="text-xs text-slate-600">Kalkulasi <strong>Subtotal + Ongkos Kirim + Pajak - Diskon = Grand Total</strong>. Inilah nilai mutlak yang harus dilunasi oleh pelanggan.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6 pt-4 border-t border-slate-100">
+            <h4 className="font-bold text-slate-900 text-base">3. Alur Status Pesanan (Order Lifecycle)</h4>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-start gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div className="mt-0.5 bg-slate-200 text-slate-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">1. DRAFT</div>
+                <div>
+                  <p className="text-xs text-slate-600">Bisa diedit bebas. <br/><strong>Aksi:</strong> Klik <strong>Confirm Order</strong> agar pesanan disetujui (stok di-*reserve*).</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                <div className="mt-0.5 bg-blue-100 text-blue-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">2. CONFIRMED</div>
+                <div>
+                  <p className="text-xs text-slate-600">Pesanan disetujui. <br/><strong>Aksi:</strong> Klik <strong>Fulfill Order</strong> agar gudang mulai menyiapkan pesanan.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-100">
+                <div className="mt-0.5 bg-amber-100 text-amber-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">3. PROCESSING</div>
+                <div>
+                  <p className="text-xs text-slate-600">Sedang dipacking. <br/><strong>Aksi:</strong> Di bagian <i>Shipment Detail</i> (bawah layar), klik <strong>Mark as Shipped</strong> jika sudah diserahkan ke kurir (pastikan nomor resi terisi).</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
+                <div className="mt-0.5 bg-indigo-100 text-indigo-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">4. FULFILLED</div>
+                <div>
+                  <p className="text-xs text-slate-600">Dikirim. <br/><strong>Aksi:</strong> Jika barang sudah sampai ke tangan pembeli, klik <strong>Mark as Delivered</strong>.</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100">
+                <div className="mt-0.5 bg-emerald-100 text-emerald-700 p-1.5 rounded text-xs font-bold px-2 shrink-0">5. COMPLETED</div>
+                <div>
+                  <p className="text-xs text-slate-600">Pesanan ditutup (Barang diterima & Lunas).</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6 pt-4 border-t border-slate-100">
+            <h4 className="font-bold text-slate-900 text-base">4. Keuangan: Tagihan, Pembayaran & Refund</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1 flex items-center gap-2"><Receipt className="w-4 h-4 text-indigo-500"/> Invoice (Tagihan)</span>
+                <p className="text-xs text-slate-600">Dokumen penagihan resmi. Pesanan bisa memiliki lebih dari 1 tagihan jika pembayaran dicicil per termin waktu.</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1 flex items-center gap-2"><CreditCard className="w-4 h-4 text-emerald-500"/> Payment (Pembayaran Masuk)</span>
+                <p className="text-xs text-slate-600">Bukti uang telah diterima di Rekening Bank Kas. Jika statusnya <strong>POSTED</strong>, artinya uang sudah sah masuk buku besar.</p>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <span className="font-semibold text-slate-800 block mb-1 flex items-center gap-2"><ArrowRightLeft className="w-4 h-4 text-rose-500"/> Refund (Pengembalian)</span>
+                <p className="text-xs text-slate-600">Pengembalian uang/dana kepada pembeli akibat retur atau pesanan dibatalkan. Mengurangi angka Net Paid.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

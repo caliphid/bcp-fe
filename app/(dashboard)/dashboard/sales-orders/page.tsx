@@ -41,7 +41,7 @@ export default function SalesOrdersPage() {
   }
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex justify-between items-start">
         <PageHeader
           title={t("pages.salesOrders.title")}

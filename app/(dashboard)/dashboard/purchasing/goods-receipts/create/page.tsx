@@ -14,7 +14,8 @@ import { Label } from "../../../../../../components/ui/label";
 import { Alert, AlertDescription } from "../../../../../../components/ui/alert";
 import { Textarea } from "../../../../../../components/ui/textarea";
 import { PageHeader } from "../../../../../../components/ui/page-header";
-import { ArrowLeft, Loader2, Info } from "lucide-react";
+import { ArrowLeft, Loader2, Info, HelpCircle } from "lucide-react";
+import { Modal } from "../../../../../../components/ui/modal";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
@@ -64,6 +65,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 function CreateGoodsReceiptContent() {
+  const { user } = useAuthStore();
+  const isStaff = user?.role === "STAFF_INPUT";
+  const [showTutorial, setShowTutorial] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
   const purchaseOrderId = searchParams.get("purchaseOrderId");
@@ -167,17 +171,22 @@ function CreateGoodsReceiptContent() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
-      <div className="flex items-center gap-4">
-        <Link 
-          href={`/dashboard/purchasing/purchase-orders/${purchaseOrderId}`} 
-          className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <PageHeader 
-          title="Receive Goods" 
-          description={`From PO: ${po.purchaseOrderCode} (${po.vendor?.name})`}
-        />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link 
+            href={`/dashboard/purchasing/purchase-orders/${purchaseOrderId}`} 
+            className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          <PageHeader 
+            title="Receive Goods" 
+            description={`From PO: ${po.purchaseOrderCode} (${po.vendor?.name})`}
+          />
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
+          <HelpCircle className="w-4 h-4 mr-1.5" /> Panduan Terima Barang
+        </Button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -330,6 +339,49 @@ function CreateGoodsReceiptContent() {
           </Button>
         </div>
       </form>
+
+      <Modal isOpen={showTutorial} onClose={() => setShowTutorial(false)} title="Tutorial: Penerimaan Barang (Goods Receipt)" className="max-w-3xl">
+        <div className="space-y-6 text-slate-700 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2">
+          <p className="mb-2"><strong>Goods Receipt (GR)</strong> berfungsi untuk mencatat fisik barang yang masuk ke gudang, sekaligus <strong>menambah stok</strong> dan (opsional) <strong>mencatat hutang</strong> berdasarkan invoice vendor.</p>
+          
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">1. Formulir Penerimaan</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <ul className="list-disc pl-4 text-xs text-slate-600 space-y-2">
+                <li><strong>Receipt Date:</strong> Tanggal aktual barang masuk ke gudang Anda.</li>
+                <li><strong>Delivery Order (DO) Number:</strong> Nomor Surat Jalan dari vendor (jika ada).</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">2. Pengecekan Fisik (Quality Control)</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p className="text-xs text-slate-600 mb-2">Anda wajib memisahkan barang yang lolos QC dengan barang yang rusak/cacat/ditolak.</p>
+              <ul className="list-disc pl-4 text-xs text-slate-600 space-y-1">
+                <li><strong>Received (Diterima):</strong> Total barang yang diserahkan oleh kurir/vendor.</li>
+                <li><strong>Accepted (Bagus):</strong> Jumlah barang yang masuk standar dan layak masuk stok gudang.</li>
+                <li><strong>Rejected (Rusak/Ditolak):</strong> Jumlah barang cacat. Barang ini <strong>tidak akan masuk ke stok</strong> dan (idealnya) akan diretur ke vendor atau dipotong dari hutang.</li>
+              </ul>
+              <div className="bg-emerald-50 text-emerald-800 p-2 rounded mt-2 text-xs">
+                Rumus sistem: <strong>Accepted + Rejected = Received</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 mt-6">
+            <h4 className="font-bold text-slate-900 text-base border-b border-slate-100 pb-2">3. Pencatatan Hutang (Vendor Invoice)</h4>
+            <div className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <p className="text-xs text-slate-600 mb-2">Jika bersamaan dengan pengiriman barang, vendor juga menyertakan <strong>Faktur Tagihan (Invoice)</strong>, Anda bisa sekalian mencatat hutang dengan mencentang kotak <strong>"Create Vendor Debt / Bill"</strong>.</p>
+              <p className="text-xs text-amber-700 bg-amber-50 p-2 rounded">Jika tidak dicentang, sistem hanya akan menambah stok gudang, namun Anda belum bisa melakukan pembayaran ke vendor sampai Anda membuat tagihan manual kelak.</p>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2 border-t border-slate-100 mt-4">
+            <Button type="button" onClick={() => setShowTutorial(false)}>Mengerti</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

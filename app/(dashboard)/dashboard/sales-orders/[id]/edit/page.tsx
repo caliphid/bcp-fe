@@ -94,7 +94,7 @@ export default function EditSalesOrderPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 w-full">
       <PageHeader
         backHref={`/dashboard/sales-orders/${id}`}
         title={isReadOnly ? "Sales Order Detail" : "Edit Draft Sales Order"}
