@@ -52,9 +52,6 @@ function SidebarTooltip({
   const [show, setShow] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const ref = useRef<HTMLAnchorElement>(null);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
 
   const handleMouseEnter = () => {
     if (!isMinimized) return;
@@ -80,8 +77,7 @@ function SidebarTooltip({
         onMouseEnter: handleMouseEnter,
         onMouseLeave: handleMouseLeave,
       })}
-      {mounted &&
-        show &&
+      {show &&
         createPortal(
           <div
             className="fixed z-[9999] px-3.5 py-2 bg-white text-slate-900 text-[13px] font-medium rounded-xl shadow-[0_0_15px_rgba(0,0,0,0.1)] flex items-center pointer-events-none"
@@ -344,6 +340,12 @@ export function Sidebar() {
           icon: <CalendarDays className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
         },
+        {
+          titleKey: "sidebar.items.marketplaceSettlements",
+          href: "/dashboard/marketplace-settlements",
+          icon: <Banknote className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
       ],
     },
     {
@@ -420,6 +422,12 @@ export function Sidebar() {
           titleKey: "sidebar.items.crew",
           href: "/dashboard/crew",
           icon: <Users className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE"],
+        },
+        {
+          titleKey: "sidebar.items.marketplaceAccounts",
+          href: "/dashboard/marketplace-accounts",
+          icon: <Building2 className="h-5 w-5" />,
           allowedRoles: ["OWNER", "ADMIN_FINANCE"],
         },
       ],

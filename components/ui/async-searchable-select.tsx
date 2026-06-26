@@ -10,6 +10,7 @@ function cn(...inputs: ClassValue[]) {
 
 interface AsyncSearchableSelectProps {
   value?: string | number;
+  defaultLabel?: string;
   onChange?: (e: { target: { name?: string; value: string }; option?: any }) => void;
   loadOptions: (inputValue: string) => Promise<{ value: string; label: string }[]>;
   defaultOptions?: { value: string; label: string }[] | boolean;
@@ -23,7 +24,7 @@ interface AsyncSearchableSelectProps {
 }
 
 export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelectProps>(
-  ({ value, onChange, loadOptions, defaultOptions = true, disabled, className, id, name, required, placeholder, cacheOptions, ...props }, ref) => {
+  ({ value, defaultLabel, onChange, loadOptions, defaultOptions = true, disabled, className, id, name, required, placeholder, cacheOptions, ...props }, ref) => {
     
     // We need to fetch the initial label if value is provided and we only have the ID.
     // However, react-select AsyncSelect handles `value` as an object { value, label }.
@@ -38,26 +39,30 @@ export const AsyncSearchableSelect = React.forwardRef<any, AsyncSearchableSelect
 
     // We need to fetch the initial label if value is provided and we only have the ID.
     const [selectedOption, setSelectedOption] = React.useState<{value: string, label: string} | null>(() => {
-      if (value && Array.isArray(defaultOptions)) {
-        return defaultOptions.find(opt => String(opt.value) === String(value)) || null;
+      if (!value) return null;
+      if (Array.isArray(defaultOptions)) {
+        return defaultOptions.find(opt => String(opt.value) === String(value)) || { value: String(value), label: defaultLabel || String(value) };
       }
-      return null;
+      return { value: String(value), label: defaultLabel || String(value) };
     });
 
     React.useEffect(() => {
-      // If the controlled value changed from outside
+      // Sync from outside
       if (value !== lastValue) {
         setLastValue(value);
         if (!value) {
           setSelectedOption(null);
         } else if (Array.isArray(defaultOptions)) {
           const match = defaultOptions.find(opt => String(opt.value) === String(value));
-          setSelectedOption(match || { value: String(value), label: String(value) });
+          setSelectedOption(match || { value: String(value), label: defaultLabel || String(value) });
         } else {
-          setSelectedOption({ value: String(value), label: String(value) });
+          setSelectedOption({ value: String(value), label: defaultLabel || String(value) });
         }
+      } else if (value && selectedOption?.label === String(value) && defaultLabel && defaultLabel !== String(value)) {
+        // Aggressively update label if it's stuck on UUID but we have a defaultLabel
+        setSelectedOption({ value: String(value), label: defaultLabel });
       }
-    }, [value, defaultOptions, lastValue]);
+    }, [value, defaultOptions, lastValue, defaultLabel, selectedOption]);
 
     return (
       <AsyncSelect

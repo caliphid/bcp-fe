@@ -1,8 +1,14 @@
 {
   "sidebar": {
     "brand": {
-      "oms": { "title": "Order", "subtitle": "Management" },
-      "finance": { "title": "Finance", "subtitle": "Control Panel" }
+      "oms": {
+        "title": "Order",
+        "subtitle": "Management"
+      },
+      "finance": {
+        "title": "Finance",
+        "subtitle": "Control Panel"
+      }
     },
     "groups": {
       "mainMenu": "Main Menu",
@@ -61,11 +67,16 @@
       "businessProfile": "Business Profile",
       "appSettings": "App Settings",
       "customers": "Customers",
-      "customerDuplicates": "Customer Duplicates"
+      "customerDuplicates": "Customer Duplicates",
+      "marketplaceSettlements": "Marketplace Settlements",
+      "marketplaceAccounts": "Marketplace Accounts"
     }
   },
   "topbar": {
-    "portals": { "finance": "Finance", "oms": "Order & Inventory" },
+    "portals": {
+      "finance": "Finance",
+      "oms": "Order & Inventory"
+    },
     "logout": "Logout"
   },
   "common": {
@@ -273,10 +284,18 @@
       "duplicateCandidate": "Duplicate Candidate",
       "reviewDuplicate": "Review Duplicate",
       "months": {
-        "january": "January", "february": "February", "march": "March",
-        "april": "April", "may": "May", "june": "June",
-        "july": "July", "august": "August", "september": "September",
-        "october": "October", "november": "November", "december": "December"
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
       }
     },
     "messages": {
@@ -1138,6 +1157,170 @@
         "addItem": "Add Item",
         "searchVariant": "Search Product Variant...",
         "submitBtn": "Submit Adjustment"
+      }
+    }
+  },
+  "marketplace": {
+    "account": {
+      "title": "Marketplace Accounts",
+      "subtitle": "Manage integration accounts for marketplace settlements.",
+      "createTitle": "Create Marketplace Account",
+      "createSubtitle": "Add a new marketplace account.",
+      "editTitle": "Edit Marketplace Account",
+      "editSubtitle": "Update configuration for",
+      "searchPlaceholder": "Search by Account Name...",
+      "form": {
+        "name": "Account Name",
+        "type": "Marketplace Type",
+        "businessUnit": "Business Unit",
+        "settlementAccount": "Settlement Account (Bank/Kas)",
+        "clearingCategory": "Settlement Clearing Category",
+        "commissionCategory": "Commission Category",
+        "shippingCategory": "Shipping Category",
+        "penaltyCategory": "Penalty Category",
+        "refundCategory": "Refund Category",
+        "notes": "Notes",
+        "btnCancel": "Cancel",
+        "btnCreate": "Create Account",
+        "btnSave": "Save Changes"
+      },
+      "table": {
+        "info": "Account Info",
+        "marketplace": "Marketplace",
+        "businessUnit": "Business Unit",
+        "settlementRef": "Settlement Ref",
+        "status": "Status",
+        "actions": "Actions",
+        "noAccounts": "No marketplace accounts yet"
+      }
+    },
+    "settlement": {
+      "title": "Marketplace Settlements",
+      "subtitle": "Manage and review settlements from marketplaces.",
+      "createTitle": "Create Marketplace Settlement",
+      "createSubtitle": "Record a new settlement from marketplace.",
+      "editTitle": "Edit Marketplace Settlement",
+      "editSubtitle": "Update configuration for",
+      "detailTitle": "Marketplace Settlement Detail",
+      "detailSubtitle": "Details for",
+      "searchPlaceholder": "Search by Code or Ext ID...",
+      "form": {
+        "account": "Marketplace Account",
+        "extId": "External Settlement ID",
+        "businessUnit": "Business Unit",
+        "bankAccount": "Bank Account (Optional)",
+        "settlementDate": "Settlement Date",
+        "payoutDate": "Payout Date (Optional)",
+        "periodStart": "Period Start (Optional)",
+        "periodEnd": "Period End (Optional)",
+        "notes": "Notes",
+        "btnCancel": "Cancel",
+        "btnCreate": "Create Settlement",
+        "btnSave": "Save Changes"
+      },
+      "status": {
+        "draft": "Draft",
+        "validating": "Validating",
+        "needs_review": "Needs Review",
+        "ready": "Ready",
+        "posted": "Posted",
+        "void": "Void",
+        "failed": "Failed"
+      },
+      "posting_status": {
+        "posted": "Posted",
+        "void": "Void",
+        "unposted": "Unposted"
+      },
+      "no_data": "No settlement data yet",
+      "table": {
+        "info": "Settlement Info",
+        "account": "Account",
+        "status": "Status",
+        "gross_amount": "Gross Amount",
+        "fees": "Fees & Deductions",
+        "net_amount": "Net Amount",
+        "actions": "Actions"
+      },
+      "detail": {
+        "header": {
+          "code": "Settlement Code",
+          "extId": "Ext ID",
+          "account": "Account",
+          "date": "Settlement Date",
+          "payout": "Payout",
+          "status": "Status",
+          "posting": "Posting",
+          "txn": "TXN"
+        },
+        "financialSummary": "Financial Summary",
+        "grossAmount": "Gross Amount",
+        "totalFees": "Total Fees",
+        "refundPenalty": "Refund / Penalty",
+        "netAmount": "Net Settlement Amount",
+        "reconDiff": "Reconciliation Difference",
+        "reconDiffMsg": "There is a difference of {amount} between expected and actual settlement. Please review unmatched lines or manual adjustments.",
+        "actions": "Actions",
+        "btnAddLines": "Add Lines",
+        "btnValidate": "Validate",
+        "btnAutoMatch": "Auto Match",
+        "btnMarkReady": "Mark Ready",
+        "btnPost": "Post to Ledger",
+        "btnVoid": "Void Settlement"
+      },
+      "customerSummary": {
+        "title": "Customer Summary",
+        "subtitle": "Aggregated from matched settlement lines.",
+        "customer": "Customer",
+        "unlinked": "Unlinked Historical Order",
+        "totalOrders": "Total Matched Orders",
+        "gross": "Gross Contribution",
+        "net": "Net Contribution"
+      },
+      "allocation": {
+        "title": "Allocation Snapshot",
+        "subtitle": "Historical snapshot of order allocation amounts. Read-only.",
+        "orderCode": "Order Code",
+        "customerInfo": "Customer Info",
+        "gross": "Gross",
+        "fees": "Fees & Pen.",
+        "refund": "Refund",
+        "tax": "Tax",
+        "net": "Net"
+      },
+      "lines": {
+        "empty": "No lines added to this settlement yet.",
+        "orderRef": "Order / Trans Ref",
+        "typeDir": "Type & Dir",
+        "desc": "Description",
+        "amount": "Amount",
+        "match": "Match",
+        "status": "Status",
+        "action": "Action",
+        "btnManualMatch": "Manual Match"
+      },
+      "addLines": {
+        "title": "Add Settlement Lines",
+        "extOrder": "Ext Order ID",
+        "extTrans": "Ext Trans ID",
+        "type": "Type",
+        "direction": "Direction",
+        "amount": "Amount",
+        "desc": "Description",
+        "custName": "Customer Name",
+        "custPhone": "Customer Phone",
+        "btnAddRow": "Add Row",
+        "btnCancel": "Cancel",
+        "btnSave": "Save Lines"
+      },
+      "manualMatch": {
+        "title": "Manual Match Line",
+        "salesOrderId": "Sales Order ID",
+        "salesOrderIdHint": "Provide the exact internal ID of the Sales Order to match.",
+        "notes": "Notes (Optional)",
+        "notesHint": "Reason for manual matching...",
+        "btnCancel": "Cancel",
+        "btnConfirm": "Confirm Match"
       }
     }
   }

@@ -1,8 +1,14 @@
 {
   "sidebar": {
     "brand": {
-      "oms": { "title": "Pesanan", "subtitle": "Manajemen" },
-      "finance": { "title": "Keuangan", "subtitle": "Panel Kontrol" }
+      "oms": {
+        "title": "Pesanan",
+        "subtitle": "Manajemen"
+      },
+      "finance": {
+        "title": "Keuangan",
+        "subtitle": "Panel Kontrol"
+      }
     },
     "groups": {
       "mainMenu": "Menu Utama",
@@ -61,11 +67,16 @@
       "businessProfile": "Profil Bisnis",
       "appSettings": "Pengaturan Aplikasi",
       "customers": "Pelanggan",
-      "customerDuplicates": "Duplikat Pelanggan"
+      "customerDuplicates": "Duplikat Pelanggan",
+      "marketplaceSettlements": "Marketplace Settlements",
+      "marketplaceAccounts": "Marketplace Accounts"
     }
   },
   "topbar": {
-    "portals": { "finance": "Keuangan", "oms": "Pesanan & Inventaris" },
+    "portals": {
+      "finance": "Keuangan",
+      "oms": "Pesanan & Inventaris"
+    },
     "logout": "Keluar"
   },
   "common": {
@@ -273,10 +284,18 @@
       "duplicateCandidate": "Kandidat Duplikat",
       "reviewDuplicate": "Review Duplikat",
       "months": {
-        "january": "Januari", "february": "Februari", "march": "Maret",
-        "april": "April", "may": "Mei", "june": "Juni",
-        "july": "Juli", "august": "Agustus", "september": "September",
-        "october": "Oktober", "november": "November", "december": "Desember"
+        "january": "Januari",
+        "february": "Februari",
+        "march": "Maret",
+        "april": "April",
+        "may": "Mei",
+        "june": "Juni",
+        "july": "Juli",
+        "august": "Agustus",
+        "september": "September",
+        "october": "Oktober",
+        "november": "November",
+        "december": "Desember"
       }
     },
     "messages": {
@@ -1138,6 +1157,170 @@
         "addItem": "Tambah Item",
         "searchVariant": "Cari Varian Produk...",
         "submitBtn": "Kirim Penyesuaian"
+      }
+    }
+  },
+  "marketplace": {
+    "account": {
+      "title": "Akun Marketplace",
+      "subtitle": "Kelola akun integrasi untuk marketplace settlement.",
+      "createTitle": "Buat Akun Marketplace",
+      "createSubtitle": "Tambah akun marketplace baru.",
+      "editTitle": "Edit Akun Marketplace",
+      "editSubtitle": "Perbarui konfigurasi untuk",
+      "searchPlaceholder": "Cari Nama Akun...",
+      "form": {
+        "name": "Nama Akun",
+        "type": "Tipe Marketplace",
+        "businessUnit": "Unit Bisnis",
+        "settlementAccount": "Akun Settlement (Bank/Kas)",
+        "clearingCategory": "Kategori Settlement Clearing",
+        "commissionCategory": "Kategori Komisi",
+        "shippingCategory": "Kategori Ongkir",
+        "penaltyCategory": "Kategori Penalti",
+        "refundCategory": "Kategori Refund",
+        "notes": "Catatan",
+        "btnCancel": "Batal",
+        "btnCreate": "Buat Akun",
+        "btnSave": "Simpan Perubahan"
+      },
+      "table": {
+        "info": "Info Akun",
+        "marketplace": "Marketplace",
+        "businessUnit": "Unit Bisnis",
+        "settlementRef": "Referensi Settlement",
+        "status": "Status",
+        "actions": "Aksi",
+        "noAccounts": "Belum ada akun marketplace"
+      }
+    },
+    "settlement": {
+      "title": "Marketplace Settlements",
+      "subtitle": "Kelola dan tinjau pencairan dana dari marketplace.",
+      "createTitle": "Buat Marketplace Settlement",
+      "createSubtitle": "Catat pencairan dana baru dari marketplace.",
+      "editTitle": "Edit Marketplace Settlement",
+      "editSubtitle": "Perbarui konfigurasi untuk",
+      "detailTitle": "Detail Marketplace Settlement",
+      "detailSubtitle": "Detail untuk",
+      "searchPlaceholder": "Cari Kode atau Ext ID...",
+      "form": {
+        "account": "Akun Marketplace",
+        "extId": "External Settlement ID",
+        "businessUnit": "Unit Bisnis",
+        "bankAccount": "Akun Bank (Opsional)",
+        "settlementDate": "Tanggal Settlement",
+        "payoutDate": "Tanggal Payout (Opsional)",
+        "periodStart": "Awal Periode (Opsional)",
+        "periodEnd": "Akhir Periode (Opsional)",
+        "notes": "Catatan",
+        "btnCancel": "Batal",
+        "btnCreate": "Buat Settlement",
+        "btnSave": "Simpan Perubahan"
+      },
+      "status": {
+        "draft": "Draft",
+        "validating": "Memvalidasi",
+        "needs_review": "Butuh Review",
+        "ready": "Siap",
+        "posted": "Posted",
+        "void": "Void",
+        "failed": "Gagal"
+      },
+      "posting_status": {
+        "posted": "Telah di-Posting",
+        "void": "Void",
+        "unposted": "Belum di-Posting"
+      },
+      "no_data": "Belum ada data settlement",
+      "table": {
+        "info": "Info Settlement",
+        "account": "Akun",
+        "status": "Status",
+        "gross_amount": "Total Kotor",
+        "fees": "Biaya & Potongan",
+        "net_amount": "Total Bersih",
+        "actions": "Aksi"
+      },
+      "detail": {
+        "header": {
+          "code": "Kode Settlement",
+          "extId": "Ext ID",
+          "account": "Akun",
+          "date": "Tanggal Settlement",
+          "payout": "Payout",
+          "status": "Status",
+          "posting": "Posting",
+          "txn": "TXN"
+        },
+        "financialSummary": "Ringkasan Finansial",
+        "grossAmount": "Jumlah Kotor",
+        "totalFees": "Total Biaya",
+        "refundPenalty": "Refund / Penalti",
+        "netAmount": "Jumlah Bersih Settlement",
+        "reconDiff": "Selisih Rekonsiliasi",
+        "reconDiffMsg": "Terdapat selisih {amount} antara estimasi dengan settlement asli. Mohon periksa baris tidak cocok atau tambahkan penyesuaian manual.",
+        "actions": "Aksi",
+        "btnAddLines": "Tambah Baris",
+        "btnValidate": "Validasi",
+        "btnAutoMatch": "Auto Match",
+        "btnMarkReady": "Tandai Siap",
+        "btnPost": "Posting Ledger",
+        "btnVoid": "Void Settlement"
+      },
+      "customerSummary": {
+        "title": "Ringkasan Pelanggan",
+        "subtitle": "Diagregasi dari order yang berhasil dicocokkan.",
+        "customer": "Pelanggan",
+        "unlinked": "Order Historis (Tidak Tertaut)",
+        "totalOrders": "Total Order Dicocokkan",
+        "gross": "Kontribusi Kotor",
+        "net": "Kontribusi Bersih"
+      },
+      "allocation": {
+        "title": "Snapshot Alokasi",
+        "subtitle": "Snapshot historis alokasi order. Hanya baca.",
+        "orderCode": "Kode Order",
+        "customerInfo": "Info Pelanggan",
+        "gross": "Kotor",
+        "fees": "Biaya & Penalti",
+        "refund": "Refund",
+        "tax": "Pajak",
+        "net": "Bersih"
+      },
+      "lines": {
+        "empty": "Belum ada baris ditambahkan ke settlement ini.",
+        "orderRef": "Ref Order / Trans",
+        "typeDir": "Tipe & Arah",
+        "desc": "Deskripsi",
+        "amount": "Jumlah",
+        "match": "Cocok",
+        "status": "Status",
+        "action": "Aksi",
+        "btnManualMatch": "Manual Match"
+      },
+      "addLines": {
+        "title": "Tambah Baris Settlement",
+        "extOrder": "Ext Order ID",
+        "extTrans": "Ext Trans ID",
+        "type": "Tipe",
+        "direction": "Arah",
+        "amount": "Jumlah",
+        "desc": "Deskripsi",
+        "custName": "Nama Pelanggan",
+        "custPhone": "No. HP Pelanggan",
+        "btnAddRow": "Tambah Baris",
+        "btnCancel": "Batal",
+        "btnSave": "Simpan Baris"
+      },
+      "manualMatch": {
+        "title": "Manual Match Baris",
+        "salesOrderId": "Sales Order ID",
+        "salesOrderIdHint": "Berikan ID internal spesifik dari Sales Order untuk pencocokan.",
+        "notes": "Catatan (Opsional)",
+        "notesHint": "Alasan pencocokan manual...",
+        "btnCancel": "Batal",
+        "btnConfirm": "Konfirmasi"
       }
     }
   }
