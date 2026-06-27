@@ -20,6 +20,7 @@ interface DataTableProps<T> {
   isLoading?: boolean;
   emptyMessage?: string;
   headerActions?: ReactNode;
+  onRowClick?: (item: T) => void;
 }
 
 export function DataTable<T>({
@@ -32,6 +33,7 @@ export function DataTable<T>({
   isLoading = false,
   emptyMessage = "No data found.",
   headerActions,
+  onRowClick,
 }: DataTableProps<T>) {
   return (
     <Card className="border-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
@@ -74,7 +76,11 @@ export function DataTable<T>({
                 </tr>
               ) : (
                 data.map((item, rowIndex) => (
-                  <tr key={rowIndex} className="group hover:bg-slate-50/80 transition-colors">
+                  <tr 
+                    key={rowIndex} 
+                    className={`group hover:bg-slate-50/80 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
+                    onClick={() => onRowClick && onRowClick(item)}
+                  >
                     {columns.map((col, colIndex) => (
                       <td key={colIndex} className={`px-6 py-4 ${col.className || ""}`}>
                         {col.cell ? col.cell(item) : col.accessorKey ? String(item[col.accessorKey] ?? "") : null}

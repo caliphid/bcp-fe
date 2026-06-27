@@ -13,7 +13,7 @@ import { ConfirmDialog } from "../../../../../components/ui/confirm-dialog";
 import { ReturnStatusBadge, ReturnTypeBadge, ShipmentStatusBadge, ResolutionTypeBadge, ItemConditionBadge } from "../../../../../features/customer-returns/components/status-badge";
 import { ArrowLeft, CheckCircle, XCircle, Package, ArrowRightLeft, CheckSquare, Settings2, Trash2 } from "lucide-react";
 import { formatCurrency } from "../../../../../features/debts/utils/formatters";
-import { formatDate } from "../../../../../lib/utils";
+import { formatDate, cn } from "../../../../../lib/utils";
 import toast from "react-hot-toast";
 
 // We'll import the Modals later when we create them.

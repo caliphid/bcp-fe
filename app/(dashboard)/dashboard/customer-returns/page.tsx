@@ -32,7 +32,7 @@ export default function CustomerReturnsPage() {
   });
 
   const returns = data?.data || [];
-  const meta = data?.meta || { page: 1, limit: 10, total: 0 };
+  const meta = data?.meta || { page: 1, limit: 10, total: 0, totalPages: 0 };
 
   const columns = [
     {
@@ -145,12 +145,8 @@ export default function CustomerReturnsPage() {
           columns={columns}
           data={returns}
           isLoading={isLoading}
-          pagination={{
-            page: meta.page,
-            limit: meta.limit,
-            total: meta.total,
-            onPageChange: setPage,
-          }}
+          meta={meta}
+          onPageChange={setPage}
           onRowClick={(row) => router.push(`/dashboard/customer-returns/${row.id}`)}
         />
       </div>

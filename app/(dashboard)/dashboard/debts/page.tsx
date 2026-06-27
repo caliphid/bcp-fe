@@ -16,6 +16,7 @@ import { DebtPaymentFormModal } from "../../../../features/debts/components/debt
 import { VoidPaymentModal } from "../../../../features/debts/components/void-payment-modal";
 import { DebtDetailDrawer } from "../../../../features/debts/components/debt-detail-drawer";
 import { DebtLenderSummary } from "../../../../features/debts/components/debt-lender-summary";
+import { DebtUnitSummary } from "../../../../features/debts/components/debt-unit-summary";
 import { Button } from "../../../../components/ui/button";
 import { Plus, HelpCircle } from "lucide-react";
 import { Modal } from "../../../../components/ui/modal";

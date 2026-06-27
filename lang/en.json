@@ -26,6 +26,7 @@
     },
     "items": {
       "overview": "Overview",
+      "orderDashboard": "Order Dashboard",
       "transactions": "Transactions",
       "debtManagement": "Debt Management",
       "debtInstallments": "Debt Installments",
@@ -1450,6 +1451,114 @@
         "btnCancel": "Cancel",
         "btnConfirm": "Confirm Match"
       }
+    }
+  },
+  "orderDashboard": {
+    "title": "Order Dashboard",
+    "subtitle": "Comprehensive view of sales, fulfillments, and financials.",
+    "errorLoadingOverview": "Error Loading Overview",
+    "errorLoadingOverviewDesc": "Failed to load dashboard data. Check if date range exceeds limits.",
+    "errorLoadingDailyTrend": "Error Loading Daily Trend",
+    "errorLoadingDailyTrendDesc": "Date range cannot exceed 366 days.",
+    "overview": {
+      "attentionRequired": "Attention Required",
+      "missingCogs": "items missing COGS (Cost of Goods Sold). Data quality warning.",
+      "unsettledOrders": "unsettled marketplace orders.",
+      "failedDeliveryReturns": "failed delivery returns pending processing.",
+      "reconciliationMismatch": "Reconciliation mismatch detected between summary and granular tables.",
+      "bookedSales": "Booked Sales",
+      "completedSales": "Completed Sales",
+      "grossProfit": "Gross Profit",
+      "netSalesProfit": "Net Sales Profit",
+      "orders": "Orders",
+      "cancelled": "Cancelled",
+      "fulfilled": "Fulfilled",
+      "cogs": "COGS",
+      "coverage": "Coverage",
+      "timezone": "Timezone",
+      "snapshotReady": "Snapshot Ready",
+      "dateRange": "Date Range",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "filterBar": {
+      "customDateRange": "Custom Date Range",
+      "monthlyPeriod": "Monthly Period",
+      "switch": "Switch",
+      "year": "Year",
+      "month": "Month",
+      "dateFrom": "Date From",
+      "dateTo": "Date To (Max 93 days)",
+      "businessUnit": "Business Unit",
+      "allUnits": "All Units",
+      "resetFilters": "Reset Filters",
+      "reset": "Reset"
+    },
+    "statusPipeline": {
+      "title": "Status Pipeline",
+      "orderStatus": "Order Status",
+      "paymentStatus": "Payment Status",
+      "shipmentStatus": "Shipment Status",
+      "settlementStatus": "Settlement Status",
+      "noData": "No data",
+      "notYetProcessed": "NOT YET PROCESSED"
+    },
+    "reconciliationPanel": {
+      "title": "Reconciliation Dashboard",
+      "grossSalesDifference": "Gross Sales Difference",
+      "cogsDifference": "COGS Difference",
+      "channelGrossSalesDifference": "Channel Gross Sales Diff",
+      "channelCogsDifference": "Channel COGS Diff",
+      "channelAdsCostDifference": "Channel Ads Cost Diff",
+      "refundDifference": "Refund Difference"
+    },
+    "monthlyReport": {
+      "title": "Monthly Performance Report",
+      "month": "Month",
+      "orders": "Orders",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "grossSales": "Gross Sales",
+      "netSales": "Net Sales",
+      "grossProfit": "Gross Profit",
+      "netSalesProfit": "Net Sales Profit",
+      "cogs": "COGS",
+      "adsCost": "Ads Cost",
+      "marketplaceFee": "Marketplace Fee",
+      "feeVariance": "Fee Variance"
+    },
+    "dailyTrend": {
+      "title": "Daily Sales & Profit Trend",
+      "date": "Date",
+      "orders": "Orders",
+      "grossSales": "Gross Sales",
+      "netSales": "Net Sales",
+      "grossProfit": "Gross Profit",
+      "netSalesProfit": "Net Sales Profit"
+    },
+    "drilldowns": {
+      "salesByChannel": "Sales By Channel",
+      "salesByMarketplace": "Sales By Marketplace",
+      "salesByProduct": "Sales By Product",
+      "salesByVariant": "Sales By Variant",
+      "salesByCategory": "Sales By Category",
+      "salesByCustomer": "Sales By Customer",
+      "unlinkedOrders": "Unlinked Orders",
+      "channel": "Channel",
+      "marketplace": "Marketplace",
+      "productId": "Product ID",
+      "productName": "Product Name",
+      "variantName": "Variant Name",
+      "category": "Category",
+      "customerCode": "Customer Code",
+      "customerName": "Customer Name",
+      "orderCode": "Order Code",
+      "orderDate": "Order Date",
+      "status": "Status",
+      "paymentStatus": "Payment Status",
+      "settlementStatus": "Settlement Status",
+      "grandTotal": "Grand Total",
+      "quantity": "Qty"
     }
   }
 }

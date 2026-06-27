@@ -8,9 +8,10 @@ interface PageHeaderProps {
   title: string;
   description?: string;
   children?: ReactNode;
+  icon?: ReactNode;
 }
 
-export function PageHeader({ title, description, children, backHref }: PageHeaderProps) {
+export function PageHeader({ title, description, children, backHref, icon }: PageHeaderProps) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
       <div>
@@ -19,6 +20,11 @@ export function PageHeader({ title, description, children, backHref }: PageHeade
             <Link href={backHref} className="text-slate-500 hover:text-slate-900 transition-colors">
               <ArrowLeft className="w-5 h-5" />
             </Link>
+          )}
+          {icon && (
+            <div className="text-slate-500 mr-1 flex items-center justify-center">
+              {icon}
+            </div>
           )}
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
         </div>

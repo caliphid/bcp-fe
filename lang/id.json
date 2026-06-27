@@ -26,6 +26,7 @@
     },
     "items": {
       "overview": "Ringkasan",
+      "orderDashboard": "Dashboard Pesanan",
       "transactions": "Transaksi",
       "debtManagement": "Manajemen Hutang",
       "debtInstallments": "Cicilan Hutang",
@@ -1450,6 +1451,114 @@
         "btnCancel": "Batal",
         "btnConfirm": "Konfirmasi"
       }
+    }
+  },
+  "orderDashboard": {
+    "title": "Dasbor Pesanan",
+    "subtitle": "Tampilan komprehensif penjualan, pemenuhan, dan keuangan.",
+    "errorLoadingOverview": "Gagal Memuat Ringkasan",
+    "errorLoadingOverviewDesc": "Gagal memuat data dasbor. Periksa apakah rentang tanggal melebihi batas.",
+    "errorLoadingDailyTrend": "Gagal Memuat Tren Harian",
+    "errorLoadingDailyTrendDesc": "Rentang tanggal tidak boleh lebih dari 366 hari.",
+    "overview": {
+      "attentionRequired": "Perlu Perhatian",
+      "missingCogs": "item kehilangan COGS (Harga Pokok Penjualan). Peringatan kualitas data.",
+      "unsettledOrders": "pesanan marketplace belum diselesaikan (unsettled).",
+      "failedDeliveryReturns": "retur pengiriman gagal menunggu pemrosesan.",
+      "reconciliationMismatch": "Ketidaksesuaian rekonsiliasi terdeteksi antara ringkasan dan tabel granular.",
+      "bookedSales": "Penjualan Dibukukan",
+      "completedSales": "Penjualan Selesai",
+      "grossProfit": "Laba Kotor",
+      "netSalesProfit": "Laba Penjualan Bersih",
+      "orders": "Pesanan",
+      "cancelled": "Dibatalkan",
+      "fulfilled": "Terkirim",
+      "cogs": "COGS",
+      "coverage": "Cakupan",
+      "timezone": "Zona Waktu",
+      "snapshotReady": "Snapshot Siap",
+      "dateRange": "Rentang Tanggal",
+      "yes": "Ya",
+      "no": "Tidak"
+    },
+    "filterBar": {
+      "customDateRange": "Rentang Tanggal Khusus",
+      "monthlyPeriod": "Periode Bulanan",
+      "switch": "Ubah",
+      "year": "Tahun",
+      "month": "Bulan",
+      "dateFrom": "Tanggal Dari",
+      "dateTo": "Tanggal Hingga (Maks 93 hari)",
+      "businessUnit": "Unit Bisnis",
+      "allUnits": "Semua Unit",
+      "resetFilters": "Atur Ulang Filter",
+      "reset": "Atur Ulang"
+    },
+    "statusPipeline": {
+      "title": "Pipeline Status",
+      "orderStatus": "Status Pesanan",
+      "paymentStatus": "Status Pembayaran",
+      "shipmentStatus": "Status Pengiriman",
+      "settlementStatus": "Status Penyelesaian",
+      "noData": "Tidak ada data",
+      "notYetProcessed": "BELUM DIPROSES"
+    },
+    "reconciliationPanel": {
+      "title": "Dasbor Rekonsiliasi",
+      "grossSalesDifference": "Selisih Penjualan Kotor",
+      "cogsDifference": "Selisih HPP (COGS)",
+      "channelGrossSalesDifference": "Selisih Penjualan Kotor Channel",
+      "channelCogsDifference": "Selisih HPP Channel",
+      "channelAdsCostDifference": "Selisih Biaya Iklan Channel",
+      "refundDifference": "Selisih Pengembalian Dana"
+    },
+    "monthlyReport": {
+      "title": "Laporan Kinerja Bulanan",
+      "month": "Bulan",
+      "orders": "Pesanan",
+      "completed": "Selesai",
+      "cancelled": "Batal",
+      "grossSales": "Penjualan Kotor",
+      "netSales": "Penjualan Bersih",
+      "grossProfit": "Laba Kotor",
+      "netSalesProfit": "Laba Penjualan Bersih",
+      "cogs": "HPP (COGS)",
+      "adsCost": "Biaya Iklan",
+      "marketplaceFee": "Biaya Marketplace",
+      "feeVariance": "Selisih Biaya"
+    },
+    "dailyTrend": {
+      "title": "Tren Penjualan & Laba Harian",
+      "date": "Tanggal",
+      "orders": "Pesanan",
+      "grossSales": "Penjualan Kotor",
+      "netSales": "Penjualan Bersih",
+      "grossProfit": "Laba Kotor",
+      "netSalesProfit": "Laba Penjualan Bersih"
+    },
+    "drilldowns": {
+      "salesByChannel": "Penjualan Berdasarkan Saluran",
+      "salesByMarketplace": "Penjualan Berdasarkan Marketplace",
+      "salesByProduct": "Penjualan Berdasarkan Produk",
+      "salesByVariant": "Penjualan Berdasarkan Varian",
+      "salesByCategory": "Penjualan Berdasarkan Kategori",
+      "salesByCustomer": "Penjualan Berdasarkan Pelanggan",
+      "unlinkedOrders": "Pesanan Belum Tertaut",
+      "channel": "Saluran",
+      "marketplace": "Marketplace",
+      "productId": "ID Produk",
+      "productName": "Nama Produk",
+      "variantName": "Nama Varian",
+      "category": "Kategori",
+      "customerCode": "Kode Pelanggan",
+      "customerName": "Nama Pelanggan",
+      "orderCode": "Kode Pesanan",
+      "orderDate": "Tanggal Pesanan",
+      "status": "Status",
+      "paymentStatus": "Status Pembayaran",
+      "settlementStatus": "Status Penyelesaian",
+      "grandTotal": "Total Keseluruhan",
+      "quantity": "Kuantitas"
     }
   }
 }

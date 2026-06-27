@@ -14,7 +14,7 @@ export default function EditCustomerPage({ params }: { params: Promise<{ id: str
   const { user } = useAuthStore();
   const router = useRouter();
   const { id } = use(params);
-  const { data, isLoading: loading, error } = useCustomer(id);
+  const { data, isLoading: loading, error, mutate } = useCustomer(id);
 
   useEffect(() => {
     if (user && user.role !== "OWNER" && user.role !== "ADMIN_FINANCE") {

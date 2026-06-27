@@ -162,6 +162,12 @@ export function Sidebar() {
       portals: ["OMS"],
       items: [
         {
+          titleKey: "sidebar.items.orderDashboard",
+          href: "/dashboard/order-dashboard",
+          icon: <LayoutDashboard className="h-5 w-5" />,
+          allowedRoles: ["OWNER", "ADMIN_FINANCE", "STAFF_INPUT"],
+        },
+        {
           titleKey: "sidebar.items.salesOrders",
           href: "/dashboard/sales-orders",
           icon: <ShoppingCart className="h-5 w-5" />,
