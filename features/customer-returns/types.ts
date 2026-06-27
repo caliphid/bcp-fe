@@ -1,8 +1,8 @@
-import { Warehouse } from "../warehouses/types";
-import { User } from "../auth/types";
-import { ProductVariant } from "../products/types";
-import { SalesOrder } from "../sales-orders/types";
-import { Customer } from "../customers/types";
+import { Warehouse } from "../../types/warehouse";
+import { User } from "../../types/auth";
+import { ProductVariant } from "../../types/product";
+import { SalesOrder } from "../../types/sales-order";
+import { Customer } from "../../types/customer";
 
 // ENUMS
 export enum CustomerReturnType {

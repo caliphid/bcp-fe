@@ -22,7 +22,7 @@ const phoneRegex = /^(\+62|62|0)8[1-9][0-9]{6,10}$/;
 
 const addressSchema = z.object({
   label: z.string().optional(),
-  addressType: z.nativeEnum(CustomerAddressType).default(CustomerAddressType.BOTH),
+  addressType: z.nativeEnum(CustomerAddressType).optional(),
   recipientName: z.string().min(2, { message: "Nama penerima wajib diisi (min 2 karakter)" }),
   recipientPhone: z.string().regex(phoneRegex, { message: "Format nomor telepon tidak valid" }).optional().or(z.literal("")),
   addressLine1: z.string().min(5, { message: "Alamat baris 1 wajib diisi (min 5 karakter)" }),
@@ -32,9 +32,9 @@ const addressSchema = z.object({
   city: z.string().optional(),
   province: z.string().optional(),
   postalCode: z.string().optional(),
-  countryCode: z.string().default("ID"),
-  isDefaultShipping: z.boolean().default(false),
-  isDefaultBilling: z.boolean().default(false),
+  countryCode: z.string().optional(),
+  isDefaultShipping: z.boolean().optional(),
+  isDefaultBilling: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof addressSchema>;

@@ -185,7 +185,7 @@ export function CustomerDetailView({ customer }: CustomerDetailViewProps) {
           {!isStaff && Number(customer.summary?.remainingBalance || 0) > 0 && (
             <div className="mt-4 p-3 bg-rose-50 rounded-xl border border-rose-100 flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-rose-500 mt-0.5 shrink-0" />
-              <p className="text-xs text-rose-700">Customer ini memiliki piutang yang belum lunas sebesar <strong>{formatMoney(customer.summary?.remainingBalance)}</strong>.</p>
+              <p className="text-xs text-rose-700">Customer ini memiliki piutang yang belum lunas sebesar <strong>{formatMoney(customer.summary?.remainingBalance || 0)}</strong>.</p>
             </div>
           )}
         </div>

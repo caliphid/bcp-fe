@@ -64,7 +64,7 @@ export function OrderDailyTrendChart({ data, loading }: OrderDailyTrendChartProp
               <YAxis axisLine={false} tickLine={false} tickFormatter={formatCurrency} tick={{fill: '#94a3b8', fontSize: 11}} />
               <Tooltip 
                 cursor={{stroke: '#cbd5e1', strokeWidth: 1, strokeDasharray: '4 4'}}
-                formatter={(value: any, name: string) => [
+                formatter={(value: any, name: any) => [
                   new Intl.NumberFormat('id-ID', { style: 'currency', currency: currency || 'IDR', maximumFractionDigits: 0 }).format(Number(value)),
                   name === "GrossSales" ? t("orderDashboard.dailyTrend.grossSales") : t("orderDashboard.dailyTrend.netSalesProfit")
                 ]}

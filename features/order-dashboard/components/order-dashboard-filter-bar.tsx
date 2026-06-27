@@ -135,7 +135,7 @@ export function OrderDashboardFilterBar() {
                 onChange={(e) => setFilter("businessUnitId", e.target.value || undefined)}
               >
                 <option value="">{t("orderDashboard.filterBar.allUnits")}</option>
-                {businessUnitsData?.data?.map(bu => (
+                {businessUnitsData?.map(bu => (
                   <option key={bu.id} value={bu.id}>{bu.name}</option>
                 ))}
               </SearchableSelect>

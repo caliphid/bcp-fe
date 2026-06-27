@@ -15,7 +15,7 @@ export default function DuplicateCustomersPage() {
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<string>("POSSIBLE_DUPLICATE");
   
-  const { data, meta, loading, mutate } = useCustomerDuplicates({ page, limit: 10, status: status as any });
+  const { data, meta, isLoading, mutate } = useCustomerDuplicates({ page, limit: 10, status: status as any });
 
   useEffect(() => {
     if (user && user.role !== "OWNER" && user.role !== "ADMIN_FINANCE") {
@@ -33,7 +33,7 @@ export default function DuplicateCustomersPage() {
         title="Review Duplikat Customer"
         description="Daftar kandidat customer yang terdeteksi duplikat oleh sistem."
         icon={<AlertTriangle className="w-6 h-6 text-amber-500" />}
-        backUrl="/dashboard/customers"
+        backHref="/dashboard/customers"
       />
 
       <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex gap-4 overflow-x-auto">
@@ -63,7 +63,7 @@ export default function DuplicateCustomersPage() {
         </button>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <div className="h-64 bg-slate-50 animate-pulse rounded-2xl border border-slate-100"></div>
       ) : (
         <>

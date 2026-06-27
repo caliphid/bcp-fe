@@ -228,7 +228,7 @@ export default function CustomerReturnDetailPage({ params }: PageProps) {
                 <>
                   <div>
                     <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Name</p>
-                    <p className="font-medium text-slate-800">{ret.customerName || ret.salesOrder?.customer?.name || "-"}</p>
+                    <p className="font-medium text-slate-800">{ret.customerName || ret.salesOrder?.customer?.fullName || "-"}</p>
                   </div>
                   <div>
                     <p className="text-xs text-slate-500 font-medium uppercase tracking-wider mb-1">Customer Phone</p>

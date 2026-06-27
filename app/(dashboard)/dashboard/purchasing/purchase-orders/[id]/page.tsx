@@ -170,7 +170,7 @@ export default function PurchaseOrderDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-3">
             <PageHeader
               title={`Purchase Order ${po.purchaseOrderCode}`}
-              description={`Vendor: ${po.vendor?.name} | Created: ${formatDate(po.createdAt)}`}
+              description={`Vendor: ${po.vendor?.name} | Created: ${formatDate(po.orderDate)}`}
             />
             <Button type="button" variant="outline" size="sm" onClick={() => setShowTutorial(true)} className="bg-white hover:bg-slate-50 text-indigo-600 border-indigo-200 h-8 px-3">
               <HelpCircle className="w-4 h-4 mr-1.5" /> Siklus Pembelian

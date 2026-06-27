@@ -27,7 +27,7 @@ const addressSchema = z.object({
   city: z.string().optional(),
   province: z.string().optional(),
   postalCode: z.string().optional(),
-  countryCode: z.string().default("ID"),
+  countryCode: z.string().optional(),
 });
 
 const schema = z.object({
@@ -38,10 +38,10 @@ const schema = z.object({
   companyName: z.string().optional(),
   taxNumber: z.string().optional(),
   businessUnitId: z.string().optional(),
-  customerType: z.nativeEnum(CustomerType).default(CustomerType.RETAIL),
-  source: z.nativeEnum(CustomerSource).default(CustomerSource.MANUAL),
+  customerType: z.nativeEnum(CustomerType).optional(),
+  source: z.nativeEnum(CustomerSource).optional(),
   notes: z.string().optional(),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).optional(),
   status: z.nativeEnum(CustomerStatus).optional(), // only for edit
   address: addressSchema.optional(), // only for create
 });

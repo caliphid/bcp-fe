@@ -60,7 +60,7 @@ export default function CustomerReturnsPage() {
       header: t("pages.customerReturns.columns.customer"),
       cell: (row: CustomerReturn) => {
         const hasCustomer = !!row.customer;
-        const name = row.customer?.fullName || row.customerName || row.salesOrder?.customer?.name || "-";
+        const name = row.customer?.fullName || row.customerName || row.salesOrder?.customer?.fullName || "-";
         
         return (
           <div>

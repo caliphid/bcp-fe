@@ -33,7 +33,7 @@ export default function BackfillCustomersPage() {
     setError(null);
     setSuccess(false);
     try {
-      await customerApi.backfillSalesOrders();
+      await customerApi.backfillSalesOrders({});
       setSuccess(true);
     } catch (err) {
       setError(extractErrorMessage(err));
@@ -48,7 +48,7 @@ export default function BackfillCustomersPage() {
         title="Admin Tool: Backfill Sales Orders"
         description="Jalankan job background untuk mengaitkan ulang Sales Order lama dengan Customer baru berdasarkan nomor telepon."
         icon={<Database className="w-6 h-6 text-indigo-500" />}
-        backUrl="/dashboard/customers"
+        backHref="/dashboard/customers"
       />
 
       <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">

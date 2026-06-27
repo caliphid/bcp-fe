@@ -27,7 +27,7 @@ export default function CreateCustomerPage() {
         title="Buat Customer Baru"
         description="Tambahkan data pelanggan baru ke dalam sistem."
         icon={<Users className="w-6 h-6" />}
-        backUrl="/dashboard/customers"
+        backHref="/dashboard/customers"
       />
 
       <CustomerForm />

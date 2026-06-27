@@ -15,7 +15,7 @@ import { useState } from "react";
 
 export default function CustomersPage() {
   const { filters, setFilter } = useCustomersStore();
-  const { data, meta, loading, mutate } = useCustomers(filters);
+  const { data, meta, isLoading, mutate } = useCustomers(filters);
   const { user } = useAuthStore();
   const { t } = useTranslation();
   
@@ -51,7 +51,7 @@ export default function CustomersPage() {
       <CustomersTable
         data={data}
         meta={meta}
-        loading={loading}
+        loading={isLoading}
         onPageChange={(page) => setFilter("page", page)}
       />
 
