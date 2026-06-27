@@ -37,7 +37,7 @@ export function OrderReconciliationPanel({ data, loading }: OrderReconciliationP
   const hasMismatch = differences.some(d => d.value !== 0);
 
   return (
-    <Card className={hasMismatch ? "border-amber-200" : ""}>
+    <Card className={`h-full flex flex-col ${hasMismatch ? "border-amber-200" : ""}`}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center justify-between">
           <span>Reconciliation Status</span>
@@ -54,17 +54,17 @@ export function OrderReconciliationPanel({ data, loading }: OrderReconciliationP
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         {hasMismatch && (
           <div className="text-xs text-amber-700 mb-4 bg-amber-50 p-2 rounded">
             Reported difference between summary totals and grouped row totals. The system displays this as-is and does not automatically adjust figures.
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {differences.map((diff, index) => (
-            <div key={index} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+            <div key={index} className="flex flex-col gap-1 p-3 bg-slate-50 rounded-lg border border-slate-100">
               <span className="text-sm font-medium text-slate-600">{diff.label}</span>
-              <span className={`text-sm font-bold ${diff.value !== 0 ? 'text-amber-600' : 'text-slate-900'}`}>
+              <span className={`text-base font-bold ${diff.value !== 0 ? 'text-amber-600' : 'text-slate-900'}`}>
                 {formatCurrency(diff.value)}
               </span>
             </div>

@@ -26,11 +26,11 @@ export function OrderStatusPipeline({ data, loading }: OrderStatusPipelineProps)
         <h4 className="text-sm font-semibold text-slate-700">{title}</h4>
         <div className="space-y-2">
           {Object.entries(statusObj).map(([status, count]) => (
-            <div key={status} className="flex items-center justify-between text-sm">
-              <span className="text-slate-600 truncate mr-2" title={status}>
+            <div key={status} className="flex items-center justify-between px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg">
+              <span className="text-slate-600 font-semibold text-[11px] truncate mr-2" title={status}>
                 {status === "UNCREATED" ? t("orderDashboard.statusPipeline.notYetProcessed") : status}
               </span>
-              <span className={`px-2 py-0.5 rounded-md font-medium text-xs ${colorClass}`}>
+              <span className={`px-2 py-0.5 rounded-md font-bold text-xs ${colorClass}`}>
                 {count}
               </span>
             </div>

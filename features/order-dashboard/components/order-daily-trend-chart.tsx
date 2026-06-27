@@ -40,13 +40,13 @@ export function OrderDailyTrendChart({ data, loading }: OrderDailyTrendChartProp
   }));
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>{t("orderDashboard.dailyTrend.title")}</CardTitle>
         <CardDescription>Movement per day (Timezone: {timezone})</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="h-[300px] w-full">
+      <CardContent className="flex-1 pb-2">
+        <div className="h-full min-h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
               <defs>
