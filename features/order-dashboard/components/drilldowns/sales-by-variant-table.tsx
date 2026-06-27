@@ -38,6 +38,7 @@ export function SalesByVariantTable({ data, loading, meta, page, limit, setPage,
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
             <tr>
+              <th className="px-4 py-3 w-16 text-center">#</th>
               <th className="px-4 py-3">SKU</th>
               <th className="px-4 py-3">{t("orderDashboard.drilldowns.productName")}</th>
               <th className="px-4 py-3">{t("orderDashboard.drilldowns.variantName")}</th>
@@ -58,6 +59,7 @@ export function SalesByVariantTable({ data, loading, meta, page, limit, setPage,
           <tbody className="divide-y divide-slate-100">
             {data.map((row, i) => (
               <tr key={i} className="hover:bg-slate-50/50">
+                <td className="px-4 py-3 text-center font-mono text-xs text-slate-500">#{ (page ? (page - 1) * (limit || 10) : 0) + i + 1 }</td>
                 <td className="px-4 py-3 font-mono text-xs">{row.sku}</td>
                 <td className="px-4 py-3 font-medium text-slate-900">{row.productName}</td>
                 <td className="px-4 py-3 text-slate-600">{row.variantName}</td>

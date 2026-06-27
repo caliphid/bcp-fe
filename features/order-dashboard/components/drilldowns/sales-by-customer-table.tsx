@@ -38,6 +38,7 @@ export function SalesByCustomerTable({ data, loading, meta, page, limit, setPage
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-medium">
             <tr>
+              <th className="px-4 py-3 w-16 text-center">#</th>
               <th className="px-4 py-3">{t("orderDashboard.drilldowns.customerCode")}</th>
               <th className="px-4 py-3">{t("orderDashboard.drilldowns.customerName")}</th>
               <th className="px-4 py-3 cursor-pointer select-none" onClick={() => handleSort?.("orderCount")}>
@@ -54,6 +55,7 @@ export function SalesByCustomerTable({ data, loading, meta, page, limit, setPage
           <tbody className="divide-y divide-slate-100">
             {data.map((row, i) => (
               <tr key={i} className={`hover:bg-slate-50/50 ${!row.linked ? 'bg-amber-50/30' : ''}`}>
+                <td className="px-4 py-3 text-center font-mono text-xs text-slate-500">#{ (page ? (page - 1) * (limit || 10) : 0) + i + 1 }</td>
                 <td className="px-4 py-3 font-mono text-xs text-slate-500">{row.customerCode || "-"}</td>
                 <td className="px-4 py-3">
                   <div className="font-medium text-slate-900 flex items-center">
