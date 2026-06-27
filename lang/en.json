@@ -741,7 +741,13 @@
         "colStatus": "Status",
         "colActions": "Actions",
         "viewDetail": "View Detail",
-        "editDebt": "Edit Debt"
+        "editDebt": "Edit Debt",
+        "colDebtName": "Debt Name",
+        "remaining": "Remaining",
+        "paid": "Paid",
+        "colDate": "Date",
+        "startDate": "Start",
+        "dueDate": "Due"
       },
       "filterBar": {
         "searchPh": "Search debt...",
@@ -762,7 +768,28 @@
         "lenderName": "Lender Name",
         "lenderPh": "Lender...",
         "dateFrom": "From Date",
-        "dateTo": "To Date"
+        "dateTo": "To Date",
+        "searchLabel": "Search Debt",
+        "statusLabel": "Debt Status",
+        "statusActive": "Active",
+        "statusPaidOff": "Paid Off",
+        "statusInactive": "Inactive",
+        "statusDefaulted": "Defaulted",
+        "typeLabel": "Debt Type",
+        "typeBankLoan": "Bank Loan",
+        "typePersonalLoan": "Personal Loan",
+        "typeBusinessCapital": "Business Capital",
+        "typeAssetPurchase": "Asset Purchase",
+        "typeCreditCard": "Credit Card",
+        "typePayable": "Payable",
+        "typeOther": "Other",
+        "businessUnitLabel": "Business Unit",
+        "allBusinessUnits": "All Units",
+        "lenderNameLabel": "Lender Name",
+        "lenderNamePh": "Lender...",
+        "dateFromLabel": "From Date",
+        "dateToLabel": "To Date",
+        "resetFilter": "Reset Filter"
       },
       "summaryCards": {
         "totalRemaining": "Total Remaining Balance",
@@ -771,7 +798,11 @@
         "avgProgress": "% Avg Progress",
         "totalPrincipal": "Total Principal Amount",
         "originalAmount": "Original Debt Amount",
-        "otherStatus": "Other Status"
+        "otherStatus": "Other Status",
+        "totalRemainingBalance": "Total Remaining Balance",
+        "originalDebtAmount": "Original Debt Amount",
+        "inactive": "Inactive",
+        "defaulted": "Defaulted"
       },
       "formModal": {
         "editTitle": "Edit Debt",
@@ -800,7 +831,23 @@
         "interestRate": "Interest Rate (%)",
         "notes": "Notes",
         "notesPh": "Additional notes",
-        "saveFailed": "Failed to save debt"
+        "saveFailed": "Failed to save debt",
+        "debtNamePlaceholder": "e.g. KUR Mandiri",
+        "lenderName": "Lender (Creditor) *",
+        "lenderNamePlaceholder": "e.g. Bank Mandiri",
+        "typeBankLoan": "Bank Loan",
+        "typePersonalLoan": "Personal Loan",
+        "typeBusinessCapital": "Business Capital",
+        "typeAssetPurchase": "Asset Purchase",
+        "typeCreditCard": "Credit Card",
+        "typePayable": "Business Payable",
+        "typeOther": "Other",
+        "businessUnitAll": "All / Global",
+        "principalAmount": "Principal Amount (IDR) *",
+        "principalAmountPlaceholder": "e.g. 10,000,000",
+        "principalLockedWarning": "Principal cannot be changed after installments exist",
+        "monthlyInstallmentPlaceholder": "e.g. 1,000,000",
+        "notesPlaceholder": "Additional notes"
       },
       "detailDrawer": {
         "title": "Debt Detail",
@@ -839,6 +886,19 @@
         "descPh": "Brief description",
         "exceedsBalance": "Payment amount cannot exceed remaining principal",
         "saveFailed": "Failed to save payment"
+      },
+      "paymentFormModal": {
+        "title": "Create Debt Payment",
+        "remainingBalance": "Remaining Balance",
+        "paymentDate": "Payment Date",
+        "amount": "Payment Amount (IDR)",
+        "amountPlaceholder": "e.g. 1,000,000",
+        "sourceAccount": "Source Account",
+        "selectAccount": "Select Account",
+        "category": "Expense Category",
+        "defaultCategory": "Default Category",
+        "description": "Description / Notes",
+        "descriptionPlaceholder": "Payment notes"
       }
     },
     "accounts": {

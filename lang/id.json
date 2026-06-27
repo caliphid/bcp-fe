@@ -741,7 +741,13 @@
         "colStatus": "Status",
         "colActions": "Aksi",
         "viewDetail": "Lihat Detail",
-        "editDebt": "Edit Hutang"
+        "editDebt": "Edit Hutang",
+        "colDebtName": "Nama Hutang",
+        "remaining": "Sisa",
+        "paid": "Terbayar",
+        "colDate": "Tanggal",
+        "startDate": "Mulai",
+        "dueDate": "Tempo"
       },
       "filterBar": {
         "searchPh": "Cari hutang...",
@@ -762,7 +768,28 @@
         "lenderName": "Nama Pemberi Pinjaman",
         "lenderPh": "Pemberi pinjaman...",
         "dateFrom": "Dari Tanggal",
-        "dateTo": "Sampai Tanggal"
+        "dateTo": "Sampai Tanggal",
+        "searchLabel": "Cari Hutang",
+        "statusLabel": "Status Hutang",
+        "statusActive": "Aktif",
+        "statusPaidOff": "Lunas",
+        "statusInactive": "Tidak Aktif",
+        "statusDefaulted": "Macet (Defaulted)",
+        "typeLabel": "Tipe Hutang",
+        "typeBankLoan": "Pinjaman Bank",
+        "typePersonalLoan": "Pinjaman Pribadi",
+        "typeBusinessCapital": "Modal Usaha",
+        "typeAssetPurchase": "Pembelian Aset",
+        "typeCreditCard": "Kartu Kredit",
+        "typePayable": "Hutang Usaha",
+        "typeOther": "Lainnya",
+        "businessUnitLabel": "Unit Bisnis",
+        "allBusinessUnits": "Semua Unit",
+        "lenderNameLabel": "Nama Pemberi Pinjaman",
+        "lenderNamePh": "Pemberi pinjaman...",
+        "dateFromLabel": "Dari Tanggal",
+        "dateToLabel": "Sampai Tanggal",
+        "resetFilter": "Reset Filter"
       },
       "summaryCards": {
         "totalRemaining": "Total Sisa Hutang",
@@ -771,7 +798,11 @@
         "avgProgress": "% Rata-rata Progress",
         "totalPrincipal": "Total Pokok Hutang",
         "originalAmount": "Jumlah Hutang Awal",
-        "otherStatus": "Status Lainnya"
+        "otherStatus": "Status Lainnya",
+        "totalRemainingBalance": "Total Sisa Hutang",
+        "originalDebtAmount": "Jumlah Hutang Awal",
+        "inactive": "Tidak Aktif",
+        "defaulted": "Macet (Defaulted)"
       },
       "formModal": {
         "editTitle": "Edit Hutang",
@@ -800,7 +831,23 @@
         "interestRate": "Suku Bunga / Interest (%)",
         "notes": "Catatan",
         "notesPh": "Catatan tambahan",
-        "saveFailed": "Gagal menyimpan hutang"
+        "saveFailed": "Gagal menyimpan hutang",
+        "debtNamePlaceholder": "Cth. KUR Mandiri",
+        "lenderName": "Pemberi Pinjaman (Kreditur) *",
+        "lenderNamePlaceholder": "Cth. Bank Mandiri",
+        "typeBankLoan": "Pinjaman Bank",
+        "typePersonalLoan": "Pinjaman Pribadi",
+        "typeBusinessCapital": "Modal Usaha",
+        "typeAssetPurchase": "Pembelian Aset",
+        "typeCreditCard": "Kartu Kredit",
+        "typePayable": "Hutang Usaha (Payable)",
+        "typeOther": "Lainnya",
+        "businessUnitAll": "Semua / Global",
+        "principalAmount": "Nominal Pokok (IDR) *",
+        "principalAmountPlaceholder": "Cth. 10.000.000",
+        "principalLockedWarning": "Pokok hutang tidak bisa diubah setelah ada cicilan",
+        "monthlyInstallmentPlaceholder": "Cth. 1.000.000",
+        "notesPlaceholder": "Catatan tambahan"
       },
       "detailDrawer": {
         "title": "Detail Hutang",
@@ -839,6 +886,19 @@
         "descPh": "Deskripsi singkat",
         "exceedsBalance": "Nominal pembayaran tidak boleh melebihi sisa pokok hutang",
         "saveFailed": "Gagal menyimpan pembayaran"
+      },
+      "paymentFormModal": {
+        "title": "Buat Pembayaran Hutang",
+        "remainingBalance": "Sisa Hutang",
+        "paymentDate": "Tanggal Pembayaran",
+        "amount": "Jumlah Pembayaran (IDR)",
+        "amountPlaceholder": "Cth. 1.000.000",
+        "sourceAccount": "Akun Sumber Dana",
+        "selectAccount": "Pilih Akun",
+        "category": "Kategori Pengeluaran",
+        "defaultCategory": "Kategori Default",
+        "description": "Deskripsi / Catatan",
+        "descriptionPlaceholder": "Catatan pembayaran"
       }
     },
     "accounts": {

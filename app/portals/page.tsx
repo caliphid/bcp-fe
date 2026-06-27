@@ -18,7 +18,7 @@ export default function PortalsPage() {
   const handleSelectPortal = (portal: 'FINANCE' | 'OMS') => {
     setActivePortal(portal);
     if (portal === 'OMS') {
-      router.push("/dashboard/sales-orders");
+      router.push("/dashboard/order-dashboard");
     } else {
       router.push("/dashboard");
     }

@@ -26,7 +26,7 @@ export function Topbar() {
     if (portal === "FINANCE") {
       router.push("/dashboard");
     } else {
-      router.push("/dashboard/sales-orders");
+      router.push("/dashboard/order-dashboard");
     }
   };
 
