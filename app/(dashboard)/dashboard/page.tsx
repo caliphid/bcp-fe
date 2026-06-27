@@ -6,9 +6,20 @@ import { DashboardFilterBar } from "../../../features/dashboard/components/dashb
 import { DashboardOverviewCards } from "../../../features/dashboard/components/dashboard-overview-cards";
 import { DashboardMonthComparison } from "../../../features/dashboard/components/dashboard-month-comparison";
 import { DashboardFinanceHealthCard } from "../../../features/dashboard/components/dashboard-finance-health-card";
-import { DashboardMonthlyTrend } from "../../../features/dashboard/components/dashboard-monthly-trend";
-import { DashboardDailyTrend } from "../../../features/dashboard/components/dashboard-daily-trend";
-import { DashboardCategoryBreakdown } from "../../../features/dashboard/components/dashboard-category-breakdown";
+import dynamic from "next/dynamic";
+
+const DashboardMonthlyTrend = dynamic(
+  () => import("../../../features/dashboard/components/dashboard-monthly-trend").then((mod) => mod.DashboardMonthlyTrend),
+  { ssr: false, loading: () => <div className="h-80 bg-slate-50 animate-pulse rounded-xl" /> }
+);
+const DashboardDailyTrend = dynamic(
+  () => import("../../../features/dashboard/components/dashboard-daily-trend").then((mod) => mod.DashboardDailyTrend),
+  { ssr: false, loading: () => <div className="h-80 bg-slate-50 animate-pulse rounded-xl" /> }
+);
+const DashboardCategoryBreakdown = dynamic(
+  () => import("../../../features/dashboard/components/dashboard-category-breakdown").then((mod) => mod.DashboardCategoryBreakdown),
+  { ssr: false, loading: () => <div className="h-80 bg-slate-50 animate-pulse rounded-xl" /> }
+);
 import { DashboardTopTransactions } from "../../../features/dashboard/components/dashboard-top-transactions";
 import { DashboardAccountBalances } from "../../../features/dashboard/components/dashboard-account-balances";
 import { DashboardBusinessUnitPerformance } from "../../../features/dashboard/components/dashboard-business-unit-performance";

@@ -6,7 +6,12 @@ import { OrderDashboardFilterBar } from "./order-dashboard-filter-bar";
 import { OrderDashboardOverviewCards } from "./order-dashboard-overview-cards";
 import { OrderStatusPipeline } from "./order-status-pipeline";
 import { OrderReconciliationPanel } from "./order-reconciliation-panel";
-import { OrderDailyTrendChart } from "./order-daily-trend-chart";
+import dynamic from "next/dynamic";
+
+const OrderDailyTrendChart = dynamic(
+  () => import("./order-daily-trend-chart").then((mod) => mod.OrderDailyTrendChart),
+  { ssr: false, loading: () => <div className="h-80 bg-slate-50 animate-pulse rounded-xl" /> }
+);
 import { OrderMonthlyReportTable } from "./order-monthly-report-table";
 import { OrderDrilldowns } from "./order-drilldowns";
 import { Alert, AlertDescription, AlertTitle } from "../../../components/ui/alert";
