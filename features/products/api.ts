@@ -4,7 +4,7 @@ import { Product, ProductVariant, CreateProductRequest, UpdateProductRequest, Cr
 
 export const productApi = {
   // --- Products ---
-  getProducts: async (params?: Record<string, any>) => {
+  getProducts: async (params?: Record<string, unknown>) => {
     const res = await api.get<ListResponse<Product>>('/products', { params });
     return res.data;
   },
@@ -34,8 +34,13 @@ export const productApi = {
     return res.data;
   },
 
+  deleteProduct: async (id: string) => {
+    const res = await api.delete<BaseResponse<{ id: string }>>(`/products/${id}`);
+    return res.data;
+  },
+
   // --- Product Variants ---
-  getProductVariants: async (params?: Record<string, any>) => {
+  getProductVariants: async (params?: Record<string, unknown>) => {
     const res = await api.get<ListResponse<ProductVariant>>('/product-variants', { params });
     return res.data;
   },

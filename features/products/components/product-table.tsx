@@ -2,7 +2,7 @@ import { Product } from "../../../types/product";
 import { PaginationMeta } from "../../../types/common";
 import { DataTable } from "../../../components/ui/data-table";
 import { StatusBadge } from "../../../components/ui/status-badge";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import { useProductStore } from "../store/product-store";
 import Link from "next/link";
 import { useTranslation } from "../../../hooks/use-translation";
@@ -14,6 +14,7 @@ interface ProductTableProps {
   canMutate: boolean;
   onEdit: (item: Product) => void;
   onToggleStatus: (item: Product) => void;
+  onDelete: (item: Product) => void;
 }
 
 export function ProductTable({
@@ -23,6 +24,7 @@ export function ProductTable({
   canMutate,
   onEdit,
   onToggleStatus,
+  onDelete,
 }: ProductTableProps) {
   const { t } = useTranslation();
   const { setFilter } = useProductStore();
@@ -75,12 +77,21 @@ export function ProductTable({
       cell: (item: Product) => (
         <div className="flex justify-end gap-2">
           {canMutate && (
-            <button
-              onClick={() => onEdit(item)}
-              className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
+            <>
+              <button
+                onClick={() => onEdit(item)}
+                className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 transition-colors"
+              >
+                <Pencil className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => onDelete(item)}
+                title={t("pages.products.delete")}
+                className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-rose-50 hover:text-rose-600 transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </>
           )}
         </div>
       ),

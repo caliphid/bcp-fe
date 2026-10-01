@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuthStore } from "../../../../../store/auth-store";
-import { useProduct, useProductVariants } from "../../../../../features/products/hooks/use-products";
+import { useProduct, useProductVariants, useRevalidateProductData } from "../../../../../features/products/hooks/use-products";
 import { productApi } from "../../../../../features/products/api";
 import { ProductVariant } from "../../../../../types/product";
 import { Button } from "../../../../../components/ui/button";
@@ -11,21 +11,24 @@ import { PageHeader } from "../../../../../components/ui/page-header";
 import { StatusBadge } from "../../../../../components/ui/status-badge";
 import { formatMoney } from "../../../../../lib/utils";
 import { extractErrorMessage } from "../../../../../lib/error";
-import { PlusCircle, Pencil, Box } from "lucide-react";
+import { PlusCircle, Pencil, Box, Trash2 } from "lucide-react";
 import { VariantFormModal } from "../../../../../features/products/components/variant-form-modal";
 import { ConfirmDialog } from "../../../../../components/ui/confirm-dialog";
 import toast from "react-hot-toast";
+import { useTranslation } from "@/hooks/use-translation";
 
 export default function ProductDetailPage() {
+  const { t } = useTranslation();
   const { id } = useParams();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
 
-  const { data: product, isLoading: loadingProduct, mutate: mutateProduct } = useProduct(id as string);
+  const { data: product, isLoading: loadingProduct } = useProduct(id as string);
   const { data: variantsData, isLoading: loadingVariants, mutate: mutateVariants } = useProductVariants({ productId: id, limit: 100 });
 
   const variants = variantsData || [];
+  const revalidateProductData = useRevalidateProductData();
 
   const [isVariantFormOpen, setIsVariantFormOpen] = useState(false);
   const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
@@ -34,6 +37,8 @@ export default function ProductDetailPage() {
     isOpen: boolean;
     title: string;
     message: string;
+    isDestructive?: boolean;
+    confirmText?: string;
     action: () => Promise<void>;
   }>({
     isOpen: false,
@@ -41,6 +46,7 @@ export default function ProductDetailPage() {
     message: "",
     action: async () => {},
   });
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleToggleStatus = (item: ProductVariant) => {
     const isActivating = item.status === "INACTIVE";
@@ -68,6 +74,30 @@ export default function ProductDetailPage() {
     });
   };
 
+  const handleDelete = () => {
+    if (!product) return;
+    setConfirmDialog({
+      isOpen: true,
+      title: t("pages.products.deleteProduct"),
+      message: t("pages.products.confirmDelete").replace("{name}", product.name),
+      isDestructive: true,
+      confirmText: t("pages.products.delete"),
+      action: async () => {
+        setIsConfirming(true);
+        try {
+          await productApi.deleteProduct(product.id);
+          toast.success(t("pages.products.deleteSuccess"));
+          revalidateProductData();
+          router.replace("/dashboard/products");
+        } catch (err) {
+          toast.error(extractErrorMessage(err));
+          setIsConfirming(false);
+          setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
+  };
+
   if (loadingProduct) {
     return <div className="p-10 text-center animate-pulse">Loading product...</div>;
   }
@@ -84,13 +114,22 @@ export default function ProductDetailPage() {
           description={product.name}
         />
         {canMutate && (
-          <Button
-            variant="outline"
-            className="gap-2 shadow-sm bg-white"
-            onClick={() => router.push(`/dashboard/products/${id}/edit`)}
-          >
-            <Pencil className="w-4 h-4" /> Edit Product
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="gap-2 shadow-sm bg-white"
+              onClick={() => router.push(`/dashboard/products/${id}/edit`)}
+            >
+              <Pencil className="w-4 h-4" /> Edit Product
+            </Button>
+            <Button
+              variant="destructive"
+              className="gap-2 shadow-sm"
+              onClick={handleDelete}
+            >
+              <Trash2 className="w-4 h-4" /> {t("pages.products.delete")}
+            </Button>
+          </div>
         )}
       </div>
 
@@ -172,7 +211,7 @@ export default function ProductDetailPage() {
                   <td colSpan={7} className="px-6 py-8 text-center text-slate-500">No variants found.</td>
                 </tr>
               ) : (
-                variants.map((v: any) => (
+                variants.map((v) => (
                   <tr key={v.id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-4 font-semibold text-slate-800">{v.sku}</td>
                     <td className="px-6 py-4">{v.color}</td>
@@ -222,6 +261,9 @@ export default function ProductDetailPage() {
         isOpen={confirmDialog.isOpen}
         title={confirmDialog.title}
         message={confirmDialog.message}
+        isDestructive={confirmDialog.isDestructive}
+        confirmText={confirmDialog.confirmText}
+        isLoading={isConfirming}
         onConfirm={confirmDialog.action}
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
       />

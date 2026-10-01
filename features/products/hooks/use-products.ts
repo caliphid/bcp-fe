@@ -1,8 +1,8 @@
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
 import { productApi } from '../api';
 import { useAuthStore } from '../../../store/auth-store';
 
-export function useProducts(params?: Record<string, any>) {
+export function useProducts(params?: Record<string, unknown>) {
   const { token } = useAuthStore.getState();
   
   const { data, error, isLoading, mutate } = useSWR(
@@ -38,7 +38,7 @@ export function useProduct(id?: string) {
   };
 }
 
-export function useProductVariants(params?: Record<string, any>) {
+export function useProductVariants(params?: Record<string, unknown>) {
   const { token } = useAuthStore.getState();
   
   const { data, error, isLoading, mutate } = useSWR(
@@ -71,5 +71,21 @@ export function useProductVariant(id?: string) {
     isLoading,
     error,
     mutate
+  };
+}
+
+const isListKey = (prefix: string) => (key: unknown) =>
+  Array.isArray(key) && key[0] === prefix;
+
+// Product status changes and deletes cascade to variants on the backend,
+// so product lists and variant lists must be revalidated together.
+export function useRevalidateProductData() {
+  const { mutate } = useSWRConfig();
+
+  return async () => {
+    await Promise.all([
+      mutate(isListKey('/products')),
+      mutate(isListKey('/product-variants')),
+    ]);
   };
 }

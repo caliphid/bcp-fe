@@ -31,7 +31,7 @@ export interface Product {
   name: string;
   articleName?: string;
   type: ProductType;
-  sku?: string;
+  sku?: string | null;
   defaultHpp: string;
   defaultPrice: string;
   description?: string;
@@ -41,6 +41,8 @@ export interface Product {
   categoryId?: string;
   category?: Category;
   variants?: ProductVariant[];
+  deletedAt: string | null;
+  deletedById: string | null;
   createdAt: string;
   updatedAt: string;
 }

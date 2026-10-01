@@ -9,7 +9,7 @@ import { productApi } from "../../products/api";
 import { useProductVariant } from "../../products/hooks/use-products";
 import { AsyncSearchableSelect } from "../../../components/ui/async-searchable-select";
 
-function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string, color?: string, size?: string }) {
+function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string | null, color?: string, size?: string }) {
   const { data } = useProductVariant(initialName ? undefined : variantId);
   const name = initialName || data?.product?.name || `Product ID: ${variantId}`;
   const sku = initialSku || data?.sku;

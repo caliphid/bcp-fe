@@ -406,8 +406,12 @@
       "createProduct": "Buat Produk",
       "activateProduct": "Aktifkan Produk",
       "deactivateProduct": "Nonaktifkan Produk",
-      "confirmActivate": "Apakah Anda yakin ingin mengaktifkan {name}?",
-      "confirmDeactivate": "Apakah Anda yakin ingin menonaktifkan {name}?"
+      "confirmActivate": "Apakah Anda yakin ingin mengaktifkan {name}? Jika tidak ada varian yang aktif, semua varian juga akan diaktifkan kembali.",
+      "confirmDeactivate": "Apakah Anda yakin ingin menonaktifkan {name}? Semua varian produk ini juga akan dinonaktifkan.",
+      "deleteProduct": "Hapus Produk",
+      "delete": "Hapus",
+      "confirmDelete": "Apakah Anda yakin ingin menghapus {name}? Tindakan ini tidak dapat dibatalkan dan semua varian produk ini akan dinonaktifkan.",
+      "deleteSuccess": "Produk berhasil dihapus"
     },
     "productCategories": {
       "title": "Kategori Produk",

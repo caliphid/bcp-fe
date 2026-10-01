@@ -406,8 +406,12 @@
       "createProduct": "Create Product",
       "activateProduct": "Activate Product",
       "deactivateProduct": "Deactivate Product",
-      "confirmActivate": "Are you sure you want to activate {name}?",
-      "confirmDeactivate": "Are you sure you want to deactivate {name}?"
+      "confirmActivate": "Are you sure you want to activate {name}? If none of its variants are active, all variants will be reactivated as well.",
+      "confirmDeactivate": "Are you sure you want to deactivate {name}? All variants of this product will also be deactivated.",
+      "deleteProduct": "Delete Product",
+      "delete": "Delete",
+      "confirmDelete": "Are you sure you want to delete {name}? This action cannot be undone, and all variants of this product will be deactivated.",
+      "deleteSuccess": "Product deleted successfully"
     },
     "productCategories": {
       "title": "Product Categories",

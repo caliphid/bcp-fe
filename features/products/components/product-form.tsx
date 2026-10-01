@@ -5,19 +5,19 @@ import { useRouter } from "next/navigation";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Trash2, Plus, Info, Loader2, HelpCircle } from "lucide-react";
+import { Trash2, Plus, Loader2, HelpCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { productApi } from "../api";
 import {
+  Product,
   ProductType,
   CreateProductRequest,
-  CreateProductVariantRequest,
+  UpdateProductVariantRequest,
 } from "../../../types/product";
 import { BusinessUnit } from "../../../types/business-unit";
 import { ProductCategory } from "../../../types/product-category";
 import { extractErrorMessage } from "../../../lib/error";
-import { formatCurrency } from "../../debts/utils/formatters";
 
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -27,6 +27,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Modal } from "../../../components/ui/modal";
 import { useTranslation } from "../../../hooks/use-translation";
+import { MasterStatus } from "../../../types/enums";
 
 const variantSchema = z.object({
   id: z.string().optional(),
@@ -40,7 +41,7 @@ const variantSchema = z.object({
 
 const schema = z
   .object({
-    name: z.string().min(2, "Product Name is required"),
+    name: z.string().trim().min(2, "Product Name is required"),
     productCode: z.string().optional(),
     articleName: z.string().optional(),
     type: z.nativeEnum(ProductType, { error: "Product Type is required" }),
@@ -72,10 +73,19 @@ const schema = z
 
 type FormData = z.infer<typeof schema>;
 
+// Maps known backend validation messages for POST/PATCH /products to form fields.
+const PRODUCT_FIELD_ERRORS: { field: keyof FormData; match: (msg: string) => boolean }[] = [
+  { field: "categoryId", match: (msg) => msg === "Product category not found or inactive" },
+  { field: "businessUnitId", match: (msg) => msg === "Business unit not found or inactive" },
+  { field: "productCode", match: (msg) => msg === "Product code already in use" },
+  { field: "sku", match: (msg) => msg === "SKU already in use" || /^SKU .+ already in use by another product variant$/.test(msg) },
+  { field: "defaultPrice", match: (msg) => msg === "Default price must be greater than or equal to default HPP" },
+];
+
 interface ProductFormProps {
   businessUnits: BusinessUnit[];
   productCategories: ProductCategory[];
-  initialData?: any; // The product object including variants
+  initialData?: Product; // The product object including variants
 }
 
 export function ProductForm({
@@ -104,6 +114,7 @@ export function ProductForm({
     watch,
     setValue,
     getValues,
+    setError: setFieldError,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -126,7 +137,7 @@ export function ProductForm({
         ? initialData.variants && initialData.variants.length > 0
         : false,
       variants:
-        initialData?.variants?.map((v: any) => ({
+        initialData?.variants?.map((v) => ({
           id: v.id,
           sku: v.sku || "",
           color: v.color || "",
@@ -144,6 +155,11 @@ export function ProductForm({
   });
 
   const hasVariants = watch("hasVariants");
+
+  // Only ACTIVE categories can be assigned; keep the current one so an edit doesn't silently drop it.
+  const selectableCategories = productCategories.filter(
+    (cat) => cat.status === MasterStatus.ACTIVE || cat.id === initialData?.categoryId,
+  );
 
   const formatInputMoney = (val: string) => {
     const numeric = val.replace(/\D/g, "");
@@ -169,10 +185,10 @@ export function ProductForm({
     const finalColors = colors.length > 0 ? colors : ["-"];
     const finalSizes = sizes.length > 0 ? sizes : ["-"];
 
-    const baseHpp = watch("defaultHpp") || "0";
-    const basePrice = watch("defaultPrice") || "0";
+    const baseHpp = getValues("defaultHpp") || "0";
+    const basePrice = getValues("defaultPrice") || "0";
 
-    const baseCode = watch("productCode") || "";
+    const baseCode = getValues("productCode") || "";
     const existingVariants = getValues("variants") || [];
     const newVariants = [];
 
@@ -246,12 +262,14 @@ export function ProductForm({
 
   const onSubmit = async (data: FormData) => {
     setError(null);
+    let productSaved = false;
     try {
       // 1. Create/Update Base Product
-      const productPayload: any = {
+      const productPayload: CreateProductRequest = {
         name: data.name,
         type: data.type,
-        productCode: data.productCode || undefined,
+        // Empty productCode: auto-generated on create, left unchanged on update
+        productCode: data.productCode?.trim() || undefined,
         businessUnitId: data.businessUnitId || undefined,
         categoryId: data.categoryId || undefined,
         articleName: data.articleName || undefined,
@@ -260,7 +278,13 @@ export function ProductForm({
 
       // Only set these base fields if it's NOT a variant product
       if (!data.hasVariants) {
-        productPayload.sku = data.sku || undefined;
+        const sku = data.sku?.trim() || "";
+        if (!initialData) {
+          productPayload.sku = sku || undefined;
+        } else if (sku !== (initialData.sku || "")) {
+          // Sending "" clears the product SKU
+          productPayload.sku = sku;
+        }
         productPayload.defaultHpp = data.defaultHpp
           ? String(parseFloat(data.defaultHpp.replace(/\D/g, "")))
           : "0";
@@ -269,24 +293,27 @@ export function ProductForm({
           : "0";
       }
 
-      let productId = initialData?.id;
+      let productId: string;
 
       if (initialData) {
+        productId = initialData.id;
         await productApi.updateProduct(productId, productPayload);
       } else {
         const createdProduct = await productApi.createProduct(productPayload);
-        productId = createdProduct?.data?.id || (createdProduct as any)?.id;
-        
-        if (!productId) {
+        const createdId = createdProduct?.data?.id;
+
+        if (!createdId) {
           console.error("Created Product Response:", createdProduct);
           throw new Error("Failed to create product. ID not returned.");
         }
+        productId = createdId;
       }
+      productSaved = true;
 
       // 2. Manage Variants
       if (data.hasVariants && data.variants && data.variants.length > 0) {
-        const variantPromises = data.variants.map((v: any) => {
-          const variantPayload: any = {
+        const variantPromises = data.variants.map((v) => {
+          const variantPayload: UpdateProductVariantRequest = {
             sku: v.sku,
             color: v.color,
             size: v.size,
@@ -302,8 +329,14 @@ export function ProductForm({
             return productApi.updateProductVariant(v.id, variantPayload);
           } else {
             // Create new variant
-            variantPayload.productId = productId;
-            return productApi.createProductVariant(variantPayload);
+            return productApi.createProductVariant({
+              ...variantPayload,
+              sku: v.sku,
+              color: v.color,
+              size: v.size,
+              unitCost: variantPayload.unitCost as string,
+              productId,
+            });
           }
         });
 
@@ -313,16 +346,16 @@ export function ProductForm({
       // 3. Deactivate variants removed from form
       if (initialData?.variants) {
         const currentVariantIds = new Set(
-          data.variants?.filter((v: any) => v.id).map((v: any) => v.id) || [],
+          data.variants?.filter((v) => v.id).map((v) => v.id) || [],
         );
         const originalVariants = initialData.variants;
         const variantsToRemove = originalVariants.filter(
-          (v: any) => !currentVariantIds.has(v.id) && v.status === "ACTIVE",
+          (v) => !currentVariantIds.has(v.id) && v.status === "ACTIVE",
         );
 
         if (variantsToRemove.length > 0) {
           await Promise.all(
-            variantsToRemove.map((v: any) =>
+            variantsToRemove.map((v) =>
               productApi.deactivateProductVariant(v.id),
             ),
           );
@@ -334,10 +367,15 @@ export function ProductForm({
       );
       router.push(`/dashboard/products/${productId}`);
     } catch (err) {
-      setError(extractErrorMessage(err));
-      toast.error(
-        `Failed to ${initialData ? "update" : "create"} product completely. Check logs.`,
-      );
+      const message = extractErrorMessage(err);
+      setError(message);
+      toast.error(message);
+      if (!productSaved) {
+        const fieldError = PRODUCT_FIELD_ERRORS.find((e) => e.match(message));
+        if (fieldError) {
+          setFieldError(fieldError.field, { type: "server", message });
+        }
+      }
     }
   };
 
@@ -383,9 +421,13 @@ export function ProductForm({
           <div className="space-y-2">
             <Label>{t("features.products.form.productCode")}</Label>
             <Input placeholder={t("features.products.form.productCodePh")} {...register("productCode")} />
-            <p className="text-xs text-slate-500">
-              {t("features.products.form.productCodeNote")}
-            </p>
+            {errors.productCode ? (
+              <p className="text-sm text-red-500">{errors.productCode.message}</p>
+            ) : (
+              <p className="text-xs text-slate-500">
+                {t("features.products.form.productCodeNote")}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -426,6 +468,9 @@ export function ProductForm({
                 </SearchableSelect>
               )}
             />
+            {errors.businessUnitId && (
+              <p className="text-sm text-red-500">{errors.businessUnitId.message}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -440,7 +485,7 @@ export function ProductForm({
                   onChange={(e) => field.onChange(e.target.value)}
                 >
                   <option value="">{t("features.products.form.noCategory")}</option>
-                  {productCategories.map((cat) => (
+                  {selectableCategories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.name}
                     </option>
@@ -448,6 +493,9 @@ export function ProductForm({
                 </SearchableSelect>
               )}
             />
+            {errors.categoryId && (
+              <p className="text-sm text-red-500">{errors.categoryId.message}</p>
+            )}
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -494,6 +542,9 @@ export function ProductForm({
             <div className="space-y-2">
               <Label>{t("features.products.form.baseSku")}</Label>
               <Input placeholder="SKU-XXX" {...register("sku")} />
+              {errors.sku && (
+                <p className="text-sm text-red-500">{errors.sku.message}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label>{t("features.products.form.defaultHpp")}</Label>
@@ -514,6 +565,9 @@ export function ProductForm({
                   setValue("defaultPrice", formatInputMoney(e.target.value));
                 }}
               />
+              {errors.defaultPrice && (
+                <p className="text-sm text-red-500">{errors.defaultPrice.message}</p>
+              )}
             </div>
           </div>
         )}
@@ -824,12 +878,12 @@ export function ProductForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
               <span className="font-semibold text-blue-800 block mb-1">Produk Tunggal (Tanpa Varian)</span>
-              <p className="text-xs text-blue-700">Biarkan <i>checkbox</i> "This product has multiple options" tidak dicentang. Anda cukup mengisi SKU, HPP (Harga Modal), dan Harga Jual (Selling Price) di bagian <i>Default Pricing</i>.</p>
+              <p className="text-xs text-blue-700">Biarkan <i>checkbox</i> &quot;This product has multiple options&quot; tidak dicentang. Anda cukup mengisi SKU, HPP (Harga Modal), dan Harga Jual (Selling Price) di bagian <i>Default Pricing</i>.</p>
             </div>
             
             <div className="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100">
               <span className="font-semibold text-indigo-800 block mb-1">Produk dengan Varian</span>
-              <p className="text-xs text-indigo-700">Centang "This product has multiple options". Bagian bawah akan berubah menampilkan opsi <i>Variant Generator</i>.</p>
+              <p className="text-xs text-indigo-700">Centang &quot;This product has multiple options&quot;. Bagian bawah akan berubah menampilkan opsi <i>Variant Generator</i>.</p>
             </div>
           </div>
         </div>

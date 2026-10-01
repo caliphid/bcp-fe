@@ -10,7 +10,7 @@ import { PlusCircle } from "lucide-react";
 import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { extractErrorMessage } from "../../../../lib/error";
 import { Alert, AlertDescription } from "../../../../components/ui/alert";
-import { useProducts } from "../../../../features/products/hooks/use-products";
+import { useProducts, useRevalidateProductData } from "../../../../features/products/hooks/use-products";
 import { useBusinessUnits } from "../../../../features/business-units/hooks/use-business-units";
 import { useProductStore } from "../../../../features/products/store/product-store";
 import { ProductFilterBar } from "../../../../features/products/components/product-filter-bar";
@@ -24,11 +24,12 @@ export default function ProductsPage() {
   const user = useAuthStore((state) => state.user);
   const canMutate = user?.role === "OWNER" || user?.role === "ADMIN_FINANCE";
   const { filters } = useProductStore();
+  const revalidateProductData = useRevalidateProductData();
 
   const { data: businessUnitsData } = useBusinessUnits();
   const businessUnits = businessUnitsData || [];
 
-  const { data: productsData, meta, isLoading: loading, error, mutate: fetchData } = useProducts({
+  const { data: productsData, meta, isLoading: loading, error } = useProducts({
     page: filters.page,
     limit: 10,
     search: filters.search || undefined,
@@ -45,6 +46,8 @@ export default function ProductsPage() {
     isOpen: boolean;
     title: string;
     message: string;
+    isDestructive?: boolean;
+    confirmText?: string;
     action: () => Promise<void>;
   }>({
     isOpen: false,
@@ -52,6 +55,7 @@ export default function ProductsPage() {
     message: "",
     action: async () => {},
   });
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const handleToggleStatus = (item: Product) => {
     const isActivating = item.status === "INACTIVE";
@@ -68,10 +72,33 @@ export default function ProductsPage() {
           } else {
             await productApi.deactivateProduct(item.id);
           }
-          fetchData();
+          revalidateProductData();
           setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         } catch (err) {
           toast.error(extractErrorMessage(err));
+          setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+        }
+      },
+    });
+  };
+
+  const handleDelete = (item: Product) => {
+    setConfirmDialog({
+      isOpen: true,
+      title: t("pages.products.deleteProduct"),
+      message: t("pages.products.confirmDelete").replace("{name}", item.name),
+      isDestructive: true,
+      confirmText: t("pages.products.delete"),
+      action: async () => {
+        setIsConfirming(true);
+        try {
+          await productApi.deleteProduct(item.id);
+          toast.success(t("pages.products.deleteSuccess"));
+          revalidateProductData();
+        } catch (err) {
+          toast.error(extractErrorMessage(err));
+        } finally {
+          setIsConfirming(false);
           setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
         }
       },
@@ -113,6 +140,7 @@ export default function ProductsPage() {
           router.push(`/dashboard/products/${item.id}/edit`);
         }}
         onToggleStatus={handleToggleStatus}
+        onDelete={handleDelete}
       />
 
       {/* Confirm Dialog */}
@@ -120,6 +148,9 @@ export default function ProductsPage() {
         isOpen={confirmDialog.isOpen}
         title={confirmDialog.title}
         message={confirmDialog.message}
+        isDestructive={confirmDialog.isDestructive}
+        confirmText={confirmDialog.confirmText}
+        isLoading={isConfirming}
         onConfirm={confirmDialog.action}
         onCancel={() => setConfirmDialog((prev) => ({ ...prev, isOpen: false }))}
       />

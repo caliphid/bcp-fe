@@ -8,7 +8,7 @@ import { Button } from "../../../components/ui/button";
 import { Modal } from "../../../components/ui/modal";
 import { useState } from "react";
 
-function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string, color?: string, size?: string }) {
+function VariantDisplayName({ variantId, initialName, initialSku, color, size }: { variantId: string, initialName?: string, initialSku?: string | null, color?: string, size?: string }) {
   const { data } = useProductVariant(initialName ? undefined : variantId);
   const name = initialName || data?.product?.name || `Product ID: ${variantId}`;
   const sku = initialSku || data?.sku;
