@@ -1,6 +1,6 @@
 import api from '../../lib/axios';
 import { BaseResponse, ListResponse } from '../../types/common';
-import { Product, ProductVariant, CreateProductRequest, UpdateProductRequest, CreateProductVariantRequest, UpdateProductVariantRequest } from '../../types/product';
+import { Product, ProductVariant, CreateProductRequest, UpdateProductRequest, CreateProductVariantRequest, CreateProductVariantsBulkRequest, UpdateProductVariantRequest } from '../../types/product';
 
 export const productApi = {
   // --- Products ---
@@ -31,6 +31,11 @@ export const productApi = {
 
   deactivateProduct: async (id: string) => {
     const res = await api.patch<BaseResponse<Product>>(`/products/${id}/deactivate`);
+    return res.data;
+  },
+
+  createProductVariantsBulk: async (productId: string, data: CreateProductVariantsBulkRequest) => {
+    const res = await api.post<BaseResponse<ProductVariant[]>>(`/products/${productId}/variants`, data);
     return res.data;
   },
 

@@ -47,6 +47,20 @@ export interface Product {
   updatedAt: string;
 }
 
+/** Variant item for POST /products (nested) and POST /products/:id/variants. */
+export interface ProductVariantInput {
+  color: string;
+  size: string;
+  /** Empty = auto-generated as <productCode>-<COLOR>-<SIZE> */
+  sku?: string;
+  barcode?: string;
+  /** Defaults to the product's defaultHpp */
+  unitCost?: number;
+  /** Defaults to the product's defaultPrice */
+  sellingPrice?: number;
+  minimumStock?: number;
+}
+
 export interface CreateProductRequest {
   name: string;
   type: ProductType;
@@ -58,9 +72,15 @@ export interface CreateProductRequest {
   defaultHpp?: string;
   defaultPrice?: string;
   description?: string;
+  /** Omitted or empty = backend creates a single DEFAULT/DEFAULT variant */
+  variants?: ProductVariantInput[];
 }
 
-export type UpdateProductRequest = Partial<CreateProductRequest>;
+export type UpdateProductRequest = Partial<Omit<CreateProductRequest, 'variants'>>;
+
+export interface CreateProductVariantsBulkRequest {
+  variants: ProductVariantInput[];
+}
 
 export interface CreateProductVariantRequest {
   productId: string;

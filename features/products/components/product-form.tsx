@@ -12,7 +12,10 @@ import { productApi } from "../api";
 import {
   Product,
   ProductType,
+  ProductVariant,
+  ProductVariantInput,
   CreateProductRequest,
+  UpdateProductRequest,
   UpdateProductVariantRequest,
 } from "../../../types/product";
 import { BusinessUnit } from "../../../types/business-unit";
@@ -28,15 +31,21 @@ import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { Modal } from "../../../components/ui/modal";
 import { useTranslation } from "../../../hooks/use-translation";
 import { MasterStatus } from "../../../types/enums";
+import { useRevalidateProductData } from "../hooks/use-products";
+import { useSWRConfig } from "swr";
+
+const MAX_VARIANTS_PER_REQUEST = 200;
 
 const variantSchema = z.object({
   id: z.string().optional(),
-  sku: z.string().min(1, "SKU is required"),
-  color: z.string().min(1, "Color is required"),
-  size: z.string().min(1, "Size is required"),
+  // Optional: backend generates <productCode>-<COLOR>-<SIZE> when empty
+  sku: z.string().optional(),
+  barcode: z.string().optional(),
+  color: z.string().trim().min(1, "Color is required"),
+  size: z.string().trim().min(1, "Size is required"),
   unitCost: z.string().min(1, "Unit Cost is required"),
   sellingPrice: z.string().optional(),
-  minimumStock: z.number().min(0).optional(),
+  minimumStock: z.number().int().min(0).optional(),
 });
 
 const schema = z
@@ -57,19 +66,63 @@ const schema = z
     hasVariants: z.boolean().optional(),
     variants: z.array(variantSchema).optional(),
   })
-  .refine(
-    (data) => {
-      if (data.hasVariants && (!data.variants || data.variants.length === 0)) {
-        return false;
+  .superRefine((data, ctx) => {
+    if (!data.hasVariants) return;
+    const variants = data.variants || [];
+
+    if (variants.length === 0) {
+      ctx.addIssue({
+        code: "custom",
+        message: "At least one variant is required when 'Has Variants' is checked",
+        path: ["variants"],
+      });
+      return;
+    }
+
+    if (variants.filter((v) => !v.id).length > MAX_VARIANTS_PER_REQUEST) {
+      ctx.addIssue({
+        code: "custom",
+        message: `Maximum ${MAX_VARIANTS_PER_REQUEST} new variants per save`,
+        path: ["variants"],
+      });
+    }
+
+    // Same rules as the backend: color/size compared case-insensitively,
+    // SKU and barcode compared exactly after trimming.
+    const flagDuplicates = (
+      field: "color" | "sku" | "barcode",
+      keyOf: (v: (typeof variants)[number]) => string,
+      message: string,
+    ) => {
+      const seen = new Set<string>();
+      variants.forEach((v, index) => {
+        const key = keyOf(v);
+        if (!key) return;
+        if (seen.has(key)) {
+          ctx.addIssue({ code: "custom", message, path: ["variants", index, field] });
+        }
+        seen.add(key);
+      });
+    };
+
+    flagDuplicates(
+      "color",
+      (v) => `${v.color.trim().toUpperCase()}|${v.size.trim().toUpperCase()}`,
+      "Duplicate color/size combination",
+    );
+    flagDuplicates("sku", (v) => v.sku?.trim() || "", "Duplicate SKU");
+    flagDuplicates("barcode", (v) => v.barcode?.trim() || "", "Duplicate barcode");
+
+    variants.forEach((v, index) => {
+      if (v.id && !v.sku?.trim()) {
+        ctx.addIssue({
+          code: "custom",
+          message: "SKU is required for existing variants",
+          path: ["variants", index, "sku"],
+        });
       }
-      return true;
-    },
-    {
-      message:
-        "At least one variant is required when 'Has Variants' is checked",
-      path: ["variants"],
-    },
-  );
+    });
+  });
 
 type FormData = z.infer<typeof schema>;
 
@@ -81,6 +134,44 @@ const PRODUCT_FIELD_ERRORS: { field: keyof FormData; match: (msg: string) => boo
   { field: "sku", match: (msg) => msg === "SKU already in use" || /^SKU .+ already in use by another product variant$/.test(msg) },
   { field: "defaultPrice", match: (msg) => msg === "Default price must be greater than or equal to default HPP" },
 ];
+
+// "Rp 50.000" -> 50000; empty -> undefined
+const parseMoney = (val?: string) => {
+  const numeric = (val ?? "").replace(/\D/g, "");
+  return numeric ? Number(numeric) : undefined;
+};
+
+type VariantFormValues = NonNullable<FormData["variants"]>[number];
+
+const toVariantInput = (v: VariantFormValues): ProductVariantInput => ({
+  color: v.color.trim(),
+  size: v.size.trim(),
+  sku: v.sku?.trim() || undefined,
+  barcode: v.barcode?.trim() || undefined,
+  unitCost: parseMoney(v.unitCost),
+  sellingPrice: parseMoney(v.sellingPrice),
+  minimumStock: v.minimumStock,
+});
+
+// Only the fields of an existing variant that actually changed.
+const getVariantChanges = (v: VariantFormValues, original: ProductVariant) => {
+  const changes: UpdateProductVariantRequest = {};
+  const sku = v.sku?.trim() || "";
+  const barcode = v.barcode?.trim() || "";
+  const unitCost = parseMoney(v.unitCost) ?? 0;
+  const sellingPrice = parseMoney(v.sellingPrice) ?? 0;
+
+  if (sku !== original.sku) changes.sku = sku;
+  if (barcode && barcode !== (original.barcode || "")) changes.barcode = barcode;
+  if (v.color.trim() !== original.color) changes.color = v.color.trim();
+  if (v.size.trim() !== original.size) changes.size = v.size.trim();
+  if (unitCost !== Number(original.unitCost)) changes.unitCost = String(unitCost);
+  if (sellingPrice !== Number(original.sellingPrice || 0)) changes.sellingPrice = String(sellingPrice);
+  if (v.minimumStock !== undefined && v.minimumStock !== original.minimumStock) {
+    changes.minimumStock = v.minimumStock;
+  }
+  return changes;
+};
 
 interface ProductFormProps {
   businessUnits: BusinessUnit[];
@@ -97,6 +188,8 @@ export function ProductForm({
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const { mutate } = useSWRConfig();
+  const revalidateProductData = useRevalidateProductData();
 
   // Variant generator state
   const [colorsInput, setColorsInput] = useState("");
@@ -140,6 +233,7 @@ export function ProductForm({
         initialData?.variants?.map((v) => ({
           id: v.id,
           sku: v.sku || "",
+          barcode: v.barcode || "",
           color: v.color || "",
           size: v.size || "",
           unitCost: String(v.unitCost),
@@ -188,27 +282,26 @@ export function ProductForm({
     const baseHpp = getValues("defaultHpp") || "0";
     const basePrice = getValues("defaultPrice") || "0";
 
-    const baseCode = getValues("productCode") || "";
     const existingVariants = getValues("variants") || [];
     const newVariants = [];
 
     for (const c of finalColors) {
       for (const s of finalSizes) {
         // Cek apakah varian dengan warna & ukuran ini sudah ada
-        const existing = existingVariants.find((v) => v.color === c && v.size === s);
+        const existing = existingVariants.find(
+          (v) =>
+            v.color.trim().toUpperCase() === c.toUpperCase() &&
+            v.size.trim().toUpperCase() === s.toUpperCase(),
+        );
 
         if (existing) {
           // Pertahankan varian yang sudah ada (termasuk ID dan SKU lama)
           newVariants.push(existing);
         } else {
-          // Generate SKU: CODE-COLOR-SIZE untuk varian baru
-          const skuParts = [];
-          if (baseCode) skuParts.push(baseCode);
-          if (c !== "-") skuParts.push(c);
-          if (s !== "-") skuParts.push(s);
-          
+          // SKU dikosongkan: backend generate <productCode>-<COLOR>-<SIZE>
           newVariants.push({
-            sku: skuParts.join("-").toUpperCase(),
+            sku: "",
+            barcode: "",
             color: c,
             size: s,
             unitCost: baseHpp,
@@ -264,104 +357,110 @@ export function ProductForm({
     setError(null);
     let productSaved = false;
     try {
-      // 1. Create/Update Base Product
-      const productPayload: CreateProductRequest = {
-        name: data.name,
-        type: data.type,
-        // Empty productCode: auto-generated on create, left unchanged on update
-        productCode: data.productCode?.trim() || undefined,
-        businessUnitId: data.businessUnitId || undefined,
-        categoryId: data.categoryId || undefined,
-        articleName: data.articleName || undefined,
-        description: data.description || undefined,
-      };
-
-      // Only set these base fields if it's NOT a variant product
-      if (!data.hasVariants) {
-        const sku = data.sku?.trim() || "";
-        if (!initialData) {
-          productPayload.sku = sku || undefined;
-        } else if (sku !== (initialData.sku || "")) {
-          // Sending "" clears the product SKU
-          productPayload.sku = sku;
-        }
-        productPayload.defaultHpp = data.defaultHpp
-          ? String(parseFloat(data.defaultHpp.replace(/\D/g, "")))
-          : "0";
-        productPayload.defaultPrice = data.defaultPrice
-          ? String(parseFloat(data.defaultPrice.replace(/\D/g, "")))
-          : "0";
-      }
-
+      const variants = data.hasVariants ? data.variants || [] : [];
+      const defaultHpp = String(parseMoney(data.defaultHpp) ?? 0);
+      const defaultPrice = String(parseMoney(data.defaultPrice) ?? 0);
       let productId: string;
 
-      if (initialData) {
-        productId = initialData.id;
-        await productApi.updateProduct(productId, productPayload);
-      } else {
-        const createdProduct = await productApi.createProduct(productPayload);
-        const createdId = createdProduct?.data?.id;
-
-        if (!createdId) {
-          console.error("Created Product Response:", createdProduct);
-          throw new Error("Failed to create product. ID not returned.");
+      if (!initialData) {
+        // Product + all variants in one atomic request
+        const payload: CreateProductRequest = {
+          name: data.name,
+          type: data.type,
+          // Empty productCode: backend generates PRD-YYYYMMDD-NNNN
+          productCode: data.productCode?.trim() || undefined,
+          businessUnitId: data.businessUnitId || undefined,
+          categoryId: data.categoryId || undefined,
+          articleName: data.articleName?.trim() || undefined,
+          description: data.description?.trim() || undefined,
+        };
+        if (data.hasVariants) {
+          payload.variants = variants.map(toVariantInput);
+        } else {
+          // Without variants the backend creates a DEFAULT/DEFAULT variant
+          payload.sku = data.sku?.trim() || undefined;
+          payload.defaultHpp = defaultHpp;
+          payload.defaultPrice = defaultPrice;
         }
-        productId = createdId;
-      }
-      productSaved = true;
 
-      // 2. Manage Variants
-      if (data.hasVariants && data.variants && data.variants.length > 0) {
-        const variantPromises = data.variants.map((v) => {
-          const variantPayload: UpdateProductVariantRequest = {
-            sku: v.sku,
-            color: v.color,
-            size: v.size,
-            unitCost: String(parseFloat(String(v.unitCost).replace(/\D/g, ""))),
-            sellingPrice: v.sellingPrice
-              ? String(parseFloat(String(v.sellingPrice).replace(/\D/g, "")))
-              : undefined,
-            minimumStock: v.minimumStock,
-          };
+        const created = await productApi.createProduct(payload);
+        productId = created.data.id;
+        productSaved = true;
+        mutate(`/products/${productId}`, created, { revalidate: false });
+      } else {
+        productId = initialData.id;
 
-          if (v.id) {
-            // Update existing variant
-            return productApi.updateProductVariant(v.id, variantPayload);
-          } else {
-            // Create new variant
-            return productApi.createProductVariant({
-              ...variantPayload,
-              sku: v.sku,
-              color: v.color,
-              size: v.size,
-              unitCost: variantPayload.unitCost as string,
-              productId,
+        // 1. Patch only the product fields that changed
+        const changes: UpdateProductRequest = {};
+        const productCode = data.productCode?.trim() || "";
+        const articleName = data.articleName?.trim() || "";
+        const description = data.description?.trim() || "";
+
+        if (data.name !== initialData.name) changes.name = data.name;
+        if (data.type !== initialData.type) changes.type = data.type;
+        // Empty productCode means "unchanged"
+        if (productCode && productCode !== initialData.productCode) changes.productCode = productCode;
+        if (data.businessUnitId && data.businessUnitId !== initialData.businessUnitId) {
+          changes.businessUnitId = data.businessUnitId;
+        }
+        if (data.categoryId && data.categoryId !== initialData.categoryId) {
+          changes.categoryId = data.categoryId;
+        }
+        if (articleName !== (initialData.articleName || "")) changes.articleName = articleName;
+        if (description !== (initialData.description || "")) changes.description = description;
+        if (!data.hasVariants) {
+          const sku = data.sku?.trim() || "";
+          // Sending "" clears the product SKU
+          if (sku !== (initialData.sku || "")) changes.sku = sku;
+          if (Number(defaultHpp) !== Number(initialData.defaultHpp)) changes.defaultHpp = defaultHpp;
+          if (Number(defaultPrice) !== Number(initialData.defaultPrice)) changes.defaultPrice = defaultPrice;
+        }
+
+        if (Object.keys(changes).length > 0) {
+          await productApi.updateProduct(productId, changes);
+        }
+        productSaved = true;
+
+        if (data.hasVariants) {
+          const originalVariants = new Map(
+            (initialData.variants || []).map((v) => [v.id, v]),
+          );
+
+          // 2. Patch existing variants that actually changed
+          const variantUpdates = variants
+            .filter((v) => v.id && originalVariants.has(v.id))
+            .map((v) => ({
+              id: v.id as string,
+              changes: getVariantChanges(v, originalVariants.get(v.id as string) as ProductVariant),
+            }))
+            .filter((u) => Object.keys(u.changes).length > 0);
+
+          await Promise.all(
+            variantUpdates.map((u) => productApi.updateProductVariant(u.id, u.changes)),
+          );
+
+          // 3. Create all new variants in one atomic request
+          const newVariants = variants.filter((v) => !v.id);
+          if (newVariants.length > 0) {
+            await productApi.createProductVariantsBulk(productId, {
+              variants: newVariants.map(toVariantInput),
             });
           }
-        });
 
-        await Promise.all(variantPromises);
-      }
-
-      // 3. Deactivate variants removed from form
-      if (initialData?.variants) {
-        const currentVariantIds = new Set(
-          data.variants?.filter((v) => v.id).map((v) => v.id) || [],
-        );
-        const originalVariants = initialData.variants;
-        const variantsToRemove = originalVariants.filter(
-          (v) => !currentVariantIds.has(v.id) && v.status === "ACTIVE",
-        );
-
-        if (variantsToRemove.length > 0) {
+          // 4. Deactivate variants removed from the form
+          const keptIds = new Set(variants.map((v) => v.id).filter(Boolean));
+          const variantsToRemove = (initialData.variants || []).filter(
+            (v) => !keptIds.has(v.id) && v.status === MasterStatus.ACTIVE,
+          );
           await Promise.all(
-            variantsToRemove.map((v) =>
-              productApi.deactivateProductVariant(v.id),
-            ),
+            variantsToRemove.map((v) => productApi.deactivateProductVariant(v.id)),
           );
         }
+
+        mutate(`/products/${productId}`);
       }
 
+      revalidateProductData();
       toast.success(
         `Product successfully ${initialData ? "updated" : "created"}!`,
       );
@@ -678,6 +777,10 @@ export function ProductForm({
               </div>
             )}
 
+            <p className="text-xs text-slate-500">
+              {t("features.products.form.variantSkuHint")}
+            </p>
+
             {errors.variants?.root && (
               <p className="text-sm text-red-500 font-medium bg-red-50 p-2 rounded">
                 {errors.variants.root.message}
@@ -687,7 +790,7 @@ export function ProductForm({
             {fields.map((item, index) => (
               <div
                 key={item.id}
-                className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end p-4 bg-slate-50 border border-slate-200 rounded-xl relative hover:border-slate-300 transition-colors"
+                className="grid grid-cols-1 md:grid-cols-14 gap-3 items-end p-4 bg-slate-50 border border-slate-200 rounded-xl relative hover:border-slate-300 transition-colors"
               >
                 {/* Visual number indicator */}
                 <div className="absolute -left-3 -top-3 w-6 h-6 bg-slate-800 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-sm">
@@ -695,17 +798,28 @@ export function ProductForm({
                 </div>
 
                 <div className="md:col-span-2 space-y-2">
-                  <Label className="text-xs">
-                    SKU <span className="text-rose-500">*</span>
-                  </Label>
+                  <Label className="text-xs">SKU</Label>
                   <Input
                     className="h-9 text-sm"
-                    placeholder="e.g. TS-BLK-S"
+                    placeholder={t("features.products.form.variantSkuPh")}
                     {...register(`variants.${index}.sku` as const)}
                   />
                   {errors.variants?.[index]?.sku && (
                     <p className="text-[10px] text-red-500">
                       {errors.variants[index]?.sku?.message}
+                    </p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-xs">{t("features.products.form.barcode")}</Label>
+                  <Input
+                    className="h-9 text-sm"
+                    {...register(`variants.${index}.barcode` as const)}
+                  />
+                  {errors.variants?.[index]?.barcode && (
+                    <p className="text-[10px] text-red-500">
+                      {errors.variants[index]?.barcode?.message}
                     </p>
                   )}
                 </div>
@@ -811,6 +925,7 @@ export function ProductForm({
               onClick={() =>
                 append({
                   sku: "",
+                  barcode: "",
                   color: "",
                   size: "",
                   unitCost: "0",
